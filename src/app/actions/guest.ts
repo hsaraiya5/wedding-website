@@ -1,6 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 
 export async function redeemInviteCode(
@@ -36,5 +37,9 @@ export async function redeemInviteCode(
     return { error: "That code doesn't look right. Double-check it and try again." };
   }
 
+  // The household bound to this browser's session may have just changed --
+  // make sure /events re-fetches rather than reusing a cached render from a
+  // previous household.
+  revalidatePath("/events");
   redirect("/events");
 }

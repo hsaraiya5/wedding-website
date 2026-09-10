@@ -3,6 +3,11 @@ import { createClient } from "@/lib/supabase/server";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
+// This page's content depends on which household the caller's session is
+// bound to, which can change (e.g. redeeming a different invite code in the
+// same browser) without the URL changing -- never cache it.
+export const dynamic = "force-dynamic";
+
 export default async function EventsPage() {
   const supabase = await createClient();
 
