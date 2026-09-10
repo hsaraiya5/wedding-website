@@ -21,7 +21,7 @@ export default async function RsvpPage({
   }
 
   const [
-    { data: household },
+    { data: household, error: householdError },
     { data: guests },
     { data: events },
     { data: rsvps },
@@ -39,6 +39,7 @@ export default async function RsvpPage({
   ]);
 
   if (!household) {
+    console.error("[/rsvp] household query failed:", householdError);
     redirect("/");
   }
 
