@@ -1,7 +1,9 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { buttonVariants } from "@/components/ui/button";
 
 // This page's content depends on which household the caller's session is
 // bound to, which can change (e.g. redeeming a different invite code in the
@@ -33,11 +35,16 @@ export default async function EventsPage() {
 
   return (
     <main className="mx-auto flex max-w-2xl flex-col gap-6 p-6">
-      <div>
-        <h1 className="text-2xl font-semibold">Your events</h1>
-        <p className="text-muted-foreground">
-          Here&apos;s what you&apos;re invited to.
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-semibold">Your events</h1>
+          <p className="text-muted-foreground">
+            Here&apos;s what you&apos;re invited to.
+          </p>
+        </div>
+        <Link href="/rsvp" className={buttonVariants()}>
+          RSVP
+        </Link>
       </div>
 
       {events && events.length > 0 ? (
