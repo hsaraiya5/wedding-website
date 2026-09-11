@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { getSessionHouseholdId } from "@/lib/guest-session";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
@@ -21,11 +22,26 @@ export default async function EventsPage() {
     redirect("/");
   }
 
-  // RLS (see supabase/migrations/0002_functions_and_policies.sql) already
-  // restricts this to events the signed-in household is invited to.
+  const householdId = await getSessionHouseholdId(supabase);
+  if (!householdId) {
+    redirect("/");
+  }
+
+  const { data: householdEvents, error: householdEventsError } = await supabase
+    .from("household_events")
+    .select("event_id")
+    .eq("household_id", householdId);
+
+  if (householdEventsError) {
+    redirect("/");
+  }
+
+  const eventIds = (householdEvents ?? []).map((he) => he.event_id);
+
   const { data: events, error } = await supabase
     .from("events")
     .select("*")
+    .in("id", eventIds.length > 0 ? eventIds : ["00000000-0000-0000-0000-000000000000"])
     .order("event_date", { ascending: true })
     .order("start_time", { ascending: true });
 
