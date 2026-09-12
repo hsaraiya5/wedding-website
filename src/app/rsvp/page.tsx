@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { getSessionHouseholdId } from "@/lib/guest-session";
+import { getGuestContext } from "@/lib/guest-session";
 import { RsvpForm } from "@/components/rsvp-form";
 
 // Depends on the session's bound household, same as /events -- never cache.
@@ -21,50 +21,12 @@ export default async function RsvpPage({
     redirect("/");
   }
 
-  const householdId = await getSessionHouseholdId(supabase);
-  if (!householdId) {
+  const context = await getGuestContext(supabase);
+  if (!context) {
     redirect("/");
   }
 
-  const { data: household, error: householdError } = await supabase
-    .from("households")
-    .select("*")
-    .eq("id", householdId)
-    .single();
-
-  if (!household) {
-    console.error("[/rsvp] household query failed:", householdError);
-    redirect("/");
-  }
-
-  const { data: guests } = await supabase
-    .from("guests")
-    .select("*")
-    .eq("household_id", householdId)
-    .order("first_name");
-
-  const guestIds = (guests ?? []).map((g) => g.id);
-
-  const { data: householdEvents } = await supabase
-    .from("household_events")
-    .select("event_id")
-    .eq("household_id", householdId);
-
-  const eventIds = (householdEvents ?? []).map((he) => he.event_id);
-  const safeEventIds = eventIds.length > 0 ? eventIds : ["00000000-0000-0000-0000-000000000000"];
-  const safeGuestIds = guestIds.length > 0 ? guestIds : ["00000000-0000-0000-0000-000000000000"];
-
-  const [{ data: events }, { data: rsvps }, { data: siteSettings }] = await Promise.all([
-    supabase
-      .from("events")
-      .select("*")
-      .in("id", safeEventIds)
-      .order("event_date", { ascending: true })
-      .order("start_time", { ascending: true }),
-    supabase.from("rsvps").select("*").in("guest_id", safeGuestIds),
-    supabase.from("site_settings").select("*").single(),
-  ]);
-
+  const { household, guests, events, rsvps, site_settings } = context;
   const { submitted } = await searchParams;
 
   return (
@@ -78,10 +40,10 @@ export default async function RsvpPage({
 
       <RsvpForm
         household={household}
-        guests={guests ?? []}
-        events={events ?? []}
-        existingRsvps={rsvps ?? []}
-        siteSettings={siteSettings}
+        guests={guests}
+        events={events}
+        existingRsvps={rsvps}
+        siteSettings={site_settings}
         justSubmitted={submitted === "1"}
       />
     </main>

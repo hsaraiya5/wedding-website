@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { getSessionHouseholdId } from "@/lib/guest-session";
+import { getGuestContext } from "@/lib/guest-session";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
@@ -22,32 +22,12 @@ export default async function EventsPage() {
     redirect("/");
   }
 
-  const householdId = await getSessionHouseholdId(supabase);
-  if (!householdId) {
+  const context = await getGuestContext(supabase);
+  if (!context) {
     redirect("/");
   }
 
-  const { data: householdEvents, error: householdEventsError } = await supabase
-    .from("household_events")
-    .select("event_id")
-    .eq("household_id", householdId);
-
-  if (householdEventsError) {
-    redirect("/");
-  }
-
-  const eventIds = (householdEvents ?? []).map((he) => he.event_id);
-
-  const { data: events, error } = await supabase
-    .from("events")
-    .select("*")
-    .in("id", eventIds.length > 0 ? eventIds : ["00000000-0000-0000-0000-000000000000"])
-    .order("event_date", { ascending: true })
-    .order("start_time", { ascending: true });
-
-  if (error) {
-    redirect("/");
-  }
+  const { events } = context;
 
   return (
     <main className="mx-auto flex max-w-2xl flex-col gap-6 p-6">
@@ -63,7 +43,7 @@ export default async function EventsPage() {
         </Link>
       </div>
 
-      {events && events.length > 0 ? (
+      {events.length > 0 ? (
         <div className="flex flex-col gap-4">
           {events.map((event) => (
             <Card key={event.id}>

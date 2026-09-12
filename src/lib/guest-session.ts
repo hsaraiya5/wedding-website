@@ -1,18 +1,38 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 
-// Resolves which household this session is bound to via redeem_invite_code,
-// independent of RLS table-visibility. Guest pages must filter their
-// queries by this id explicitly rather than relying on RLS visibility
-// alone -- a session that happens to also be an admin (e.g. someone testing
-// both flows in the same browser) is visible to every household under the
-// admin RLS policies, which silently broadens "my household's events" into
-// "every event" if the query isn't scoped explicitly.
-export async function getSessionHouseholdId(
+export type GuestContext = {
+  household: {
+    id: string;
+    display_name: string;
+    rsvp_submitted_at: string | null;
+    song_request: string | null;
+  };
+  guests: { id: string; first_name: string; last_name: string }[];
+  events: {
+    id: string;
+    name: string;
+    event_date: string | null;
+    start_time: string | null;
+    venue_name: string | null;
+    address: string | null;
+    dress_code: string | null;
+    meal_info: string | null;
+    description: string | null;
+  }[];
+  rsvps: { guest_id: string; event_id: string; attending: "yes" | "no" | null }[];
+  site_settings: { rsvp_deadline: string | null; late_edits_enabled: boolean } | null;
+};
+
+// Everything a guest-facing page (/events, /rsvp) needs, in one round-trip
+// instead of several sequential ones. See get_guest_context in
+// supabase/migrations/0004_get_guest_context.sql. Returns null if this
+// session isn't bound to a household (no code redeemed / session expired).
+export async function getGuestContext(
   supabase: SupabaseClient
-): Promise<string | null> {
-  const { data, error } = await supabase.rpc("session_household_id");
+): Promise<GuestContext | null> {
+  const { data, error } = await supabase.rpc("get_guest_context");
   if (error || !data) {
     return null;
   }
-  return data as string;
+  return data as GuestContext;
 }
