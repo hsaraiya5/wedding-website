@@ -34,7 +34,7 @@ export async function saveHousehold(
   }
 
   const supabase = await createClient();
-  const { data: newId, error } = await supabase.rpc("admin_upsert_household", {
+  const { error } = await supabase.rpc("admin_upsert_household", {
     p_household_id: householdId,
     p_display_name: displayName,
     p_contact_email: contactEmail,
@@ -55,7 +55,7 @@ export async function saveHousehold(
 
   revalidatePath("/admin");
   if (!householdId) {
-    redirect(`/admin/households/${newId}`);
+    redirect(`/admin?created=${encodeURIComponent(displayName)}`);
   }
   revalidatePath(`/admin/households/${householdId}`);
   return { error: null };

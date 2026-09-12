@@ -12,16 +12,19 @@ import {
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { buttonVariants } from "@/components/ui/button";
+import { EditInvitationsDialog } from "@/components/edit-invitations-dialog";
 
 type EventRef = { name: string } | { name: string }[] | null;
 
 type Guest = {
+  id: string;
   first_name: string;
   last_name: string;
   guest_events: { event_id: string; events: EventRef }[];
   rsvps: { event_id: string; attending: "yes" | "no" | null }[];
 };
+
+type Event = { id: string; name: string; event_date: string | null };
 
 type Household = {
   id: string;
@@ -43,7 +46,13 @@ function eventList(guest: Guest): { name: string; status: string }[] {
   });
 }
 
-export function HouseholdsTable({ households }: { households: Household[] }) {
+export function HouseholdsTable({
+  households,
+  events,
+}: {
+  households: Household[];
+  events: Event[];
+}) {
   const [search, setSearch] = useState("");
   const [groupFilter, setGroupFilter] = useState("");
 
@@ -124,12 +133,12 @@ export function HouseholdsTable({ households }: { households: Household[] }) {
               <TableCell className="text-sm">
                 <div className="flex flex-col gap-1">
                   {household.guests.map((guest) => {
-                    const events = eventList(guest);
+                    const guestEventList = eventList(guest);
                     return (
-                      <div key={`${guest.first_name}-${guest.last_name}`}>
+                      <div key={guest.id}>
                         <span className="font-medium">{guest.first_name}:</span>{" "}
-                        {events.length > 0
-                          ? events.map((e, i) => (
+                        {guestEventList.length > 0
+                          ? guestEventList.map((e, i) => (
                               <span key={i}>
                                 {i > 0 ? ", " : ""}
                                 {e.name} ({e.status})
@@ -142,12 +151,17 @@ export function HouseholdsTable({ households }: { households: Household[] }) {
                 </div>
               </TableCell>
               <TableCell>
-                <Link
-                  href={`/admin/households/${household.id}#guests`}
-                  className={buttonVariants({ variant: "outline", size: "sm" })}
-                >
-                  Edit invitations
-                </Link>
+                <EditInvitationsDialog
+                  householdId={household.id}
+                  householdName={household.display_name}
+                  events={events}
+                  guests={household.guests.map((guest) => ({
+                    id: guest.id,
+                    first_name: guest.first_name,
+                    last_name: guest.last_name,
+                    invitedEventIds: guest.guest_events.map((ge) => ge.event_id),
+                  }))}
+                />
               </TableCell>
             </TableRow>
           ))}
