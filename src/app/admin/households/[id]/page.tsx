@@ -62,7 +62,7 @@ export default async function EditHouseholdPage({
         </CardContent>
       </Card>
 
-      <Card>
+      <Card id="guests">
         <CardHeader>
           <CardTitle>Guests</CardTitle>
         </CardHeader>

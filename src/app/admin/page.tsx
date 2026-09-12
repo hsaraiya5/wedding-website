@@ -19,7 +19,7 @@ export default async function AdminDashboardPage() {
   const { data: households } = await supabase
     .from("households")
     .select(
-      "id, display_name, code, group_tag, guests(first_name, last_name, guest_events(events(name)))"
+      "id, display_name, code, group_tag, guests(first_name, last_name, guest_events(event_id, events(name)), rsvps(event_id, attending))"
     )
     .order("display_name");
 

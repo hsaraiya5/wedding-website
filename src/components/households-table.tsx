@@ -12,11 +12,15 @@ import {
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { buttonVariants } from "@/components/ui/button";
+
+type EventRef = { name: string } | { name: string }[] | null;
 
 type Guest = {
   first_name: string;
   last_name: string;
-  guest_events: { events: { name: string } | { name: string }[] | null }[];
+  guest_events: { event_id: string; events: EventRef }[];
+  rsvps: { event_id: string; attending: "yes" | "no" | null }[];
 };
 
 type Household = {
@@ -27,12 +31,16 @@ type Household = {
   guests: Guest[];
 };
 
-function eventNamesFor(guest: Guest): string {
-  return guest.guest_events
-    .flatMap((ge) => (Array.isArray(ge.events) ? ge.events : ge.events ? [ge.events] : []))
-    .map((e) => e.name)
-    .filter(Boolean)
-    .join(", ");
+function eventList(guest: Guest): { name: string; status: string }[] {
+  const rsvpByEvent = new Map(guest.rsvps.map((r) => [r.event_id, r.attending]));
+  return guest.guest_events.flatMap((ge) => {
+    const events = Array.isArray(ge.events) ? ge.events : ge.events ? [ge.events] : [];
+    return events.map((event) => {
+      const attending = rsvpByEvent.get(ge.event_id);
+      const status = attending === "yes" ? "Yes" : attending === "no" ? "No" : "Pending";
+      return { name: event.name, status };
+    });
+  });
 }
 
 export function HouseholdsTable({ households }: { households: Household[] }) {
@@ -95,7 +103,8 @@ export function HouseholdsTable({ households }: { households: Household[] }) {
             <TableHead>Household</TableHead>
             <TableHead>Group</TableHead>
             <TableHead>Code</TableHead>
-            <TableHead>Guests &amp; invited events</TableHead>
+            <TableHead>Guests, invited events &amp; RSVP status</TableHead>
+            <TableHead></TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -113,9 +122,32 @@ export function HouseholdsTable({ households }: { households: Household[] }) {
                 <code>{household.code}</code>
               </TableCell>
               <TableCell className="text-sm">
-                {household.guests
-                  .map((guest) => `${guest.first_name}: ${eventNamesFor(guest) || "none"}`)
-                  .join("; ")}
+                <div className="flex flex-col gap-1">
+                  {household.guests.map((guest) => {
+                    const events = eventList(guest);
+                    return (
+                      <div key={`${guest.first_name}-${guest.last_name}`}>
+                        <span className="font-medium">{guest.first_name}:</span>{" "}
+                        {events.length > 0
+                          ? events.map((e, i) => (
+                              <span key={i}>
+                                {i > 0 ? ", " : ""}
+                                {e.name} ({e.status})
+                              </span>
+                            ))
+                          : "no invited events"}
+                      </div>
+                    );
+                  })}
+                </div>
+              </TableCell>
+              <TableCell>
+                <Link
+                  href={`/admin/households/${household.id}#guests`}
+                  className={buttonVariants({ variant: "outline", size: "sm" })}
+                >
+                  Edit invitations
+                </Link>
               </TableCell>
             </TableRow>
           ))}
