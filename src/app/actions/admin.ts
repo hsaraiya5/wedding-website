@@ -21,7 +21,7 @@ export async function saveHousehold(
     return { error: "Household name is required." };
   }
 
-  let guests: { first_name: string; last_name: string }[] | null = null;
+  let guests: { first_name: string; last_name: string; event_ids?: string[] }[] | null = null;
   if (!householdId) {
     try {
       guests = JSON.parse(guestsRaw || "[]");

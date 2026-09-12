@@ -14,29 +14,52 @@ type Household = {
   group_tag: string | null;
 } | null;
 
-type NewGuest = { first_name: string; last_name: string };
+type Event = { id: string; name: string; event_date: string | null };
+
+type NewGuest = { first_name: string; last_name: string; event_ids: string[] };
 
 export function HouseholdDetailsForm({
   household,
   existingGroupTags,
+  events = [],
 }: {
   household: Household;
   existingGroupTags: string[];
+  events?: Event[];
 }) {
   const [state, formAction, pending] = useActionState(saveHousehold, { error: null });
 
   // Only relevant when creating -- a household needs at least one guest to
-  // ever be useful to whoever redeems its code, so guests are collected
-  // here and created atomically with the household itself.
-  const [newGuests, setNewGuests] = useState<NewGuest[]>([{ first_name: "", last_name: "" }]);
+  // ever be useful to whoever redeems its code, so guests (and which
+  // events each is invited to) are collected here and created atomically
+  // with the household itself.
+  const [newGuests, setNewGuests] = useState<NewGuest[]>([
+    { first_name: "", last_name: "", event_ids: [] },
+  ]);
 
-  const updateGuest = (index: number, field: keyof NewGuest, value: string) => {
+  const updateGuest = (index: number, field: "first_name" | "last_name", value: string) => {
     setNewGuests((prev) =>
       prev.map((guest, i) => (i === index ? { ...guest, [field]: value } : guest))
     );
   };
 
-  const addGuestRow = () => setNewGuests((prev) => [...prev, { first_name: "", last_name: "" }]);
+  const toggleGuestEvent = (index: number, eventId: string) => {
+    setNewGuests((prev) =>
+      prev.map((guest, i) => {
+        if (i !== index) return guest;
+        const has = guest.event_ids.includes(eventId);
+        return {
+          ...guest,
+          event_ids: has
+            ? guest.event_ids.filter((id) => id !== eventId)
+            : [...guest.event_ids, eventId],
+        };
+      })
+    );
+  };
+
+  const addGuestRow = () =>
+    setNewGuests((prev) => [...prev, { first_name: "", last_name: "", event_ids: [] }]);
   const removeGuestRow = (index: number) =>
     setNewGuests((prev) => prev.filter((_, i) => i !== index));
 
@@ -99,32 +122,61 @@ export function HouseholdDetailsForm({
       </div>
 
       {!household ? (
-        <div className="flex flex-col gap-2">
-          <Label>Guests</Label>
-          <p className="text-xs text-muted-foreground">
-            At least one guest is required -- otherwise the family sees an empty page when they use their code.
-          </p>
+        <div className="flex flex-col gap-3">
+          <div>
+            <Label>Guests</Label>
+            <p className="text-xs text-muted-foreground">
+              At least one guest is required -- otherwise the family sees an empty page when they use their code.
+            </p>
+          </div>
           {newGuests.map((guest, index) => (
-            <div key={index} className="flex items-center gap-2">
-              <Input
-                placeholder="First name"
-                value={guest.first_name}
-                onChange={(e) => updateGuest(index, "first_name", e.target.value)}
-              />
-              <Input
-                placeholder="Last name"
-                value={guest.last_name}
-                onChange={(e) => updateGuest(index, "last_name", e.target.value)}
-              />
-              {newGuests.length > 1 ? (
-                <Button
-                  type="button"
-                  variant="destructive"
-                  size="sm"
-                  onClick={() => removeGuestRow(index)}
-                >
-                  Remove
-                </Button>
+            <div key={index} className="flex flex-col gap-2 rounded-lg border p-3">
+              <div className="flex items-center gap-2">
+                <Input
+                  placeholder="First name"
+                  value={guest.first_name}
+                  onChange={(e) => updateGuest(index, "first_name", e.target.value)}
+                />
+                <Input
+                  placeholder="Last name"
+                  value={guest.last_name}
+                  onChange={(e) => updateGuest(index, "last_name", e.target.value)}
+                />
+                {newGuests.length > 1 ? (
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => removeGuestRow(index)}
+                  >
+                    Remove
+                  </Button>
+                ) : null}
+              </div>
+
+              {events.length > 0 ? (
+                <div className="flex flex-col gap-1">
+                  <p className="text-xs font-medium text-muted-foreground">Invited events</p>
+                  <div className="flex flex-wrap gap-3">
+                    {events.map((event) => (
+                      <div key={event.id} className="flex items-center gap-1.5">
+                        <input
+                          type="checkbox"
+                          id={`new-guest-${index}-event-${event.id}`}
+                          checked={guest.event_ids.includes(event.id)}
+                          onChange={() => toggleGuestEvent(index, event.id)}
+                          className="size-4"
+                        />
+                        <Label
+                          htmlFor={`new-guest-${index}-event-${event.id}`}
+                          className="text-sm font-normal"
+                        >
+                          {event.name}
+                        </Label>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               ) : null}
             </div>
           ))}

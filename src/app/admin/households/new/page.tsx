@@ -13,7 +13,10 @@ export default async function NewHouseholdPage() {
     return <NotAuthorized email={user.email} />;
   }
 
-  const existingGroupTags = await getExistingGroupTags(supabase);
+  const [existingGroupTags, { data: events }] = await Promise.all([
+    getExistingGroupTags(supabase),
+    supabase.from("events").select("id, name, event_date").order("event_date"),
+  ]);
 
   return (
     <main className="mx-auto flex max-w-xl flex-col gap-6 p-6">
@@ -24,7 +27,11 @@ export default async function NewHouseholdPage() {
           <CardTitle>Household details</CardTitle>
         </CardHeader>
         <CardContent>
-          <HouseholdDetailsForm household={null} existingGroupTags={existingGroupTags} />
+          <HouseholdDetailsForm
+            household={null}
+            existingGroupTags={existingGroupTags}
+            events={events ?? []}
+          />
         </CardContent>
       </Card>
     </main>
