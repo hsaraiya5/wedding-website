@@ -27,6 +27,8 @@ type Event = {
   start_time: string | null;
 };
 
+type GuestEvent = { guest_id: string; event_id: string };
+
 type Rsvp = { guest_id: string; event_id: string; attending: "yes" | "no" | null };
 
 type SiteSettings = {
@@ -42,6 +44,7 @@ export function RsvpForm({
   household,
   guests,
   events,
+  guestEvents,
   existingRsvps,
   siteSettings,
   justSubmitted,
@@ -49,6 +52,7 @@ export function RsvpForm({
   household: Household;
   guests: Guest[];
   events: Event[];
+  guestEvents: GuestEvent[];
   existingRsvps: Rsvp[];
   siteSettings: SiteSettings;
   justSubmitted: boolean;
@@ -57,6 +61,12 @@ export function RsvpForm({
   const deadline = siteSettings?.rsvp_deadline ? new Date(siteSettings.rsvp_deadline) : null;
   const deadlinePassed = deadline ? new Date() > deadline : false;
   const canEdit = !deadlinePassed || Boolean(siteSettings?.late_edits_enabled);
+
+  const invitedSet = useMemo(
+    () => new Set(guestEvents.map((ge) => answerKey(ge.guest_id, ge.event_id))),
+    [guestEvents]
+  );
+  const isInvited = (guestId: string, eventId: string) => invitedSet.has(answerKey(guestId, eventId));
 
   const [mode, setMode] = useState<"readonly" | "edit">(
     alreadySubmitted ? "readonly" : "edit"
@@ -126,14 +136,16 @@ export function RsvpForm({
                   </span>
                 </div>
                 <div className="flex flex-wrap gap-2">
-                  {guests.map((guest) => {
-                    const answer = answers[answerKey(guest.id, event.id)];
-                    return (
-                      <Badge key={guest.id} variant={answer === "yes" ? "default" : "secondary"}>
-                        {guest.first_name}: {answer === "yes" ? "Yes" : answer === "no" ? "No" : "Not answered"}
-                      </Badge>
-                    );
-                  })}
+                  {guests
+                    .filter((guest) => isInvited(guest.id, event.id))
+                    .map((guest) => {
+                      const answer = answers[answerKey(guest.id, event.id)];
+                      return (
+                        <Badge key={guest.id} variant={answer === "yes" ? "default" : "secondary"}>
+                          {guest.first_name}: {answer === "yes" ? "Yes" : answer === "no" ? "No" : "Not answered"}
+                        </Badge>
+                      );
+                    })}
                 </div>
               </div>
             ))}
@@ -167,30 +179,32 @@ export function RsvpForm({
                 </div>
               </CardHeader>
               <CardContent className="flex flex-col gap-4">
-                {guests.map((guest) => {
-                  const key = answerKey(guest.id, event.id);
-                  return (
-                    <div key={guest.id} className="flex items-center justify-between gap-4">
-                      <Label>{guest.first_name} {guest.last_name}</Label>
-                      <RadioGroup
-                        value={answers[key] ?? ""}
-                        onValueChange={(value) =>
-                          setAnswers((prev) => ({ ...prev, [key]: value as "yes" | "no" }))
-                        }
-                        className="flex flex-row gap-4"
-                      >
-                        <div className="flex items-center gap-2">
-                          <RadioGroupItem value="yes" id={`${key}-yes`} />
-                          <Label htmlFor={`${key}-yes`}>Yes</Label>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <RadioGroupItem value="no" id={`${key}-no`} />
-                          <Label htmlFor={`${key}-no`}>No</Label>
-                        </div>
-                      </RadioGroup>
-                    </div>
-                  );
-                })}
+                {guests
+                  .filter((guest) => isInvited(guest.id, event.id))
+                  .map((guest) => {
+                    const key = answerKey(guest.id, event.id);
+                    return (
+                      <div key={guest.id} className="flex items-center justify-between gap-4">
+                        <Label>{guest.first_name} {guest.last_name}</Label>
+                        <RadioGroup
+                          value={answers[key] ?? ""}
+                          onValueChange={(value) =>
+                            setAnswers((prev) => ({ ...prev, [key]: value as "yes" | "no" }))
+                          }
+                          className="flex flex-row gap-4"
+                        >
+                          <div className="flex items-center gap-2">
+                            <RadioGroupItem value="yes" id={`${key}-yes`} />
+                            <Label htmlFor={`${key}-yes`}>Yes</Label>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <RadioGroupItem value="no" id={`${key}-no`} />
+                            <Label htmlFor={`${key}-no`}>No</Label>
+                          </div>
+                        </RadioGroup>
+                      </div>
+                    );
+                  })}
               </CardContent>
             </Card>
           ))}

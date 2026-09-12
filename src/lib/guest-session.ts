@@ -19,14 +19,16 @@ export type GuestContext = {
     meal_info: string | null;
     description: string | null;
   }[];
+  guest_events: { guest_id: string; event_id: string }[];
   rsvps: { guest_id: string; event_id: string; attending: "yes" | "no" | null }[];
   site_settings: { rsvp_deadline: string | null; late_edits_enabled: boolean } | null;
 };
 
 // Everything a guest-facing page (/events, /rsvp) needs, in one round-trip
 // instead of several sequential ones. See get_guest_context in
-// supabase/migrations/0004_get_guest_context.sql. Returns null if this
-// session isn't bound to a household (no code redeemed / session expired).
+// supabase/migrations/0004_get_guest_context.sql (updated in
+// 0007_per_guest_invitations.sql for per-guest invitations). Returns null
+// if this session isn't bound to a household (no code redeemed / expired).
 export async function getGuestContext(
   supabase: SupabaseClient
 ): Promise<GuestContext | null> {

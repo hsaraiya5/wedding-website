@@ -117,10 +117,14 @@ export async function deleteGuest(guestId: string, householdId: string) {
   revalidatePath(`/admin/households/${householdId}`);
 }
 
-export async function saveInvitations(householdId: string, eventIds: string[]) {
+export async function saveGuestInvitations(
+  guestId: string,
+  householdId: string,
+  eventIds: string[]
+) {
   const supabase = await createClient();
-  const { error } = await supabase.rpc("admin_set_household_events", {
-    p_household_id: householdId,
+  const { error } = await supabase.rpc("admin_set_guest_events", {
+    p_guest_id: guestId,
     p_event_ids: eventIds,
   });
 

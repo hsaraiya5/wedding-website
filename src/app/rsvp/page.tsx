@@ -26,7 +26,7 @@ export default async function RsvpPage({
     redirect("/");
   }
 
-  const { household, guests, events, rsvps, site_settings } = context;
+  const { household, guests, events, guest_events, rsvps, site_settings } = context;
   const { submitted } = await searchParams;
 
   return (
@@ -42,6 +42,7 @@ export default async function RsvpPage({
         household={household}
         guests={guests}
         events={events}
+        guestEvents={guest_events}
         existingRsvps={rsvps}
         siteSettings={site_settings}
         justSubmitted={submitted === "1"}

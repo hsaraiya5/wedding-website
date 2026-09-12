@@ -2,17 +2,21 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { saveInvitations } from "@/app/actions/admin";
+import { saveGuestInvitations } from "@/app/actions/admin";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 
 type Event = { id: string; name: string; event_date: string | null };
 
+// Per-guest invitations -- not every guest in a household is necessarily
+// invited to every event (e.g. kids skipping a late-night event).
 export function InvitationsForm({
+  guestId,
   householdId,
   events,
   invitedEventIds,
 }: {
+  guestId: string;
   householdId: string;
   events: Event[];
   invitedEventIds: string[];
@@ -38,7 +42,7 @@ export function InvitationsForm({
     setError(null);
     startTransition(async () => {
       try {
-        await saveInvitations(householdId, Array.from(selected));
+        await saveGuestInvitations(guestId, householdId, Array.from(selected));
         router.refresh();
       } catch {
         setError("Something went wrong saving invitations.");
@@ -47,22 +51,24 @@ export function InvitationsForm({
   };
 
   return (
-    <div className="flex flex-col gap-3">
-      {events.map((event) => (
-        <div key={event.id} className="flex items-center gap-2">
-          <input
-            type="checkbox"
-            id={`event-${event.id}`}
-            checked={selected.has(event.id)}
-            onChange={() => toggle(event.id)}
-            className="size-4"
-          />
-          <Label htmlFor={`event-${event.id}`}>
-            {event.name} <span className="text-muted-foreground">({event.event_date})</span>
-          </Label>
-        </div>
-      ))}
-      <Button type="button" onClick={handleSave} disabled={pending} className="self-start">
+    <div className="flex flex-col gap-2">
+      <div className="flex flex-wrap gap-3">
+        {events.map((event) => (
+          <div key={event.id} className="flex items-center gap-1.5">
+            <input
+              type="checkbox"
+              id={`event-${guestId}-${event.id}`}
+              checked={selected.has(event.id)}
+              onChange={() => toggle(event.id)}
+              className="size-4"
+            />
+            <Label htmlFor={`event-${guestId}-${event.id}`} className="text-sm font-normal">
+              {event.name}
+            </Label>
+          </div>
+        ))}
+      </div>
+      <Button type="button" variant="outline" size="sm" onClick={handleSave} disabled={pending} className="self-start">
         {pending ? "Saving..." : "Save invitations"}
       </Button>
       {error ? <p className="text-sm text-destructive">{error}</p> : null}

@@ -4,7 +4,6 @@ import { NotAuthorized } from "@/components/not-authorized";
 import { HouseholdDetailsForm } from "@/components/household-details-form";
 import { CodeManagement } from "@/components/code-management";
 import { GuestManager } from "@/components/guest-manager";
-import { InvitationsForm } from "@/components/invitations-form";
 import { DeleteHouseholdButton } from "@/components/delete-household-button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -23,13 +22,11 @@ export default async function EditHouseholdPage({
     return <NotAuthorized email={user.email} />;
   }
 
-  const [{ data: household }, { data: guests }, { data: events }, { data: householdEvents }] =
-    await Promise.all([
-      supabase.from("households").select("*").eq("id", id).single(),
-      supabase.from("guests").select("*").eq("household_id", id).order("first_name"),
-      supabase.from("events").select("id, name, event_date").order("event_date"),
-      supabase.from("household_events").select("event_id").eq("household_id", id),
-    ]);
+  const [{ data: household }, { data: guests }, { data: events }] = await Promise.all([
+    supabase.from("households").select("*").eq("id", id).single(),
+    supabase.from("guests").select("*").eq("household_id", id).order("first_name"),
+    supabase.from("events").select("id, name, event_date").order("event_date"),
+  ]);
 
   if (!household) {
     return (
@@ -39,7 +36,11 @@ export default async function EditHouseholdPage({
     );
   }
 
-  const invitedEventIds = (householdEvents ?? []).map((he) => he.event_id);
+  const guestIds = (guests ?? []).map((g) => g.id);
+  const { data: guestEvents } =
+    guestIds.length > 0
+      ? await supabase.from("guest_events").select("guest_id, event_id").in("guest_id", guestIds)
+      : { data: [] };
 
   return (
     <main className="mx-auto flex max-w-xl flex-col gap-6 p-6">
@@ -63,19 +64,11 @@ export default async function EditHouseholdPage({
           <CardTitle>Guests</CardTitle>
         </CardHeader>
         <CardContent>
-          <GuestManager householdId={household.id} guests={guests ?? []} />
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Invited events</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <InvitationsForm
+          <GuestManager
             householdId={household.id}
+            guests={guests ?? []}
             events={events ?? []}
-            invitedEventIds={invitedEventIds}
+            guestEvents={guestEvents ?? []}
           />
         </CardContent>
       </Card>

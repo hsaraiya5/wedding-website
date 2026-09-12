@@ -5,10 +5,22 @@ import { useRouter } from "next/navigation";
 import { saveGuest, deleteGuest } from "@/app/actions/admin";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { InvitationsForm } from "@/components/invitations-form";
 
 type Guest = { id: string; first_name: string; last_name: string };
+type Event = { id: string; name: string; event_date: string | null };
 
-function GuestRow({ guest, householdId }: { guest: Guest; householdId: string }) {
+function GuestRow({
+  guest,
+  householdId,
+  events,
+  invitedEventIds,
+}: {
+  guest: Guest;
+  householdId: string;
+  events: Event[];
+  invitedEventIds: string[];
+}) {
   const [state, formAction, pending] = useActionState(saveGuest, { error: null });
   const router = useRouter();
   const [deleting, startDeleteTransition] = useTransition();
@@ -22,21 +34,33 @@ function GuestRow({ guest, householdId }: { guest: Guest; householdId: string })
   };
 
   return (
-    <form action={formAction} className="flex flex-col gap-2 border-b pb-3 last:border-b-0 last:pb-0">
-      <input type="hidden" name="guest_id" value={guest.id} />
-      <input type="hidden" name="household_id" value={householdId} />
-      <div className="flex items-center gap-2">
-        <Input name="first_name" defaultValue={guest.first_name} placeholder="First name" required />
-        <Input name="last_name" defaultValue={guest.last_name} placeholder="Last name" required />
-        <Button type="submit" variant="outline" size="sm" disabled={pending}>
-          {pending ? "Saving..." : "Save"}
-        </Button>
-        <Button type="button" variant="destructive" size="sm" onClick={handleDelete} disabled={deleting}>
-          Remove
-        </Button>
+    <div className="flex flex-col gap-3 border-b pb-4 last:border-b-0 last:pb-0">
+      <form action={formAction} className="flex flex-col gap-2">
+        <input type="hidden" name="guest_id" value={guest.id} />
+        <input type="hidden" name="household_id" value={householdId} />
+        <div className="flex items-center gap-2">
+          <Input name="first_name" defaultValue={guest.first_name} placeholder="First name" required />
+          <Input name="last_name" defaultValue={guest.last_name} placeholder="Last name" required />
+          <Button type="submit" variant="outline" size="sm" disabled={pending}>
+            {pending ? "Saving..." : "Save"}
+          </Button>
+          <Button type="button" variant="destructive" size="sm" onClick={handleDelete} disabled={deleting}>
+            Remove
+          </Button>
+        </div>
+        {state.error ? <p className="text-sm text-destructive">{state.error}</p> : null}
+      </form>
+
+      <div>
+        <p className="mb-1 text-xs font-medium text-muted-foreground">Invited events</p>
+        <InvitationsForm
+          guestId={guest.id}
+          householdId={householdId}
+          events={events}
+          invitedEventIds={invitedEventIds}
+        />
       </div>
-      {state.error ? <p className="text-sm text-destructive">{state.error}</p> : null}
-    </form>
+    </div>
   );
 }
 
@@ -65,16 +89,29 @@ function AddGuestForm({ householdId, resetKey }: { householdId: string; resetKey
 export function GuestManager({
   householdId,
   guests,
+  events,
+  guestEvents,
 }: {
   householdId: string;
   guests: Guest[];
+  events: Event[];
+  guestEvents: { guest_id: string; event_id: string }[];
 }) {
+  const invitedEventIdsByGuest = (guestId: string) =>
+    guestEvents.filter((ge) => ge.guest_id === guestId).map((ge) => ge.event_id);
+
   return (
     <div className="flex flex-col gap-4">
       {guests.length > 0 ? (
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-4">
           {guests.map((guest) => (
-            <GuestRow key={guest.id} guest={guest} householdId={householdId} />
+            <GuestRow
+              key={guest.id}
+              guest={guest}
+              householdId={householdId}
+              events={events}
+              invitedEventIds={invitedEventIdsByGuest(guest.id)}
+            />
           ))}
         </div>
       ) : (

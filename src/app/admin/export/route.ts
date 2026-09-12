@@ -27,7 +27,9 @@ export async function GET(request: Request) {
   const [{ data: households }, { data: rsvps }] = await Promise.all([
     supabase
       .from("households")
-      .select("id, display_name, code, contact_email, rsvp_submitted_at, guests(id, first_name, last_name), household_events(events(name))")
+      .select(
+        "id, display_name, code, contact_email, rsvp_submitted_at, guests(id, first_name, last_name, guest_events(events(name)))"
+      )
       .order("display_name"),
     supabase.from("rsvps").select("guest_id, event_id, attending"),
   ]);
@@ -62,13 +64,13 @@ export async function GET(request: Request) {
   ];
 
   for (const household of households ?? []) {
-    const invitedEventNames = household.household_events
-      .flatMap((he) => he.events)
-      .filter(Boolean)
-      .map((e) => e!.name)
-      .join("; ");
-
     for (const guest of household.guests) {
+      const invitedEventNames = guest.guest_events
+        .flatMap((ge) => ge.events)
+        .filter(Boolean)
+        .map((e) => e!.name)
+        .join("; ");
+
       const guestRsvps = rsvpsByGuest.get(guest.id) ?? [];
       const rsvpStatus = guestRsvps
         .map((r) => `${eventNameById.get(r.event_id) ?? "Unknown event"}: ${r.attending === "yes" ? "Yes" : r.attending === "no" ? "No" : "Pending"}`)

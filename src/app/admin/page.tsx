@@ -25,7 +25,7 @@ export default async function AdminDashboardPage() {
 
   const { data: households } = await supabase
     .from("households")
-    .select("id, display_name, code, guests(first_name, last_name), household_events(events(name))")
+    .select("id, display_name, code, guests(first_name, last_name, guest_events(events(name)))")
     .order("display_name");
 
   return (
@@ -75,12 +75,17 @@ export default async function AdminDashboardPage() {
                       .map((g) => `${g.first_name} ${g.last_name}`)
                       .join(", ")}
                   </TableCell>
-                  <TableCell>
-                    {household.household_events
-                      .flatMap((he) => he.events)
-                      .map((event) => event?.name)
-                      .filter(Boolean)
-                      .join(", ")}
+                  <TableCell className="text-sm">
+                    {household.guests
+                      .map((guest) => {
+                        const eventNames = guest.guest_events
+                          .flatMap((ge) => ge.events)
+                          .map((event) => event?.name)
+                          .filter(Boolean)
+                          .join(", ");
+                        return `${guest.first_name}: ${eventNames || "none"}`;
+                      })
+                      .join("; ")}
                   </TableCell>
                 </TableRow>
               ))}
