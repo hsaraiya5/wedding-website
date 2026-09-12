@@ -75,6 +75,27 @@ export async function regenerateCode(householdId: string) {
   revalidatePath("/admin");
 }
 
+export async function setHouseholdCode(householdId: string, code: string) {
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("admin_set_household_code", {
+    p_household_id: householdId,
+    p_code: code,
+  });
+
+  if (error) {
+    if (error.message.includes("duplicate key")) {
+      throw new Error("That code is already in use by another household.");
+    }
+    if (error.message.includes("code_required")) {
+      throw new Error("Enter a code.");
+    }
+    throw new Error("Something went wrong saving the code.");
+  }
+
+  revalidatePath(`/admin/households/${householdId}`);
+  revalidatePath("/admin");
+}
+
 export async function deleteHousehold(householdId: string) {
   const supabase = await createClient();
   const { error } = await supabase.rpc("admin_delete_household", {

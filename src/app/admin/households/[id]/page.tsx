@@ -58,7 +58,7 @@ export default async function EditHouseholdPage({
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
           <HouseholdDetailsForm household={household} existingGroupTags={existingGroupTags} />
-          <CodeManagement householdId={household.id} code={household.code} />
+          <CodeManagement key={household.code} householdId={household.id} code={household.code} />
         </CardContent>
       </Card>
 

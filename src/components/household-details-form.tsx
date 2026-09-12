@@ -95,15 +95,12 @@ export function HouseholdDetailsForm({
         />
       </div>
 
-      <div className="flex flex-col gap-2">
-        <Label htmlFor="code">Invite code</Label>
-        <Input
-          id="code"
-          name="code"
-          defaultValue={household?.code ?? ""}
-          placeholder="Leave blank to auto-generate"
-        />
-      </div>
+      {!household ? (
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="code">Invite code</Label>
+          <Input id="code" name="code" placeholder="Leave blank to auto-generate" />
+        </div>
+      ) : null}
 
       <div className="flex flex-col gap-2">
         <Label htmlFor="group_tag">Group</Label>
