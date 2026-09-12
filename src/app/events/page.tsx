@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { getGuestContext } from "@/lib/guest-session";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
@@ -21,17 +22,12 @@ export default async function EventsPage() {
     redirect("/");
   }
 
-  // RLS (see supabase/migrations/0002_functions_and_policies.sql) already
-  // restricts this to events the signed-in household is invited to.
-  const { data: events, error } = await supabase
-    .from("events")
-    .select("*")
-    .order("event_date", { ascending: true })
-    .order("start_time", { ascending: true });
-
-  if (error) {
+  const context = await getGuestContext(supabase);
+  if (!context) {
     redirect("/");
   }
+
+  const { events } = context;
 
   return (
     <main className="mx-auto flex max-w-2xl flex-col gap-6 p-6">
@@ -47,7 +43,7 @@ export default async function EventsPage() {
         </Link>
       </div>
 
-      {events && events.length > 0 ? (
+      {events.length > 0 ? (
         <div className="flex flex-col gap-4">
           {events.map((event) => (
             <Card key={event.id}>

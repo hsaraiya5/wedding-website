@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { getGuestContext } from "@/lib/guest-session";
 import { RsvpForm } from "@/components/rsvp-form";
 
 // Depends on the session's bound household, same as /events -- never cache.
@@ -20,29 +21,12 @@ export default async function RsvpPage({
     redirect("/");
   }
 
-  const [
-    { data: household, error: householdError },
-    { data: guests },
-    { data: events },
-    { data: rsvps },
-    { data: siteSettings },
-  ] = await Promise.all([
-    supabase.from("households").select("*").single(),
-    supabase.from("guests").select("*").order("first_name"),
-    supabase
-      .from("events")
-      .select("*")
-      .order("event_date", { ascending: true })
-      .order("start_time", { ascending: true }),
-    supabase.from("rsvps").select("*"),
-    supabase.from("site_settings").select("*").single(),
-  ]);
-
-  if (!household) {
-    console.error("[/rsvp] household query failed:", householdError);
+  const context = await getGuestContext(supabase);
+  if (!context) {
     redirect("/");
   }
 
+  const { household, guests, events, rsvps, site_settings } = context;
   const { submitted } = await searchParams;
 
   return (
@@ -56,10 +40,10 @@ export default async function RsvpPage({
 
       <RsvpForm
         household={household}
-        guests={guests ?? []}
-        events={events ?? []}
-        existingRsvps={rsvps ?? []}
-        siteSettings={siteSettings}
+        guests={guests}
+        events={events}
+        existingRsvps={rsvps}
+        siteSettings={site_settings}
         justSubmitted={submitted === "1"}
       />
     </main>
