@@ -38,8 +38,9 @@ export async function redeemInviteCode(
   }
 
   // The household bound to this browser's session may have just changed --
-  // make sure /events re-fetches rather than reusing a cached render from a
-  // previous household.
+  // make sure the guest pages re-fetch rather than reusing a cached render
+  // from a previous household.
+  revalidatePath("/home");
   revalidatePath("/events");
-  redirect("/events");
+  redirect("/home");
 }

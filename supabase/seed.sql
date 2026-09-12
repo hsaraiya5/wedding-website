@@ -1,6 +1,7 @@
 -- Seed data for local/dev testing of the auth flow:
--- two mock households with different event visibility, four placeholder
--- events (W/X/Y/Z), and the initial admin allowlist entry.
+-- two mock households with different event visibility (including
+-- per-guest differences within household 1), four placeholder events
+-- (W/X/Y/Z), and the initial admin allowlist entry.
 
 insert into admins (email) values
   ('hrishikesh.saraiya@gmail.com')
@@ -29,16 +30,23 @@ join (values
 ) as g(household_display_name, first_name, last_name)
   on g.household_display_name = h.display_name;
 
--- Household 1 is invited to all four events (W, X, Y, Z).
-insert into household_events (household_id, event_id)
-select h.id, e.id
-from households h
+-- Household 1: Alex is invited to all four events, Jamie only to W and Y --
+-- demonstrates per-guest invitations differing within the same household.
+insert into guest_events (guest_id, event_id)
+select g.id, e.id
+from guests g
 cross join events e
-where h.display_name = 'Mock Guest Household 1';
+where g.first_name = 'Alex' and g.last_name = 'Placeholder';
 
--- Household 2 is only invited to Y and Z.
-insert into household_events (household_id, event_id)
-select h.id, e.id
-from households h
+insert into guest_events (guest_id, event_id)
+select g.id, e.id
+from guests g
+join events e on e.name in ('Event W', 'Event Y')
+where g.first_name = 'Jamie' and g.last_name = 'Placeholder';
+
+-- Household 2 (single guest, Sam) is only invited to Y and Z.
+insert into guest_events (guest_id, event_id)
+select g.id, e.id
+from guests g
 join events e on e.name in ('Event Y', 'Event Z')
-where h.display_name = 'Mock Guest Household 2';
+where g.first_name = 'Sam' and g.last_name = 'Placeholder';
