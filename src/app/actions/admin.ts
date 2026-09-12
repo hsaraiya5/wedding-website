@@ -14,9 +14,22 @@ export async function saveHousehold(
   const displayName = String(formData.get("display_name") ?? "").trim();
   const contactEmail = String(formData.get("contact_email") ?? "").trim() || null;
   const code = String(formData.get("code") ?? "").trim() || null;
+  const guestsRaw = String(formData.get("guests") ?? "");
 
   if (!displayName) {
     return { error: "Household name is required." };
+  }
+
+  let guests: { first_name: string; last_name: string }[] | null = null;
+  if (!householdId) {
+    try {
+      guests = JSON.parse(guestsRaw || "[]");
+    } catch {
+      return { error: "Something went wrong. Please try again." };
+    }
+    if (!guests || guests.length === 0) {
+      return { error: "Add at least one guest before creating the household." };
+    }
   }
 
   const supabase = await createClient();
@@ -25,11 +38,15 @@ export async function saveHousehold(
     p_display_name: displayName,
     p_contact_email: contactEmail,
     p_code: code,
+    p_guests: guests,
   });
 
   if (error) {
     if (error.message.includes("duplicate key")) {
       return { error: "That code is already in use by another household." };
+    }
+    if (error.message.includes("household_needs_at_least_one_guest")) {
+      return { error: "Add at least one guest before creating the household." };
     }
     return { error: "Something went wrong saving the household. Please try again." };
   }
