@@ -97,9 +97,22 @@ export async function saveGuest(
   const householdId = String(formData.get("household_id") ?? "").trim();
   const firstName = String(formData.get("first_name") ?? "").trim();
   const lastName = String(formData.get("last_name") ?? "").trim();
+  const eventIdsRaw = String(formData.get("event_ids") ?? "");
 
   if (!firstName || !lastName) {
     return { error: "First and last name are both required." };
+  }
+
+  let eventIds: string[] | null = null;
+  if (!guestId) {
+    try {
+      eventIds = JSON.parse(eventIdsRaw || "[]");
+    } catch {
+      return { error: "Something went wrong. Please try again." };
+    }
+    if (!eventIds || eventIds.length === 0) {
+      return { error: "Select at least one event this guest is invited to." };
+    }
   }
 
   const supabase = await createClient();
@@ -108,9 +121,13 @@ export async function saveGuest(
     p_household_id: householdId,
     p_first_name: firstName,
     p_last_name: lastName,
+    p_event_ids: eventIds,
   });
 
   if (error) {
+    if (error.message.includes("guest_needs_at_least_one_event")) {
+      return { error: "Select at least one event this guest is invited to." };
+    }
     return { error: "Something went wrong saving the guest. Please try again." };
   }
 
