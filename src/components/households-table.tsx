@@ -12,7 +12,8 @@ import {
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { EditInvitationsDialog } from "@/components/edit-invitations-dialog";
+import { buttonVariants } from "@/components/ui/button";
+import { DeleteHouseholdButton } from "@/components/delete-household-button";
 
 type EventRef = { name: string } | { name: string }[] | null;
 
@@ -23,8 +24,6 @@ type Guest = {
   guest_events: { event_id: string; events: EventRef }[];
   rsvps: { event_id: string; attending: "yes" | "no" | null }[];
 };
-
-type Event = { id: string; name: string; event_date: string | null };
 
 type Household = {
   id: string;
@@ -46,13 +45,7 @@ function eventList(guest: Guest): { name: string; status: string }[] {
   });
 }
 
-export function HouseholdsTable({
-  households,
-  events,
-}: {
-  households: Household[];
-  events: Event[];
-}) {
+export function HouseholdsTable({ households }: { households: Household[] }) {
   const [search, setSearch] = useState("");
   const [groupFilter, setGroupFilter] = useState("");
 
@@ -151,17 +144,18 @@ export function HouseholdsTable({
                 </div>
               </TableCell>
               <TableCell>
-                <EditInvitationsDialog
-                  householdId={household.id}
-                  householdName={household.display_name}
-                  events={events}
-                  guests={household.guests.map((guest) => ({
-                    id: guest.id,
-                    first_name: guest.first_name,
-                    last_name: guest.last_name,
-                    invitedEventIds: guest.guest_events.map((ge) => ge.event_id),
-                  }))}
-                />
+                <div className="flex gap-2">
+                  <Link
+                    href={`/admin/households/${household.id}`}
+                    className={buttonVariants({ variant: "outline", size: "sm" })}
+                  >
+                    Edit
+                  </Link>
+                  <DeleteHouseholdButton
+                    householdId={household.id}
+                    displayName={household.display_name}
+                  />
+                </div>
               </TableCell>
             </TableRow>
           ))}

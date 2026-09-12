@@ -18,15 +18,12 @@ export default async function AdminDashboardPage() {
     return <NotAuthorized email={user.email} />;
   }
 
-  const [{ data: households }, { data: events }] = await Promise.all([
-    supabase
-      .from("households")
-      .select(
-        "id, display_name, code, group_tag, guests(id, first_name, last_name, guest_events(event_id, events(name)), rsvps(event_id, attending))"
-      )
-      .order("display_name"),
-    supabase.from("events").select("id, name, event_date").order("event_date"),
-  ]);
+  const { data: households } = await supabase
+    .from("households")
+    .select(
+      "id, display_name, code, group_tag, guests(id, first_name, last_name, guest_events(event_id, events(name)), rsvps(event_id, attending))"
+    )
+    .order("display_name");
 
   return (
     <main className="mx-auto flex max-w-4xl flex-col gap-6 p-6">
@@ -54,7 +51,7 @@ export default async function AdminDashboardPage() {
           <CardTitle>Households</CardTitle>
         </CardHeader>
         <CardContent>
-          <HouseholdsTable households={households ?? []} events={events ?? []} />
+          <HouseholdsTable households={households ?? []} />
         </CardContent>
       </Card>
     </main>
