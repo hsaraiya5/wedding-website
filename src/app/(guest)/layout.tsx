@@ -1,9 +1,20 @@
-import { SiteNav } from "@/components/site-nav";
+import { createClient } from "@/lib/supabase/server";
+import { getGuestContext } from "@/lib/guest-session";
+import { getWeddingStart } from "@/lib/countdown";
+import { SiteHeader } from "@/components/site-header";
 
-export default function GuestLayout({ children }: { children: React.ReactNode }) {
+// Depends on the session's bound household (via getGuestContext), same as
+// every guest page -- never cache.
+export const dynamic = "force-dynamic";
+
+export default async function GuestLayout({ children }: { children: React.ReactNode }) {
+  const supabase = await createClient();
+  const context = await getGuestContext(supabase);
+  const weddingStart = context ? getWeddingStart(context.events) : null;
+
   return (
     <>
-      <SiteNav />
+      <SiteHeader weddingStartIso={weddingStart?.toISOString() ?? null} />
       {children}
     </>
   );
