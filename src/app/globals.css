@@ -7,9 +7,10 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-sans);
+  --font-sans: var(--font-body);
   --font-mono: var(--font-geist-mono);
-  --font-heading: var(--font-sans);
+  --font-heading: var(--font-display);
+  --font-script: var(--font-script);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -39,6 +40,14 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
+
+  /* Event accent colors, straight from the design handoff -- used per
+     event (Haldi/Sangeet/Ceremony/Reception) rather than as UI chrome. */
+  --color-event-haldi: var(--event-haldi);
+  --color-event-sangeet: var(--event-sangeet);
+  --color-event-ceremony: var(--event-ceremony);
+  --color-event-reception: var(--event-reception);
+
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -48,73 +57,47 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
+/* Warm, botanical Jaipur-inspired palette from the design handoff
+   (developer-handoff/index.html). This site doesn't have a designed dark
+   variant, so :root is the only palette that matters here. */
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
-}
+  --background: #fffaf0; /* paper */
+  --foreground: #332922; /* ink */
+  --card: #f8eedc; /* ivory */
+  --card-foreground: #332922;
+  --popover: #fffaf0;
+  --popover-foreground: #332922;
+  --primary: #a13f3d; /* red */
+  --primary-foreground: #fffdf6;
+  --secondary: #f8eedc; /* ivory */
+  --secondary-foreground: #332922;
+  --muted: #f8eedc;
+  --muted-foreground: #75675c;
+  --accent: #f4dfd9; /* soft-red */
+  --accent-foreground: #712b31; /* red-dark */
+  --destructive: #b3261e;
+  --border: rgba(75, 54, 40, 0.2); /* line */
+  --input: rgba(75, 54, 40, 0.15);
+  --ring: #d98b91; /* pink */
+  --chart-1: #d79324; /* marigold */
+  --chart-2: #1f5c76; /* indigo */
+  --chart-3: #d98b91; /* pink */
+  --chart-4: #5f7452; /* leaf */
+  --chart-5: #a13f3d; /* red */
+  --radius: 0.25rem;
+  --sidebar: #f8eedc;
+  --sidebar-foreground: #332922;
+  --sidebar-primary: #a13f3d;
+  --sidebar-primary-foreground: #fffdf6;
+  --sidebar-accent: #f4dfd9;
+  --sidebar-accent-foreground: #712b31;
+  --sidebar-border: rgba(75, 54, 40, 0.2);
+  --sidebar-ring: #d98b91;
 
-.dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --event-haldi: #d79324; /* marigold */
+  --event-sangeet: #1f5c76; /* indigo */
+  --event-ceremony: #d98b91; /* pink */
+  --event-reception: #5f7452; /* leaf */
 }
 
 @layer base {
@@ -126,5 +109,8 @@
   }
   html {
     @apply font-sans;
+  }
+  h1, h2, h3 {
+    @apply font-heading;
   }
 }
