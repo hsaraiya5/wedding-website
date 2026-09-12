@@ -2,14 +2,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { requireAdminUser } from "@/lib/admin-guard";
 import { NotAuthorized } from "@/components/not-authorized";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { HouseholdsTable } from "@/components/households-table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { buttonVariants } from "@/components/ui/button";
 
@@ -25,7 +18,9 @@ export default async function AdminDashboardPage() {
 
   const { data: households } = await supabase
     .from("households")
-    .select("id, display_name, code, guests(first_name, last_name, guest_events(events(name)))")
+    .select(
+      "id, display_name, code, group_tag, guests(first_name, last_name, guest_events(events(name)))"
+    )
     .order("display_name");
 
   return (
@@ -50,47 +45,7 @@ export default async function AdminDashboardPage() {
           <CardTitle>Households</CardTitle>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Household</TableHead>
-                <TableHead>Code</TableHead>
-                <TableHead>Guests</TableHead>
-                <TableHead>Invited events</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {households?.map((household) => (
-                <TableRow key={household.id}>
-                  <TableCell className="font-medium">
-                    <Link href={`/admin/households/${household.id}`} className="hover:underline">
-                      {household.display_name}
-                    </Link>
-                  </TableCell>
-                  <TableCell>
-                    <code>{household.code}</code>
-                  </TableCell>
-                  <TableCell>
-                    {household.guests
-                      .map((g) => `${g.first_name} ${g.last_name}`)
-                      .join(", ")}
-                  </TableCell>
-                  <TableCell className="text-sm">
-                    {household.guests
-                      .map((guest) => {
-                        const eventNames = guest.guest_events
-                          .flatMap((ge) => ge.events)
-                          .map((event) => event?.name)
-                          .filter(Boolean)
-                          .join(", ");
-                        return `${guest.first_name}: ${eventNames || "none"}`;
-                      })
-                      .join("; ")}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+          <HouseholdsTable households={households ?? []} />
         </CardContent>
       </Card>
     </main>

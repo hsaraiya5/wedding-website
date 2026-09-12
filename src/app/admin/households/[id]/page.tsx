@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { requireAdminUser } from "@/lib/admin-guard";
+import { getExistingGroupTags } from "@/lib/group-tags";
 import { NotAuthorized } from "@/components/not-authorized";
 import { HouseholdDetailsForm } from "@/components/household-details-form";
 import { CodeManagement } from "@/components/code-management";
@@ -37,10 +38,12 @@ export default async function EditHouseholdPage({
   }
 
   const guestIds = (guests ?? []).map((g) => g.id);
-  const { data: guestEvents } =
+  const [{ data: guestEvents }, existingGroupTags] = await Promise.all([
     guestIds.length > 0
-      ? await supabase.from("guest_events").select("guest_id, event_id").in("guest_id", guestIds)
-      : { data: [] };
+      ? supabase.from("guest_events").select("guest_id, event_id").in("guest_id", guestIds)
+      : Promise.resolve({ data: [] }),
+    getExistingGroupTags(supabase),
+  ]);
 
   return (
     <main className="mx-auto flex max-w-xl flex-col gap-6 p-6">
@@ -54,7 +57,7 @@ export default async function EditHouseholdPage({
           <CardTitle>Household details</CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
-          <HouseholdDetailsForm household={household} />
+          <HouseholdDetailsForm household={household} existingGroupTags={existingGroupTags} />
           <CodeManagement householdId={household.id} code={household.code} />
         </CardContent>
       </Card>

@@ -11,11 +11,18 @@ type Household = {
   display_name: string;
   contact_email: string | null;
   code: string;
+  group_tag: string | null;
 } | null;
 
 type NewGuest = { first_name: string; last_name: string };
 
-export function HouseholdDetailsForm({ household }: { household: Household }) {
+export function HouseholdDetailsForm({
+  household,
+  existingGroupTags,
+}: {
+  household: Household;
+  existingGroupTags: string[];
+}) {
   const [state, formAction, pending] = useActionState(saveHousehold, { error: null });
 
   // Only relevant when creating -- a household needs at least one guest to
@@ -73,6 +80,22 @@ export function HouseholdDetailsForm({ household }: { household: Household }) {
           defaultValue={household?.code ?? ""}
           placeholder="Leave blank to auto-generate"
         />
+      </div>
+
+      <div className="flex flex-col gap-2">
+        <Label htmlFor="group_tag">Group</Label>
+        <Input
+          id="group_tag"
+          name="group_tag"
+          defaultValue={household?.group_tag ?? ""}
+          placeholder="e.g. Saraiya, Manchella, Hrishikesh Friends"
+          list="group-tag-suggestions"
+        />
+        <datalist id="group-tag-suggestions">
+          {existingGroupTags.map((tag) => (
+            <option key={tag} value={tag} />
+          ))}
+        </datalist>
       </div>
 
       {!household ? (

@@ -28,7 +28,7 @@ export async function GET(request: Request) {
     supabase
       .from("households")
       .select(
-        "id, display_name, code, contact_email, rsvp_submitted_at, guests(id, first_name, last_name, guest_events(events(name)))"
+        "id, display_name, code, group_tag, contact_email, rsvp_submitted_at, guests(id, first_name, last_name, guest_events(events(name)))"
       )
       .order("display_name"),
     supabase.from("rsvps").select("guest_id, event_id, attending"),
@@ -53,6 +53,7 @@ export async function GET(request: Request) {
   const rows: string[][] = [
     [
       "Household",
+      "Group",
       "Code",
       "Contact Email",
       "Guest First Name",
@@ -78,6 +79,7 @@ export async function GET(request: Request) {
 
       rows.push([
         household.display_name,
+        household.group_tag ?? "",
         household.code,
         household.contact_email ?? "",
         guest.first_name,

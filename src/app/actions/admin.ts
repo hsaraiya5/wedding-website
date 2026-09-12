@@ -14,6 +14,7 @@ export async function saveHousehold(
   const displayName = String(formData.get("display_name") ?? "").trim();
   const contactEmail = String(formData.get("contact_email") ?? "").trim() || null;
   const code = String(formData.get("code") ?? "").trim() || null;
+  const groupTag = String(formData.get("group_tag") ?? "").trim() || null;
   const guestsRaw = String(formData.get("guests") ?? "");
 
   if (!displayName) {
@@ -39,6 +40,7 @@ export async function saveHousehold(
     p_contact_email: contactEmail,
     p_code: code,
     p_guests: guests,
+    p_group_tag: groupTag,
   });
 
   if (error) {
