@@ -32,10 +32,9 @@ export default async function RsvpPage({
   return (
     <main className="mx-auto flex max-w-2xl flex-col gap-6 p-6">
       <div>
-        <h1 className="text-2xl font-semibold">RSVP</h1>
-        <p className="text-muted-foreground">
-          For {household.display_name}
-        </p>
+        <p className="text-xs font-bold uppercase tracking-wide text-primary">RSVP</p>
+        <h1 className="font-heading text-3xl">Will you join us?</h1>
+        <p className="text-muted-foreground">For {household.display_name}</p>
       </div>
 
       <RsvpForm

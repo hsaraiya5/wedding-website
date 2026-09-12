@@ -2,8 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getGuestContext } from "@/lib/guest-session";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { EventsTimeline } from "@/components/events-timeline";
 import { buttonVariants } from "@/components/ui/button";
 
 // This page's content depends on which household the caller's session is
@@ -30,13 +29,11 @@ export default async function EventsPage() {
   const { events } = context;
 
   return (
-    <main className="mx-auto flex max-w-2xl flex-col gap-6 p-6">
+    <main className="mx-auto flex max-w-3xl flex-col gap-6 p-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold">Your events</h1>
-          <p className="text-muted-foreground">
-            Here&apos;s what you&apos;re invited to.
-          </p>
+          <p className="text-xs font-bold uppercase tracking-wide text-primary">Your itinerary</p>
+          <h1 className="font-heading text-3xl">Your weekend, at a glance.</h1>
         </div>
         <Link href="/rsvp" className={buttonVariants()}>
           RSVP
@@ -44,27 +41,7 @@ export default async function EventsPage() {
       </div>
 
       {events.length > 0 ? (
-        <div className="flex flex-col gap-4">
-          {events.map((event) => (
-            <Card key={event.id}>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle>{event.name}</CardTitle>
-                  <Badge variant="secondary">
-                    {event.event_date} &middot; {event.start_time}
-                  </Badge>
-                </div>
-                <CardDescription>{event.venue_name}</CardDescription>
-              </CardHeader>
-              <CardContent className="flex flex-col gap-1 text-sm text-muted-foreground">
-                <p>{event.address}</p>
-                <p>Dress code: {event.dress_code}</p>
-                <p>Meal: {event.meal_info}</p>
-                <p>{event.description}</p>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+        <EventsTimeline events={events} />
       ) : (
         <p className="text-muted-foreground">No events found for your household.</p>
       )}

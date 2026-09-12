@@ -6,10 +6,11 @@ import { submitRsvp } from "@/app/actions/rsvp";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Textarea } from "@/components/ui/textarea";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
+import { formatEventDay, formatEventTime } from "@/lib/format";
 
 type Household = {
   id: string;
@@ -68,9 +69,17 @@ export function RsvpForm({
   );
   const isInvited = (guestId: string, eventId: string) => invitedSet.has(answerKey(guestId, eventId));
 
+  // Only guests with something to answer for get a spot in the carousel.
+  const rsvpGuests = useMemo(
+    () => guests.filter((guest) => events.some((event) => isInvited(guest.id, event.id))),
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- isInvited is derived from guestEvents, already a dep
+    [guests, events, guestEvents]
+  );
+
   const [mode, setMode] = useState<"readonly" | "edit">(
     alreadySubmitted ? "readonly" : "edit"
   );
+  const [activeGuestIndex, setActiveGuestIndex] = useState(0);
 
   const initialAnswers = useMemo(() => {
     const map: Record<string, "yes" | "no"> = {};
@@ -97,11 +106,13 @@ export function RsvpForm({
       }))
   );
 
+  const activeGuest = rsvpGuests[activeGuestIndex];
+
   return (
     <div className="flex flex-col gap-4">
       {deadline ? (
         <p className="text-sm text-muted-foreground">
-          RSVP by {deadline.toLocaleDateString()} {deadline.toLocaleTimeString()}
+          Please reply by {deadline.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
         </p>
       ) : null}
 
@@ -116,7 +127,7 @@ export function RsvpForm({
 
       {justSubmitted ? (
         <Alert>
-          <AlertTitle>Thanks!</AlertTitle>
+          <AlertTitle>Stamped and received.</AlertTitle>
           <AlertDescription>Your RSVP has been recorded.</AlertDescription>
         </Alert>
       ) : null}
@@ -132,7 +143,7 @@ export function RsvpForm({
                 <div className="flex items-center justify-between">
                   <p className="font-medium">{event.name}</p>
                   <span className="text-sm text-muted-foreground">
-                    {event.event_date} &middot; {event.start_time}
+                    {formatEventDay(event.event_date)} &middot; {formatEventTime(event.start_time)}
                   </span>
                 </div>
                 <div className="flex flex-wrap gap-2">
@@ -168,46 +179,119 @@ export function RsvpForm({
         <form action={formAction} className="flex flex-col gap-6">
           <input type="hidden" name="answers" value={JSON.stringify(answersArray)} />
 
-          {events.map((event) => (
-            <Card key={event.id}>
-              <CardHeader>
+          {rsvpGuests.length > 0 ? (
+            <Card>
+              <CardContent className="flex flex-col gap-5">
                 <div className="flex items-center justify-between">
-                  <CardTitle>{event.name}</CardTitle>
-                  <span className="text-sm text-muted-foreground">
-                    {event.event_date} &middot; {event.start_time}
-                  </span>
+                  <strong className="text-sm">
+                    Guest {activeGuestIndex + 1} of {rsvpGuests.length}
+                  </strong>
+                  <div className="flex gap-1.5" role="tablist" aria-label="Choose a guest">
+                    {rsvpGuests.map((guest, index) => (
+                      <button
+                        key={guest.id}
+                        type="button"
+                        role="tab"
+                        aria-selected={index === activeGuestIndex}
+                        aria-label={`${guest.first_name} ${guest.last_name}`}
+                        onClick={() => setActiveGuestIndex(index)}
+                        className={cn(
+                          "flex size-7 items-center justify-center rounded-full border text-sm",
+                          index === activeGuestIndex
+                            ? "border-primary bg-primary text-primary-foreground"
+                            : "border-border text-muted-foreground"
+                        )}
+                      >
+                        {index + 1}
+                      </button>
+                    ))}
+                  </div>
                 </div>
-              </CardHeader>
-              <CardContent className="flex flex-col gap-4">
-                {guests
-                  .filter((guest) => isInvited(guest.id, event.id))
-                  .map((guest) => {
-                    const key = answerKey(guest.id, event.id);
-                    return (
-                      <div key={guest.id} className="flex items-center justify-between gap-4">
-                        <Label>{guest.first_name} {guest.last_name}</Label>
-                        <RadioGroup
-                          value={answers[key] ?? ""}
-                          onValueChange={(value) =>
-                            setAnswers((prev) => ({ ...prev, [key]: value as "yes" | "no" }))
-                          }
-                          className="flex flex-row gap-4"
-                        >
-                          <div className="flex items-center gap-2">
-                            <RadioGroupItem value="yes" id={`${key}-yes`} />
-                            <Label htmlFor={`${key}-yes`}>Yes</Label>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <RadioGroupItem value="no" id={`${key}-no`} />
-                            <Label htmlFor={`${key}-no`}>No</Label>
-                          </div>
-                        </RadioGroup>
-                      </div>
-                    );
-                  })}
+
+                {activeGuest ? (
+                  <div className="flex flex-col gap-4">
+                    <h3 className="font-heading text-xl">
+                      {activeGuest.first_name} {activeGuest.last_name}
+                    </h3>
+                    <div className="grid gap-3 sm:grid-cols-2">
+                      {events
+                        .filter((event) => isInvited(activeGuest.id, event.id))
+                        .map((event) => {
+                          const key = answerKey(activeGuest.id, event.id);
+                          const value = answers[key];
+                          return (
+                            <div
+                              key={event.id}
+                              className="flex flex-col gap-2 rounded-lg border border-border/60 bg-background/60 p-3"
+                            >
+                              <strong className="text-sm">{event.name}</strong>
+                              <span className="text-xs text-muted-foreground">
+                                {formatEventDay(event.event_date)} &middot; {formatEventTime(event.start_time)}
+                              </span>
+                              <div className="flex gap-2">
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    setAnswers((prev) => ({ ...prev, [key]: "yes" }))
+                                  }
+                                  aria-pressed={value === "yes"}
+                                  className={cn(
+                                    "flex-1 rounded border px-3 py-1.5 text-sm font-semibold transition-colors",
+                                    value === "yes"
+                                      ? "border-primary bg-primary text-primary-foreground"
+                                      : "border-border hover:bg-muted"
+                                  )}
+                                >
+                                  Yes
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    setAnswers((prev) => ({ ...prev, [key]: "no" }))
+                                  }
+                                  aria-pressed={value === "no"}
+                                  className={cn(
+                                    "flex-1 rounded border px-3 py-1.5 text-sm font-semibold transition-colors",
+                                    value === "no"
+                                      ? "border-primary bg-primary text-primary-foreground"
+                                      : "border-border hover:bg-muted"
+                                  )}
+                                >
+                                  No
+                                </button>
+                              </div>
+                            </div>
+                          );
+                        })}
+                    </div>
+                  </div>
+                ) : null}
+
+                <div className="flex justify-between">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    disabled={activeGuestIndex === 0}
+                    onClick={() => setActiveGuestIndex((i) => Math.max(0, i - 1))}
+                  >
+                    &larr; Previous guest
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    disabled={activeGuestIndex === rsvpGuests.length - 1}
+                    onClick={() =>
+                      setActiveGuestIndex((i) => Math.min(rsvpGuests.length - 1, i + 1))
+                    }
+                  >
+                    Next guest &rarr;
+                  </Button>
+                </div>
               </CardContent>
             </Card>
-          ))}
+          ) : (
+            <p className="text-muted-foreground">No events found for your household.</p>
+          )}
 
           <div className="flex flex-col gap-2">
             <Label htmlFor="song_request">Song request (optional)</Label>
@@ -216,7 +300,7 @@ export function RsvpForm({
               name="song_request"
               value={songRequest}
               onChange={(event) => setSongRequest(event.target.value)}
-              placeholder="Any song that'll get you on the dance floor"
+              placeholder="Song title and artist"
             />
           </div>
 
@@ -224,7 +308,7 @@ export function RsvpForm({
 
           <div className="flex gap-2">
             <Button type="submit" disabled={pending}>
-              {pending ? "Submitting..." : "Submit RSVP"}
+              {pending ? "Submitting..." : "Stamp our RSVP"}
             </Button>
             {alreadySubmitted ? (
               <Button type="button" variant="outline" onClick={() => setMode("readonly")}>
