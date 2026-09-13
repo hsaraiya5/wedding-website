@@ -1,0 +1,139 @@
+"use client";
+
+import { useActionState, useEffect, useRef, useState, type CSSProperties } from "react";
+import { useRouter } from "next/navigation";
+import { redeemInviteCode, type RedeemCodeState } from "@/app/actions/guest";
+import { designAssets } from "@/lib/design-assets";
+import "./invite-entrance.css";
+
+// Ported from the design handoff's ".access" flow: a 3D-flipping invite
+// card that turns to reveal an envelope, which opens to lift out a
+// "Welcome, <household>" card before handing off to the real site.
+// Phases are cumulative (matching the original's classList.add sequence --
+// each stage's CSS relies on earlier stages' classes still being present,
+// e.g. the red "turning" background must persist through "leaving").
+const PHASES = ["turning", "opening", "lifting", "welcoming", "leaving"] as const;
+type PhaseIndex = 0 | 1 | 2 | 3 | 4 | 5;
+
+const initialState: RedeemCodeState = { error: null, householdName: null };
+
+export function InviteEntrance() {
+  const router = useRouter();
+  const [state, formAction, pending] = useActionState(redeemInviteCode, initialState);
+  const [phaseIndex, setPhaseIndex] = useState<PhaseIndex>(0);
+  const startedRef = useRef(false);
+
+  // If the browser restores this page from its back/forward cache (e.g.
+  // after redeeming a code, then hitting Back), the restored snapshot can
+  // carry a stale "pending" state from a submission that never resolved.
+  // Force a real reload in that case so the form always starts fresh.
+  useEffect(() => {
+    const onPageShow = (event: PageTransitionEvent) => {
+      if (event.persisted) window.location.reload();
+    };
+    window.addEventListener("pageshow", onPageShow);
+    return () => window.removeEventListener("pageshow", onPageShow);
+  }, []);
+
+  useEffect(() => {
+    if (!state.householdName || startedRef.current) return;
+    startedRef.current = true;
+
+    const reducedMotion =
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const timing = reducedMotion ? [10, 30, 50, 80, 180, 240] : [70, 980, 1900, 3000, 5200, 5900];
+
+    document.body.style.overflow = "hidden";
+
+    const timers = [
+      setTimeout(() => setPhaseIndex(1), timing[0]),
+      setTimeout(() => setPhaseIndex(2), timing[1]),
+      setTimeout(() => setPhaseIndex(3), timing[2]),
+      setTimeout(() => setPhaseIndex(4), timing[3]),
+      setTimeout(() => setPhaseIndex(5), timing[4]),
+      setTimeout(() => {
+        document.body.style.overflow = "";
+        router.push("/home");
+      }, timing[5]),
+    ];
+
+    return () => {
+      timers.forEach(clearTimeout);
+      document.body.style.overflow = "";
+    };
+  }, [state.householdName, router]);
+
+  const activeClasses = PHASES.slice(0, phaseIndex)
+    .map((p) => `ie-${p}`)
+    .join(" ");
+  const isFlipped = phaseIndex >= 1;
+
+  const heroArtStyle = { "--ie-hero-art": `url(${designAssets.hero})` } as CSSProperties;
+
+  return (
+    <div
+      className={`ie-access ${activeClasses}`.trim()}
+      style={heroArtStyle}
+      aria-busy={phaseIndex > 0 && phaseIndex < 5 ? "true" : undefined}
+      aria-labelledby="ie-access-title"
+    >
+      <div className="ie-card-shell">
+        <div className="ie-card">
+          <div className="ie-face ie-front" aria-hidden={isFlipped}>
+            <div className="ie-copy">
+              <div className="ie-monogram" aria-hidden="true">
+                G&nbsp;H
+              </div>
+              <p className="ie-eyebrow">You are invited</p>
+              <h1 id="ie-access-title">Gayathri &amp; Hrishikesh</h1>
+              <p className="ie-access-date">May 29-30, 2027 &middot; Wyndham Pittsburgh</p>
+              <form action={formAction} className="ie-code-form">
+                <label htmlFor="invite-code">Invitation code</label>
+                <input
+                  id="invite-code"
+                  name="code"
+                  placeholder="Enter your code"
+                  autoComplete="off"
+                  disabled={pending || phaseIndex > 0}
+                  aria-describedby="ie-code-error"
+                />
+                <button
+                  className="ie-code-submit"
+                  type="submit"
+                  aria-label="Open invitation"
+                  disabled={pending || phaseIndex > 0}
+                >
+                  &rarr;
+                </button>
+                <div className="ie-error" id="ie-code-error" role="alert">
+                  {state.error}
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <div className="ie-face ie-back" aria-hidden={!isFlipped}>
+            <div className="ie-insert" aria-label="Wedding invitation card">
+              <div className="ie-insert-copy">
+                <div className="ie-monogram" aria-hidden="true">
+                  G&nbsp;H
+                </div>
+                <p className="ie-eyebrow">Gayathri &amp; Hrishikesh</p>
+                <p className="ie-script" role="status">
+                  <span>Welcome, {state.householdName}</span>
+                </p>
+                <p className="ie-access-date">May 29-30, 2027 &middot; Wyndham Pittsburgh</p>
+              </div>
+            </div>
+            <div className="ie-env-side ie-left" />
+            <div className="ie-env-side ie-right" />
+            <div className="ie-env-pocket" />
+            <div className="ie-env-flap" />
+            <div className="ie-seal">G&nbsp;H</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

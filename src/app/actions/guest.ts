@@ -1,16 +1,23 @@
 "use server";
 
-import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 
+export type RedeemCodeState = {
+  error: string | null;
+  householdName: string | null;
+};
+
+// Doesn't redirect on success -- returns the household name so the client
+// can run the invite-card/envelope entrance animation first, then navigate
+// to /home itself once it finishes.
 export async function redeemInviteCode(
-  _prevState: { error: string | null },
+  _prevState: RedeemCodeState,
   formData: FormData
-): Promise<{ error: string | null }> {
+): Promise<RedeemCodeState> {
   const code = String(formData.get("code") ?? "").trim();
   if (!code) {
-    return { error: "Please enter your invite code." };
+    return { error: "Please enter your invite code.", householdName: null };
   }
 
   const supabase = await createClient();
@@ -25,7 +32,7 @@ export async function redeemInviteCode(
   if (!session) {
     const { error: signInError } = await supabase.auth.signInAnonymously();
     if (signInError) {
-      return { error: "Something went wrong. Please try again." };
+      return { error: "Something went wrong. Please try again.", householdName: null };
     }
   }
 
@@ -34,7 +41,10 @@ export async function redeemInviteCode(
   });
 
   if (error || !data || data.length === 0) {
-    return { error: "That code doesn't look right. Double-check it and try again." };
+    return {
+      error: "That code doesn't look right. Double-check it and try again.",
+      householdName: null,
+    };
   }
 
   // The household bound to this browser's session may have just changed --
@@ -42,5 +52,6 @@ export async function redeemInviteCode(
   // from a previous household.
   revalidatePath("/home");
   revalidatePath("/events");
-  redirect("/home");
+
+  return { error: null, householdName: data[0].household_name as string };
 }

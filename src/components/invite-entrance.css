@@ -1,0 +1,343 @@
+/*
+  Ported from the design handoff (developer-handoff/index.html, ".access"
+  section) -- the invite-code entrance: a 3D-flipping card that turns to
+  reveal an envelope, which opens to lift out a "Welcome, <household>" card.
+  Class names prefixed ie- (invite-entrance) to avoid colliding with
+  anything else in the app; values are the designer's literal colors for
+  this one illustration, not general theme tokens.
+*/
+
+.ie-access {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: #fbf6eb;
+  padding: 40px;
+  perspective: 1800px;
+  transition: background 700ms ease, opacity 700ms ease, visibility 0s linear 700ms;
+}
+.ie-access.ie-turning { background: #963940; }
+.ie-access.ie-leaving { opacity: 0; visibility: hidden; pointer-events: none; }
+
+.ie-card-shell {
+  position: relative;
+  isolation: isolate;
+  width: min(1480px, 80vw, calc((100svh - 140px) * 1.7768));
+  aspect-ratio: 1672 / 941;
+  animation: ie-card-arrive 900ms cubic-bezier(0.18, 0.78, 0.2, 1) both;
+}
+.ie-card-shell::after {
+  content: "";
+  position: absolute;
+  right: 7%;
+  bottom: -24px;
+  left: 7%;
+  z-index: -1;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(50, 13, 20, 0.42);
+  filter: blur(22px);
+  opacity: 0.72;
+  transform: scaleX(0.94);
+  transition: opacity 700ms ease, transform 900ms ease;
+}
+.ie-access.ie-turning .ie-card-shell::after { opacity: 0.9; transform: scaleX(0.82) translateY(8px); }
+.ie-access.ie-lifting .ie-card-shell::after { opacity: 0.5; transform: scaleX(0.7) translateY(88px); }
+
+.ie-card {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 950ms cubic-bezier(0.2, 0.72, 0.2, 1);
+}
+.ie-access.ie-turning .ie-card { transform: rotateY(180deg) translateZ(20px); }
+.ie-access.ie-opening .ie-card { transform: translateY(135px) scale(0.75) rotateY(180deg) translateZ(30px); }
+.ie-access.ie-lifting .ie-card { transform: translateY(135px) scale(0.75) rotateY(180deg) translateZ(44px); }
+
+.ie-face {
+  position: absolute;
+  inset: 0;
+  border: 1px solid rgba(113, 43, 49, 0.16);
+  box-shadow: 0 30px 90px rgba(73, 22, 29, 0.25);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  border-radius: 6px;
+}
+.ie-front {
+  z-index: 2;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  background: #fffaf0;
+  text-align: center;
+}
+.ie-front::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--ie-hero-art) center / 100% 100% no-repeat;
+  transform-origin: bottom center;
+  animation: ie-bloom 1500ms cubic-bezier(0.18, 0.78, 0.2, 1) both;
+}
+.ie-copy {
+  position: relative;
+  z-index: 1;
+  width: min(720px, 64%);
+  display: grid;
+  justify-items: center;
+  padding: 32px;
+}
+.ie-copy > * { opacity: 0; animation: ie-copy-arrive 600ms ease both; }
+.ie-copy .ie-monogram { animation-delay: 180ms; }
+.ie-copy > .ie-eyebrow { animation-delay: 280ms; }
+.ie-copy h1 { animation-delay: 380ms; }
+.ie-copy .ie-access-date { animation-delay: 480ms; }
+.ie-copy .ie-code-form { animation-delay: 580ms; }
+.ie-copy h1 {
+  margin-top: 8px;
+  color: #712b31;
+  font-family: var(--font-heading);
+  font-weight: 400;
+  font-size: clamp(2.4rem, 4.3vw, 3.8rem);
+  line-height: 1.02;
+}
+.ie-copy .ie-code-form { width: min(420px, 100%); margin-top: 24px; }
+.ie-copy .ie-access-date { font-size: 1.15rem; }
+
+.ie-back {
+  z-index: 1;
+  overflow: visible;
+  background: #a8444c;
+  perspective: 1400px;
+  transform: rotateY(180deg);
+}
+.ie-back::before {
+  content: "";
+  position: absolute;
+  inset: 13px;
+  z-index: 1;
+  border: 1px solid rgba(255, 244, 220, 0.18);
+  box-shadow: inset 0 0 42px rgba(70, 17, 28, 0.15);
+  pointer-events: none;
+}
+
+.ie-monogram {
+  width: 60px;
+  height: 60px;
+  margin-bottom: 18px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #a13f3d;
+  border-radius: 50%;
+  color: #a13f3d;
+  font-family: var(--font-heading);
+  font-size: 1.1rem;
+}
+.ie-eyebrow {
+  color: #a13f3d;
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.ie-access-date {
+  margin-top: 8px;
+  color: #1f5c76;
+  font-family: var(--font-heading);
+  font-size: 1.1rem;
+}
+
+.ie-insert,
+.ie-env-pocket,
+.ie-env-side,
+.ie-env-flap,
+.ie-seal { position: absolute; }
+
+.ie-insert {
+  inset: 7%;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: #fffaf0 var(--ie-hero-art) center / 100% 100% no-repeat;
+  border: 1px solid rgba(113, 43, 49, 0.15);
+  box-shadow: 0 10px 26px rgba(71, 24, 31, 0.18);
+  transform: translateY(8%) scale(0.88) rotateX(-3deg);
+  transform-origin: center center;
+  transition: transform 1300ms cubic-bezier(0.16, 0.82, 0.2, 1), box-shadow 900ms ease;
+  border-radius: 4px;
+}
+.ie-access.ie-lifting .ie-insert {
+  box-shadow: 0 30px 72px rgba(71, 24, 31, 0.3);
+  transform: translateY(-52%) scale(0.9) rotateX(0);
+}
+.ie-insert-copy {
+  position: relative;
+  z-index: 1;
+  width: min(760px, 66%);
+  display: grid;
+  justify-items: center;
+  text-align: center;
+}
+.ie-insert-copy > .ie-monogram,
+.ie-insert-copy > .ie-eyebrow,
+.ie-insert-copy > .ie-access-date {
+  opacity: 0;
+  transform: translateY(12px);
+}
+.ie-access.ie-welcoming .ie-insert-copy > .ie-monogram { animation: ie-copy-arrive 520ms ease both; }
+.ie-access.ie-welcoming .ie-insert-copy > .ie-eyebrow { animation: ie-copy-arrive 520ms ease 120ms both; }
+.ie-access.ie-welcoming .ie-insert-copy > .ie-access-date { animation: ie-copy-arrive 520ms ease 1750ms both; }
+
+.ie-script {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  margin-top: 10px;
+  color: #712b31;
+  font-family: var(--font-script);
+  font-size: clamp(2.4rem, 5vw, 3.9rem);
+  line-height: 1.12;
+  text-align: center;
+  text-shadow: 0 2px 0 rgba(255, 255, 255, 0.72), 0 12px 30px rgba(113, 43, 49, 0.16);
+}
+.ie-script span {
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+  clip-path: inset(0 100% 0 0);
+}
+.ie-script::after {
+  content: "";
+  display: block;
+  width: 42%;
+  height: 1px;
+  margin: 22px auto 0;
+  background: currentColor;
+  opacity: 0.5;
+  transform: scaleX(0);
+  transform-origin: left;
+}
+.ie-access.ie-welcoming .ie-script span { animation: ie-write-welcome 1900ms cubic-bezier(0.18, 0.7, 0.2, 1) forwards; }
+.ie-access.ie-welcoming .ie-script::after { animation: ie-draw-flourish 700ms ease 1550ms forwards; }
+
+.ie-env-pocket {
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 4;
+  height: 58%;
+  clip-path: polygon(0 0, 50% 48%, 100% 0, 100% 100%, 0 100%);
+  background: #993a44;
+  box-shadow: inset 0 16px 34px rgba(79, 25, 35, 0.2), 0 -2px 0 rgba(255, 245, 221, 0.1);
+  transition: transform 950ms cubic-bezier(0.18, 0.78, 0.2, 1);
+}
+.ie-env-side { bottom: 0; z-index: 3; width: 51%; height: 67%; background: #bd5c63; transition: transform 950ms cubic-bezier(0.18, 0.78, 0.2, 1); }
+.ie-env-side.ie-left { left: 0; clip-path: polygon(0 0, 100% 55%, 0 100%); }
+.ie-env-side.ie-right { right: 0; clip-path: polygon(100% 0, 0 55%, 100% 100%); }
+.ie-env-flap {
+  inset: 0 0 auto;
+  z-index: 6;
+  height: 62%;
+  transform-origin: top center;
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+  background: #d17a76;
+  box-shadow: 0 12px 26px rgba(65, 17, 27, 0.18);
+  transition: transform 950ms cubic-bezier(0.2, 0.78, 0.2, 1) 420ms, z-index 0s linear 1050ms;
+}
+.ie-env-flap::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--ie-hero-art) top center / 100% auto no-repeat;
+  opacity: 0.18;
+}
+.ie-seal {
+  top: 43%;
+  left: 50%;
+  z-index: 7;
+  width: 68px;
+  height: 68px;
+  display: grid;
+  place-items: center;
+  border: 6px double rgba(255, 247, 222, 0.24);
+  border-radius: 50%;
+  background: #712b31;
+  color: #fff9ea;
+  font-family: var(--font-heading);
+  font-size: 1rem;
+  box-shadow: 0 12px 28px rgba(71, 24, 31, 0.28);
+  transform: translate(-50%, -50%);
+  transition: opacity 280ms ease 320ms, transform 480ms ease 320ms;
+}
+.ie-access.ie-opening .ie-env-flap { z-index: 1; transform: rotateX(180deg); }
+.ie-access.ie-opening .ie-seal { opacity: 0; transform: translate(-50%, -20%) scale(0.68); }
+
+.ie-code-form {
+  width: 100%;
+  margin-top: 14px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  text-align: left;
+}
+.ie-code-form label {
+  grid-column: 1 / -1;
+  color: #75675c;
+  font-size: 0.82rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+.ie-code-form input {
+  min-width: 0;
+  min-height: 52px;
+  border: 1px solid rgba(75, 54, 40, 0.2);
+  border-radius: 4px;
+  background: #fffdf6;
+  padding: 10px 14px;
+  font-size: 1.02rem;
+  outline-color: #1f5c76;
+}
+.ie-code-submit {
+  width: 52px;
+  height: 52px;
+  border: 0;
+  border-radius: 50%;
+  background: #a13f3d;
+  color: #fffdf6;
+  font-size: 1.3rem;
+  box-shadow: 0 9px 20px rgba(113, 43, 49, 0.2);
+  transition: background 180ms ease, box-shadow 220ms ease, transform 220ms ease;
+}
+.ie-code-submit:hover { background: #712b31; box-shadow: 0 13px 26px rgba(113, 43, 49, 0.28); transform: translateY(-2px); }
+.ie-code-submit:disabled { opacity: 0.6; }
+.ie-error {
+  grid-column: 1 / -1;
+  min-height: 22px;
+  color: #712b31;
+  font-size: 0.88rem;
+}
+
+@keyframes ie-card-arrive {
+  from { opacity: 0; transform: translateY(24px) scale(0.975); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes ie-bloom {
+  from { opacity: 0.16; transform: translateY(14px) scale(0.97); filter: saturate(0.75); }
+  to { opacity: 1; transform: translateY(0) scale(1); filter: saturate(1); }
+}
+@keyframes ie-copy-arrive {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes ie-write-welcome { to { clip-path: inset(0 0 0 0); } }
+@keyframes ie-draw-flourish { to { transform: scaleX(1); } }
+
+@media (max-width: 640px) {
+  .ie-copy { width: min(660px, 90%); padding: 20px; }
+  .ie-access { padding: 16px; }
+}
