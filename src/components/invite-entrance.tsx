@@ -2,6 +2,7 @@
 
 import { useActionState, useEffect, useRef, useState, type CSSProperties } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { redeemInviteCode, type RedeemCodeState } from "@/app/actions/guest";
 import { designAssets } from "@/lib/design-assets";
 import "./invite-entrance.css";
@@ -134,6 +135,12 @@ export function InviteEntrance() {
           </div>
         </div>
       </div>
+
+      {phaseIndex === 0 ? (
+        <Link href="/admin/login" className="ie-admin-link">
+          Admin login
+        </Link>
+      ) : null}
     </div>
   );
 }
