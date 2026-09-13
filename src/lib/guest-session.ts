@@ -13,11 +13,13 @@ export type GuestContext = {
     name: string;
     event_date: string | null;
     start_time: string | null;
+    end_time: string | null;
     venue_name: string | null;
     address: string | null;
     dress_code: string | null;
     meal_info: string | null;
     description: string | null;
+    extra_content: Record<string, unknown>;
   }[];
   guest_events: { guest_id: string; event_id: string }[];
   rsvps: { guest_id: string; event_id: string; attending: "yes" | "no" | null }[];
