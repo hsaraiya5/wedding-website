@@ -22,6 +22,25 @@
 .ie-access.ie-turning { background: #963940; }
 .ie-access.ie-leaving { opacity: 0; visibility: hidden; pointer-events: none; }
 
+/* Subtle, always-discoverable admin entry point -- otherwise finding the
+   admin login means knowing to type /admin/login by hand. Only shown
+   before a code submission starts (phaseIndex === 0 in the component), so
+   it doesn't linger over the card-flip/envelope animation. */
+.ie-admin-link {
+  position: absolute;
+  right: 20px;
+  bottom: 16px;
+  z-index: 2;
+  color: rgba(51, 41, 34, 0.38);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  text-decoration: none;
+  transition: color 160ms ease;
+}
+.ie-admin-link:hover { color: #a13f3d; }
+
 .ie-card-shell {
   position: relative;
   isolation: isolate;
