@@ -4,7 +4,6 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { saveGuestInvitations } from "@/app/actions/admin";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
 
 type Event = { id: string; name: string; event_date: string | null };
 
@@ -52,23 +51,30 @@ export function InvitationsForm({
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="flex flex-wrap gap-3">
-        {events.map((event) => (
-          <div key={event.id} className="flex items-center gap-1.5">
-            <input
-              type="checkbox"
-              id={`event-${guestId}-${event.id}`}
-              checked={selected.has(event.id)}
-              onChange={() => toggle(event.id)}
-              className="size-4"
-            />
-            <Label htmlFor={`event-${guestId}-${event.id}`} className="text-sm font-normal">
+      <div className="flex flex-wrap gap-2">
+        {events.map((event) => {
+          const pressed = selected.has(event.id);
+          return (
+            <button
+              key={event.id}
+              type="button"
+              aria-pressed={pressed}
+              className="av-toggle"
+              onClick={() => toggle(event.id)}
+            >
               {event.name}
-            </Label>
-          </div>
-        ))}
+            </button>
+          );
+        })}
       </div>
-      <Button type="button" variant="outline" size="sm" onClick={handleSave} disabled={pending} className="self-start">
+      <Button
+        type="button"
+        variant="outline"
+        size="sm"
+        onClick={handleSave}
+        disabled={pending}
+        className="self-start rounded-full"
+      >
         {pending ? "Saving..." : "Save invitations"}
       </Button>
       {error ? <p className="text-sm text-destructive">{error}</p> : null}

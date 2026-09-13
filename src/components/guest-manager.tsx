@@ -5,11 +5,14 @@ import { useRouter } from "next/navigation";
 import { saveGuest, deleteGuest } from "@/app/actions/admin";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { InvitationsForm } from "@/components/invitations-form";
 
 type Guest = { id: string; first_name: string; last_name: string };
 type Event = { id: string; name: string; event_date: string | null };
+
+function initials(first: string, last: string) {
+  return (first[0] ?? "") + (last[0] ?? "");
+}
 
 function GuestRow({
   guest,
@@ -35,17 +38,25 @@ function GuestRow({
   };
 
   return (
-    <div className="flex flex-col gap-3 border-b pb-4 last:border-b-0 last:pb-0">
-      <form action={formAction} className="flex flex-col gap-2">
+    <div className="av-guest-block">
+      <form action={formAction} className="flex flex-col gap-3">
         <input type="hidden" name="guest_id" value={guest.id} />
         <input type="hidden" name="household_id" value={householdId} />
         <div className="flex items-center gap-2">
+          <span className="av-avatar">{initials(guest.first_name, guest.last_name)}</span>
           <Input name="first_name" defaultValue={guest.first_name} placeholder="First name" required />
           <Input name="last_name" defaultValue={guest.last_name} placeholder="Last name" required />
-          <Button type="submit" variant="outline" size="sm" disabled={pending}>
+          <Button type="submit" variant="outline" size="sm" className="rounded-full" disabled={pending}>
             {pending ? "Saving..." : "Save"}
           </Button>
-          <Button type="button" variant="destructive" size="sm" onClick={handleDelete} disabled={deleting}>
+          <Button
+            type="button"
+            variant="destructive"
+            size="sm"
+            className="rounded-full"
+            onClick={handleDelete}
+            disabled={deleting}
+          >
             Remove
           </Button>
         </div>
@@ -53,7 +64,7 @@ function GuestRow({
       </form>
 
       <div>
-        <p className="mb-1 text-xs font-medium text-muted-foreground">Invited events</p>
+        <p className="av-section-hint mb-2 font-medium">Invited events</p>
         <InvitationsForm
           guestId={guest.id}
           householdId={householdId}
@@ -95,7 +106,7 @@ function AddGuestForm({
   };
 
   return (
-    <form key={resetKey} action={formAction} className="flex flex-col gap-2">
+    <form key={resetKey} action={formAction} className="av-guest-block border-dashed">
       <input type="hidden" name="household_id" value={householdId} />
       <input type="hidden" name="event_ids" value={JSON.stringify(Array.from(selectedEvents))} />
       <div className="flex items-center gap-2">
@@ -104,30 +115,30 @@ function AddGuestForm({
       </div>
 
       {events.length > 0 ? (
-        <div className="flex flex-col gap-1">
-          <p className="text-xs font-medium text-muted-foreground">Invited events</p>
-          <div className="flex flex-wrap gap-3">
-            {events.map((event) => (
-              <div key={event.id} className="flex items-center gap-1.5">
-                <input
-                  type="checkbox"
-                  id={`add-guest-event-${event.id}`}
-                  checked={selectedEvents.has(event.id)}
-                  onChange={() => toggleEvent(event.id)}
-                  className="size-4"
-                />
-                <Label htmlFor={`add-guest-event-${event.id}`} className="text-sm font-normal">
+        <div className="flex flex-col gap-2">
+          <p className="av-section-hint font-medium">Invited events</p>
+          <div className="flex flex-wrap gap-2">
+            {events.map((event) => {
+              const pressed = selectedEvents.has(event.id);
+              return (
+                <button
+                  key={event.id}
+                  type="button"
+                  aria-pressed={pressed}
+                  className="av-toggle"
+                  onClick={() => toggleEvent(event.id)}
+                >
                   {event.name}
-                </Label>
-              </div>
-            ))}
+                </button>
+              );
+            })}
           </div>
         </div>
       ) : null}
 
       {state.error ? <p className="text-sm text-destructive">{state.error}</p> : null}
 
-      <Button type="submit" disabled={pending || selectedEvents.size === 0} className="self-start">
+      <Button type="submit" disabled={pending || selectedEvents.size === 0} className="self-start rounded-full">
         {pending ? "Adding..." : "Add guest"}
       </Button>
     </form>

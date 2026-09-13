@@ -16,6 +16,12 @@
   background: linear-gradient(180deg, #fdf6e8 0%, var(--background) 320px);
 }
 
+/* Radius-only version of .av-shell's override, for content that's
+   portalled outside the .av-shell DOM subtree (e.g. Dialogs render to
+   document.body) but should still pick up the rounder admin geometry
+   instead of the guest site's sharper default. */
+.av-radius { --radius: 0.85rem; }
+
 .av-card {
   border-radius: var(--radius-xl);
   border: 1px solid var(--border);
@@ -73,3 +79,81 @@
 .av-pill-yes { background: color-mix(in oklch, var(--color-event-reception), white 80%); color: var(--color-event-reception); }
 .av-pill-no { background: var(--accent); color: var(--accent-foreground); }
 .av-pill-pending { background: var(--muted); color: var(--muted-foreground); }
+
+/* A titled card section, used across the household create/edit pages
+   instead of shadcn's Card (which keeps the guest site's sharper formal
+   radius) -- consistent rounded/shadowed container for every form block. */
+.av-section {
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--border);
+  background: var(--card);
+  box-shadow: var(--av-shadow-sm);
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.av-section-title { font-family: var(--font-heading); font-size: 1.25rem; }
+.av-section-hint { font-size: 0.8rem; color: var(--muted-foreground); }
+
+/* A single label+field block, consistent vertical rhythm across every
+   admin form. */
+.av-field { display: flex; flex-direction: column; gap: 6px; }
+.av-field label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: var(--muted-foreground);
+}
+
+/* Clickable pill toggle for multi-select (event invitations), replacing
+   raw checkboxes with something that matches the RSVP-status pill
+   language used elsewhere in the dashboard. */
+.av-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--background);
+  padding: 6px 14px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--foreground);
+  transition: background 140ms ease, border-color 140ms ease, color 140ms ease;
+}
+.av-toggle:hover { border-color: var(--primary); }
+.av-toggle[aria-pressed="true"] {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: var(--primary-foreground);
+}
+
+/* A single guest row inside a household -- name fields + inline actions,
+   with its invitation toggles nested below. Replaces the plain bordered
+   div used previously. */
+.av-guest-block {
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  background: var(--background);
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* Wraps the household edit/create pages' <main> so their max-width and
+   spacing feel like the same product as the dashboard. */
+.av-page { margin: 0 auto; width: 100%; max-width: 56rem; display: flex; flex-direction: column; gap: 24px; padding: 40px 32px; }
+
+.av-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--muted-foreground);
+  transition: color 140ms ease;
+}
+.av-back-link:hover { color: var(--primary); }

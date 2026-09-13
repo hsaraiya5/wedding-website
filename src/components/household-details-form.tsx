@@ -66,14 +66,14 @@ export function HouseholdDetailsForm({
   const validGuests = newGuests.filter((g) => g.first_name.trim() && g.last_name.trim());
 
   return (
-    <form action={formAction} className="flex flex-col gap-4">
+    <form action={formAction} className="flex flex-col gap-5">
       {household ? (
         <input type="hidden" name="household_id" value={household.id} />
       ) : (
         <input type="hidden" name="guests" value={JSON.stringify(validGuests)} />
       )}
 
-      <div className="flex flex-col gap-2">
+      <div className="av-field">
         <Label htmlFor="display_name">Household name</Label>
         <Input
           id="display_name"
@@ -84,7 +84,7 @@ export function HouseholdDetailsForm({
         />
       </div>
 
-      <div className="flex flex-col gap-2">
+      <div className="av-field">
         <Label htmlFor="contact_email">Contact email</Label>
         <Input
           id="contact_email"
@@ -96,13 +96,13 @@ export function HouseholdDetailsForm({
       </div>
 
       {!household ? (
-        <div className="flex flex-col gap-2">
+        <div className="av-field">
           <Label htmlFor="code">Invite code</Label>
           <Input id="code" name="code" placeholder="Leave blank to auto-generate" />
         </div>
       ) : null}
 
-      <div className="flex flex-col gap-2">
+      <div className="av-field">
         <Label htmlFor="group_tag">Group</Label>
         <Input
           id="group_tag"
@@ -119,15 +119,15 @@ export function HouseholdDetailsForm({
       </div>
 
       {!household ? (
-        <div className="flex flex-col gap-3">
-          <div>
+        <div className="flex flex-col gap-3 border-t border-border pt-5">
+          <div className="av-field">
             <Label>Guests</Label>
-            <p className="text-xs text-muted-foreground">
+            <p className="av-section-hint">
               At least one guest is required -- otherwise the family sees an empty page when they use their code.
             </p>
           </div>
           {newGuests.map((guest, index) => (
-            <div key={index} className="flex flex-col gap-2 rounded-lg border p-3">
+            <div key={index} className="av-guest-block">
               <div className="flex items-center gap-2">
                 <Input
                   placeholder="First name"
@@ -144,6 +144,7 @@ export function HouseholdDetailsForm({
                     type="button"
                     variant="destructive"
                     size="sm"
+                    className="rounded-full"
                     onClick={() => removeGuestRow(index)}
                   >
                     Remove
@@ -152,32 +153,35 @@ export function HouseholdDetailsForm({
               </div>
 
               {events.length > 0 ? (
-                <div className="flex flex-col gap-1">
-                  <p className="text-xs font-medium text-muted-foreground">Invited events</p>
-                  <div className="flex flex-wrap gap-3">
-                    {events.map((event) => (
-                      <div key={event.id} className="flex items-center gap-1.5">
-                        <input
-                          type="checkbox"
-                          id={`new-guest-${index}-event-${event.id}`}
-                          checked={guest.event_ids.includes(event.id)}
-                          onChange={() => toggleGuestEvent(index, event.id)}
-                          className="size-4"
-                        />
-                        <Label
-                          htmlFor={`new-guest-${index}-event-${event.id}`}
-                          className="text-sm font-normal"
+                <div className="flex flex-col gap-2">
+                  <p className="av-section-hint font-medium">Invited events</p>
+                  <div className="flex flex-wrap gap-2">
+                    {events.map((event) => {
+                      const pressed = guest.event_ids.includes(event.id);
+                      return (
+                        <button
+                          key={event.id}
+                          type="button"
+                          aria-pressed={pressed}
+                          className="av-toggle"
+                          onClick={() => toggleGuestEvent(index, event.id)}
                         >
                           {event.name}
-                        </Label>
-                      </div>
-                    ))}
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
               ) : null}
             </div>
           ))}
-          <Button type="button" variant="outline" size="sm" onClick={addGuestRow} className="self-start">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="self-start rounded-full"
+            onClick={addGuestRow}
+          >
             Add another guest
           </Button>
         </div>
@@ -188,7 +192,7 @@ export function HouseholdDetailsForm({
       <Button
         type="submit"
         disabled={pending || (!household && validGuests.length === 0)}
-        className="self-start"
+        className="self-start rounded-full"
       >
         {pending ? "Saving..." : household ? "Save changes" : "Create household"}
       </Button>

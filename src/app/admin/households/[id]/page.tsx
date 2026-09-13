@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { requireAdminUser } from "@/lib/admin-guard";
 import { getExistingGroupTags } from "@/lib/group-tags";
@@ -6,7 +7,6 @@ import { HouseholdDetailsForm } from "@/components/household-details-form";
 import { CodeManagement } from "@/components/code-management";
 import { GuestManager } from "@/components/guest-manager";
 import { DeleteHouseholdButton } from "@/components/delete-household-button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export const dynamic = "force-dynamic";
 
@@ -31,8 +31,11 @@ export default async function EditHouseholdPage({
 
   if (!household) {
     return (
-      <main className="flex min-h-screen items-center justify-center p-6">
+      <main className="av-page items-center text-center">
         <p className="text-muted-foreground">Household not found.</p>
+        <Link href="/admin" className="av-back-link">
+          &larr; Back to dashboard
+        </Link>
       </main>
     );
   }
@@ -46,35 +49,36 @@ export default async function EditHouseholdPage({
   ]);
 
   return (
-    <main className="mx-auto flex max-w-xl flex-col gap-6 p-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">{household.display_name}</h1>
+    <main className="av-page">
+      <Link href="/admin" className="av-back-link self-start">
+        &larr; Dashboard
+      </Link>
+
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <p className="text-xs font-bold uppercase tracking-wide text-primary">Household</p>
+          <h1 className="font-heading text-3xl">{household.display_name}</h1>
+        </div>
         <DeleteHouseholdButton householdId={household.id} displayName={household.display_name} />
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Household details</CardTitle>
-        </CardHeader>
-        <CardContent className="flex flex-col gap-4">
-          <HouseholdDetailsForm household={household} existingGroupTags={existingGroupTags} />
+      <div className="av-section">
+        <h2 className="av-section-title">Household details</h2>
+        <HouseholdDetailsForm household={household} existingGroupTags={existingGroupTags} />
+        <div className="border-t border-border pt-5">
           <CodeManagement key={household.code} householdId={household.id} code={household.code} />
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
-      <Card id="guests">
-        <CardHeader>
-          <CardTitle>Guests</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <GuestManager
-            householdId={household.id}
-            guests={guests ?? []}
-            events={events ?? []}
-            guestEvents={guestEvents ?? []}
-          />
-        </CardContent>
-      </Card>
+      <div className="av-section" id="guests">
+        <h2 className="av-section-title">Guests</h2>
+        <GuestManager
+          householdId={household.id}
+          guests={guests ?? []}
+          events={events ?? []}
+          guestEvents={guestEvents ?? []}
+        />
+      </div>
     </main>
   );
 }

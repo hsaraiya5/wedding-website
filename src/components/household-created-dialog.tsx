@@ -24,7 +24,7 @@ export function HouseholdCreatedDialog() {
 
   return (
     <Dialog open={Boolean(createdName)} onOpenChange={(next) => !next && handleClose()}>
-      <DialogContent>
+      <DialogContent className="av-radius">
         <DialogHeader>
           <DialogTitle>{createdName} created</DialogTitle>
           <DialogDescription>
