@@ -44,6 +44,27 @@
 .av-stat-value { font-family: var(--font-heading); font-size: 1.9rem; line-height: 1; color: var(--accent-foreground); }
 .av-stat-label { font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.02em; color: var(--muted-foreground); }
 
+/* Per-event RSVP breakdown -- "how many said yes to event X" in zero
+   clicks, since the aggregate .av-stat cards above can only answer that
+   across every event combined. */
+.av-event-stat {
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--border);
+  background: var(--card);
+  box-shadow: var(--av-shadow-sm);
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.av-event-stat-name { font-family: var(--font-heading); font-size: 0.98rem; }
+.av-event-stat-main { display: flex; align-items: baseline; gap: 6px; }
+.av-event-stat-main strong { font-family: var(--font-heading); font-size: 1.7rem; line-height: 1; color: var(--color-event-reception); }
+.av-event-stat-main span { font-size: 0.8rem; color: var(--muted-foreground); }
+.av-event-stat-breakdown { display: flex; gap: 12px; font-size: 0.76rem; color: var(--muted-foreground); }
+.av-event-stat-breakdown .av-no { color: var(--accent-foreground); font-weight: 700; }
+.av-event-stat-breakdown .av-pending { color: var(--foreground); font-weight: 700; }
+
 .av-row {
   border-radius: var(--radius-lg);
   transition: background 140ms ease;

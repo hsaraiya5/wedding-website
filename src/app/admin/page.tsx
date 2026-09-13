@@ -17,12 +17,15 @@ export default async function AdminDashboardPage() {
     return <NotAuthorized email={user.email} />;
   }
 
-  const { data: households } = await supabase
-    .from("households")
-    .select(
-      "id, display_name, code, group_tag, guests(id, first_name, last_name, guest_events(event_id, events(name)), rsvps(event_id, attending))"
-    )
-    .order("display_name");
+  const [{ data: households }, { data: eventsList }] = await Promise.all([
+    supabase
+      .from("households")
+      .select(
+        "id, display_name, code, group_tag, guests(id, first_name, last_name, guest_events(event_id, events(name)), rsvps(event_id, attending))"
+      )
+      .order("display_name"),
+    supabase.from("events").select("id, name, event_date").order("event_date"),
+  ]);
 
   const allGuests = (households ?? []).flatMap((h) => h.guests);
   const totalHouseholds = households?.length ?? 0;
@@ -41,6 +44,23 @@ export default async function AdminDashboardPage() {
     { label: "Yes RSVPs", value: rsvpYes },
     { label: "Pending RSVPs", value: pendingCount },
   ];
+
+  // Per-event breakdown -- "Yes RSVPs" above is a total across every
+  // event, which can't answer "how many said yes to the Haldi specifically"
+  // without opening every household. This answers that in zero clicks.
+  const eventStats = (eventsList ?? []).map((event) => {
+    let invited = 0;
+    let yes = 0;
+    let no = 0;
+    for (const guest of allGuests) {
+      if (!guest.guest_events.some((ge) => ge.event_id === event.id)) continue;
+      invited += 1;
+      const rsvp = guest.rsvps.find((r) => r.event_id === event.id);
+      if (rsvp?.attending === "yes") yes += 1;
+      else if (rsvp?.attending === "no") no += 1;
+    }
+    return { id: event.id, name: event.name, invited, yes, no, pending: invited - yes - no };
+  });
 
   return (
     <main className="mx-auto flex max-w-7xl flex-col gap-8 px-8 py-10">
@@ -71,6 +91,31 @@ export default async function AdminDashboardPage() {
           </div>
         ))}
       </div>
+
+      {eventStats.length > 0 ? (
+        <div>
+          <h2 className="mb-4 font-heading text-xl">RSVPs by event</h2>
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+            {eventStats.map((event) => (
+              <div key={event.id} className="av-event-stat">
+                <span className="av-event-stat-name">{event.name}</span>
+                <div className="av-event-stat-main">
+                  <strong>{event.yes}</strong>
+                  <span>of {event.invited} yes</span>
+                </div>
+                <div className="av-event-stat-breakdown">
+                  <span>
+                    <span className="av-no">{event.no}</span> no
+                  </span>
+                  <span>
+                    <span className="av-pending">{event.pending}</span> pending
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : null}
 
       <div>
         <h2 className="mb-5 font-heading text-xl">Households</h2>
