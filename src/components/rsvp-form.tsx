@@ -195,25 +195,30 @@ export function RsvpForm({
               Your answers stay read-only until you choose to make changes.
             </p>
 
-            <ul className="rv-confirmation-list">
-              {events.flatMap((event) =>
-                guests
-                  .filter((guest) => isInvited(guest.id, event.id))
-                  .map((guest) => {
-                    const answer = answers[answerKey(guest.id, event.id)];
-                    return (
-                      <li key={`${guest.id}-${event.id}`}>
-                        <span>
-                          {guest.first_name} &middot; {event.name}
-                        </span>
-                        <strong className={answer === "yes" ? "rv-yes" : "rv-no"}>
-                          {answer === "yes" ? "Yes" : "No"}
-                        </strong>
-                      </li>
-                    );
-                  })
-              )}
-            </ul>
+            <div className="rv-people">
+              {rsvpGuests.map((guest) => (
+                <div key={guest.id} className="rv-person-card">
+                  <span className="rv-person-name">
+                    {guest.first_name} {guest.last_name}
+                  </span>
+                  <div className="rv-person-events">
+                    {events
+                      .filter((event) => isInvited(guest.id, event.id))
+                      .map((event) => {
+                        const answer = answers[answerKey(guest.id, event.id)];
+                        return (
+                          <span
+                            key={event.id}
+                            className={`rv-person-event ${answer === "yes" ? "rv-yes" : "rv-no"}`}
+                          >
+                            {event.name}
+                          </span>
+                        );
+                      })}
+                  </div>
+                </div>
+              ))}
+            </div>
 
             {household.song_request ? (
               <p className="mt-4 text-sm text-muted-foreground">

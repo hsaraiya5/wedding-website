@@ -261,23 +261,53 @@
   67% { transform: translateY(-2px) scale(1.002); }
 }
 
-.rv-confirmation-list {
-  width: min(600px, 100%);
-  margin: 20px 0 0;
-  padding: 0;
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  column-gap: 28px;
-  list-style: none;
-  border-top: 1px solid var(--border);
+/* Confirmation answers grouped by person: one card per guest, laid out
+   horizontally (name + a row of event outcomes), stacked vertically as a
+   list of guests -- replaces an earlier flat two-column table-like list
+   that made it hard to see "what is this person doing" at a glance. */
+.rv-people {
+  width: 100%;
+  max-width: 640px;
+  margin: 24px auto 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
   text-align: left;
 }
-.rv-confirmation-list li { display: flex; justify-content: space-between; gap: 14px; border-bottom: 1px solid var(--border); padding: 10px 0; font-size: 0.85rem; }
-.rv-confirmation-list strong { display: inline-flex; align-items: center; gap: 5px; font-weight: 800; }
-.rv-confirmation-list strong.rv-yes { color: var(--color-event-reception); }
-.rv-confirmation-list strong.rv-no { color: var(--accent-foreground); }
-.rv-confirmation-list strong.rv-yes::before { content: "\2713"; }
-.rv-confirmation-list strong.rv-no::before { content: "\00d7"; font-size: 1.12em; }
+.rv-person-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--card);
+  padding: 14px 18px;
+}
+.rv-person-name {
+  font-family: var(--font-heading);
+  font-size: 1.1rem;
+  color: var(--accent-foreground);
+}
+.rv-person-events { display: flex; flex-wrap: wrap; gap: 8px; }
+.rv-person-event {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 999px;
+  padding: 5px 12px;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+.rv-person-event.rv-yes { background: var(--color-event-reception); color: #fffaf0; }
+.rv-person-event.rv-no { background: var(--accent-foreground); color: #fffaf0; }
+.rv-person-event::before { font-size: 0.85em; }
+.rv-person-event.rv-yes::before { content: "\2713"; }
+.rv-person-event.rv-no::before { content: "\00d7"; }
+
+@media (min-width: 560px) {
+  .rv-person-card { flex-direction: row; align-items: center; gap: 20px; }
+  .rv-person-name { flex: 0 0 140px; }
+}
 
 @media (min-width: 780px) {
   .rv-heading { grid-template-columns: minmax(260px, 0.85fr) minmax(300px, 1.15fr); align-items: end; gap: 40px; }
