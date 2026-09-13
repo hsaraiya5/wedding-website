@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getGuestContext } from "@/lib/guest-session";
 import { getWeddingStart } from "@/lib/countdown";
+import { WelcomeHome, WelcomeArt, WelcomePanel } from "@/components/welcome-home";
 import { Countdown } from "@/components/countdown";
 import { buttonVariants } from "@/components/ui/button";
 
@@ -28,31 +29,39 @@ export default async function HomePage() {
   const weddingStart = getWeddingStart(context.events);
 
   return (
-    <main className="flex flex-col items-center gap-10 px-6 py-16 text-center">
-      <div className="flex flex-col items-center gap-3">
-        <p className="text-xs font-bold uppercase tracking-wide text-primary">
+    <WelcomeHome>
+      <WelcomeArt
+        mapUrl="https://www.google.com/maps/search/?api=1&query=Wyndham+Grand+Pittsburgh+Downtown"
+        caption={
+          <>
+            May 29-30, 2027
+            <br />
+            Wyndham Pittsburgh
+          </>
+        }
+      />
+      <WelcomePanel>
+        <p className="wh-eyebrow text-xs font-bold uppercase tracking-wide text-primary">
           Gayathri &amp; Hrishikesh
         </p>
-        <h1 className="font-script text-5xl text-accent-foreground">
-          Welcome, {context.household.display_name}
-        </h1>
-        <p className="max-w-md text-muted-foreground">
+        <h1 className="wh-title">Welcome, {context.household.display_name}</h1>
+        <p className="wh-message">
           We are so happy you will be celebrating this joyful weekend with us in Pittsburgh.
         </p>
-      </div>
 
-      {weddingStart ? (
-        <Countdown target={weddingStart} title="The wedding weekend begins in" showSeconds />
-      ) : null}
+        {weddingStart ? (
+          <Countdown target={weddingStart} title="The wedding weekend begins in" showSeconds />
+        ) : null}
 
-      <div className="flex gap-3">
-        <Link href="/events" className={buttonVariants()}>
-          View the itinerary
-        </Link>
-        <Link href="/rsvp" className={buttonVariants({ variant: "outline" })}>
-          RSVP
-        </Link>
-      </div>
-    </main>
+        <div className="wh-actions">
+          <Link href="/events" className={buttonVariants()}>
+            View the itinerary
+          </Link>
+          <Link href="/rsvp" className={buttonVariants({ variant: "outline" })}>
+            RSVP
+          </Link>
+        </div>
+      </WelcomePanel>
+    </WelcomeHome>
   );
 }
