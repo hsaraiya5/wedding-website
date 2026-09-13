@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
-import { cn } from "@/lib/utils";
+import { useState, type CSSProperties } from "react";
 import { formatEventDay, formatEventDayFull, formatEventTime } from "@/lib/format";
+import "./events-timeline.css";
 
 type Event = {
   id: string;
@@ -31,71 +31,68 @@ export function EventsTimeline({ events }: { events: Event[] }) {
 
   if (!active) return null;
 
+  const trackFill =
+    events.length > 1 ? `${(activeIndex / (events.length - 1)) * 75 + 12.5}%` : "12.5%";
+
   return (
-    <div className="flex flex-col gap-6">
-      <div
-        role="tablist"
-        aria-label="Wedding weekend events"
-        className="flex gap-2 overflow-x-auto pb-2"
-      >
-        {events.map((event, index) => {
-          const accent = accentColors[index % accentColors.length];
-          const isActive = index === activeIndex;
-          return (
-            <button
-              key={event.id}
-              type="button"
-              role="tab"
-              aria-selected={isActive}
-              onClick={() => setActiveIndex(index)}
-              style={{ borderColor: isActive ? accent : undefined }}
-              className={cn(
-                "flex min-w-[9rem] flex-col items-start gap-1 rounded-lg border-2 border-transparent bg-card px-4 py-3 text-left transition-colors",
-                isActive ? "shadow-sm" : "opacity-70 hover:opacity-100"
-              )}
-            >
-              <span className="text-xs text-muted-foreground">
-                {formatEventDay(event.event_date)}
-              </span>
-              <span className="text-xs font-semibold" style={{ color: accent }}>
-                {formatEventTime(event.start_time)}
-              </span>
-              <strong className="font-heading text-base leading-tight">{event.name}</strong>
-            </button>
-          );
-        })}
+    <div>
+      <div className="tl-shell">
+        <div
+          className="tl-track"
+          role="tablist"
+          aria-label="Wedding weekend events"
+          style={{ gridTemplateColumns: `repeat(${events.length}, minmax(0, 1fr))` } as CSSProperties}
+        >
+          <span className="tl-progress" style={{ width: trackFill }} aria-hidden="true" />
+          {events.map((event, index) => {
+            const accent = accentColors[index % accentColors.length];
+            return (
+              <button
+                key={event.id}
+                type="button"
+                role="tab"
+                aria-selected={index === activeIndex}
+                onClick={() => setActiveIndex(index)}
+                className="tl-stop"
+                style={{ "--tl-color": accent } as CSSProperties}
+              >
+                <span className="tl-stop-day">{formatEventDay(event.event_date)}</span>
+                <span className="tl-dot" aria-hidden="true" />
+                <span className="tl-stop-time">{formatEventTime(event.start_time)}</span>
+                <strong>{event.name}</strong>
+              </button>
+            );
+          })}
+        </div>
       </div>
 
-      <article
-        className="rounded-lg border-l-4 bg-card p-6"
-        style={{ borderLeftColor: accentColors[activeIndex % accentColors.length] }}
-      >
-        <p className="text-xs font-bold uppercase tracking-wide text-primary">
-          {formatEventDayFull(active.event_date)}
-        </p>
-        <h3 className="font-heading text-2xl">{active.name}</h3>
-        {active.description ? (
-          <p className="mt-2 text-muted-foreground">{active.description}</p>
-        ) : null}
+      <article className="tl-detail" key={active.id}>
+        <div>
+          <p className="tl-detail-eyebrow text-xs font-bold uppercase tracking-wide">
+            {formatEventDayFull(active.event_date)}
+          </p>
+          <h3 className="font-heading">{active.name}</h3>
+          {active.description ? <p className="tl-detail-copy">{active.description}</p> : null}
+        </div>
 
-        <dl className="mt-4 grid grid-cols-2 gap-x-6 gap-y-3 text-sm sm:grid-cols-4">
+        <dl className="tl-facts">
           <div>
-            <dt className="text-xs uppercase tracking-wide text-muted-foreground">Time</dt>
+            <dt>Time</dt>
             <dd>
               {formatEventTime(active.start_time)}
               {active.end_time ? ` to ${formatEventTime(active.end_time)}` : ""}
             </dd>
           </div>
           <div>
-            <dt className="text-xs uppercase tracking-wide text-muted-foreground">Venue</dt>
+            <dt>Venue</dt>
             <dd>{active.venue_name || "Coming soon"}</dd>
           </div>
           <div>
-            <dt className="text-xs uppercase tracking-wide text-muted-foreground">Address</dt>
+            <dt>Address</dt>
             <dd>{active.address || "Coming soon"}</dd>
           </div>
           <div>
-            <dt className="text-xs uppercase tracking-wide text-muted-foreground">Meal</dt>
+            <dt>Meal</dt>
             <dd>{active.meal_info || "Coming soon"}</dd>
           </div>
         </dl>

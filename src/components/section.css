@@ -1,0 +1,106 @@
+/*
+  Ported from the design handoff (developer-handoff/index.html, the
+  "Post-envelope information flow" block). Every content section reveals
+  itself on scroll: botanical rail illustrations grow in along the edges,
+  an underline draws under the heading, the content fades/slides up, and
+  any intro paragraph types itself out character by character. Classes
+  prefixed sc- (section-chrome) to avoid collisions elsewhere in the app.
+*/
+
+.sc-section {
+  position: relative;
+  overflow: hidden;
+  padding: 72px 0 84px;
+  --sc-rail-opacity: 0.55;
+}
+
+.sc-rail {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  z-index: 0;
+  width: clamp(72px, 9vw, 160px);
+  background-size: 100% auto;
+  background-repeat: repeat-y;
+  opacity: 0;
+  clip-path: inset(100% 0 0 0);
+  transform: translateY(18px) scale(0.985);
+  transform-origin: bottom;
+  transition: clip-path 1400ms cubic-bezier(0.18, 0.72, 0.2, 1), opacity 700ms ease, transform 1400ms cubic-bezier(0.18, 0.72, 0.2, 1);
+  filter: drop-shadow(0 12px 16px rgba(67, 57, 43, 0.08));
+  pointer-events: none;
+}
+.sc-rail-left { left: 0; background-position: left top; }
+.sc-rail-right { right: 0; background-position: right top; transition-delay: 120ms; }
+.sc-section.sc-in-view .sc-rail {
+  opacity: var(--sc-rail-opacity);
+  clip-path: inset(0 0 0 0);
+  transform: translateY(0) scale(1);
+  animation: sc-botanical-grow 1650ms cubic-bezier(0.18, 0.78, 0.2, 1) both;
+}
+.sc-section.sc-in-view .sc-rail-right { animation-delay: 120ms; }
+@keyframes sc-botanical-grow {
+  0% { opacity: 0; clip-path: inset(100% 0 0); transform: translateY(28px) scale(0.94); }
+  72% { opacity: var(--sc-rail-opacity); clip-path: inset(0); transform: translateY(-3px) scale(1.012); }
+  100% { opacity: var(--sc-rail-opacity); clip-path: inset(0); transform: translateY(0) scale(1); }
+}
+
+.sc-container {
+  position: relative;
+  z-index: 1;
+  width: min(1100px, calc(100% - clamp(140px, 16vw, 340px)));
+  margin: 0 auto;
+}
+
+.sc-heading {
+  max-width: 720px;
+  margin: 0 auto 40px;
+  text-align: center;
+}
+.sc-heading::after {
+  content: "";
+  display: block;
+  width: 76px;
+  height: 2px;
+  margin: 20px auto 0;
+  background: var(--primary);
+  opacity: 0.55;
+  transform: scaleX(0);
+  transform-origin: center;
+}
+.sc-section.sc-in-view .sc-heading::after { animation: sc-heading-line-grow 700ms ease 420ms both; }
+@keyframes sc-heading-line-grow { to { transform: scaleX(1); } }
+.sc-heading h2 { margin-top: 8px; font-size: 2.3rem; line-height: 1.1; }
+.sc-heading > p {
+  max-width: 620px;
+  margin: 14px auto 0;
+  color: var(--muted-foreground);
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.sc-typed-line { min-height: 3rem; }
+.sc-typed-line span::after {
+  content: "";
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  margin-left: 4px;
+  background: currentColor;
+  vertical-align: -0.08em;
+  opacity: 0;
+}
+.sc-typed-line.sc-typing span::after { animation: sc-typing-caret 620ms steps(1) infinite; opacity: 0.65; }
+@keyframes sc-typing-caret { 50% { opacity: 0; } }
+
+.sc-reveal {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 650ms ease, transform 780ms cubic-bezier(0.2, 0.72, 0.2, 1);
+}
+.sc-section.sc-in-view .sc-reveal { opacity: 1; transform: translateY(0); }
+
+@media (max-width: 720px) {
+  .sc-container { width: min(560px, calc(100% - 32px)); }
+  .sc-rail { display: none; }
+}
