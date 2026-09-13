@@ -192,3 +192,9 @@ export async function saveGuestInvitations(
   revalidatePath(`/admin/households/${householdId}`);
   revalidatePath("/admin");
 }
+
+export async function signOutAdmin() {
+  const supabase = await createClient();
+  await supabase.auth.signOut();
+  redirect("/admin/login");
+}

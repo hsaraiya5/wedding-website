@@ -5,7 +5,6 @@ import { requireAdminUser } from "@/lib/admin-guard";
 import { NotAuthorized } from "@/components/not-authorized";
 import { HouseholdsTable } from "@/components/households-table";
 import { HouseholdCreatedDialog } from "@/components/household-created-dialog";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { buttonVariants } from "@/components/ui/button";
 
 export const dynamic = "force-dynamic";
@@ -25,16 +24,34 @@ export default async function AdminDashboardPage() {
     )
     .order("display_name");
 
+  const allGuests = (households ?? []).flatMap((h) => h.guests);
+  const totalHouseholds = households?.length ?? 0;
+  const totalGuests = allGuests.length;
+  const rsvpYes = allGuests.reduce(
+    (sum, g) => sum + g.rsvps.filter((r) => r.attending === "yes").length,
+    0
+  );
+  const invitedCount = allGuests.reduce((sum, g) => sum + g.guest_events.length, 0);
+  const respondedCount = allGuests.reduce((sum, g) => sum + g.rsvps.length, 0);
+  const pendingCount = Math.max(0, invitedCount - respondedCount);
+
+  const stats = [
+    { label: "Households", value: totalHouseholds },
+    { label: "Guests", value: totalGuests },
+    { label: "Yes RSVPs", value: rsvpYes },
+    { label: "Pending RSVPs", value: pendingCount },
+  ];
+
   return (
-    <main className="mx-auto flex max-w-4xl flex-col gap-6 p-6">
+    <main className="mx-auto flex max-w-5xl flex-col gap-8 px-6 py-10">
       <Suspense fallback={null}>
         <HouseholdCreatedDialog />
       </Suspense>
 
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold">Admin dashboard</h1>
-          <p className="text-muted-foreground">Signed in as {user.email}</p>
+          <p className="text-xs font-bold uppercase tracking-wide text-primary">Admin</p>
+          <h1 className="font-heading text-3xl">Wedding dashboard</h1>
         </div>
         <div className="flex gap-2">
           <a href="/admin/export" className={buttonVariants({ variant: "outline" })}>
@@ -46,14 +63,19 @@ export default async function AdminDashboardPage() {
         </div>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Households</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <HouseholdsTable households={households ?? []} />
-        </CardContent>
-      </Card>
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+        {stats.map((stat) => (
+          <div key={stat.label} className="av-stat">
+            <span className="av-stat-value">{stat.value}</span>
+            <span className="av-stat-label">{stat.label}</span>
+          </div>
+        ))}
+      </div>
+
+      <div className="av-card p-6">
+        <h2 className="mb-4 font-heading text-xl">Households</h2>
+        <HouseholdsTable households={households ?? []} />
+      </div>
     </main>
   );
 }
