@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getGuestContext } from "@/lib/guest-session";
+import { Section, SectionHeading } from "@/components/section";
 import { EventsTimeline } from "@/components/events-timeline";
 import { buttonVariants } from "@/components/ui/button";
 
@@ -29,22 +30,26 @@ export default async function EventsPage() {
   const { events } = context;
 
   return (
-    <main className="mx-auto flex max-w-3xl flex-col gap-6 p-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-xs font-bold uppercase tracking-wide text-primary">Your itinerary</p>
-          <h1 className="font-heading text-3xl">Your weekend, at a glance.</h1>
-        </div>
-        <Link href="/rsvp" className={buttonVariants()}>
-          RSVP
-        </Link>
-      </div>
+    <Section id="events">
+      <SectionHeading
+        eyebrow="Your itinerary"
+        title="Your weekend, at a glance."
+        intro="Four celebrations, two joyful days, and every detail gathered in one place."
+      />
 
-      {events.length > 0 ? (
-        <EventsTimeline events={events} />
-      ) : (
-        <p className="text-muted-foreground">No events found for your household.</p>
-      )}
-    </main>
+      <div className="sc-reveal flex flex-col gap-6">
+        <div className="flex justify-end">
+          <Link href="/rsvp" className={buttonVariants()}>
+            RSVP
+          </Link>
+        </div>
+
+        {events.length > 0 ? (
+          <EventsTimeline events={events} />
+        ) : (
+          <p className="text-center text-muted-foreground">No events found for your household.</p>
+        )}
+      </div>
+    </Section>
   );
 }

@@ -30,22 +30,14 @@ export default async function RsvpPage({
   const { submitted } = await searchParams;
 
   return (
-    <main className="mx-auto flex max-w-2xl flex-col gap-6 p-6">
-      <div>
-        <p className="text-xs font-bold uppercase tracking-wide text-primary">RSVP</p>
-        <h1 className="font-heading text-3xl">Will you join us?</h1>
-        <p className="text-muted-foreground">For {household.display_name}</p>
-      </div>
-
-      <RsvpForm
-        household={household}
-        guests={guests}
-        events={events}
-        guestEvents={guest_events}
-        existingRsvps={rsvps}
-        siteSettings={site_settings}
-        justSubmitted={submitted === "1"}
-      />
-    </main>
+    <RsvpForm
+      household={household}
+      guests={guests}
+      events={events}
+      guestEvents={guest_events}
+      existingRsvps={rsvps}
+      siteSettings={site_settings}
+      justSubmitted={submitted === "1"}
+    />
   );
 }

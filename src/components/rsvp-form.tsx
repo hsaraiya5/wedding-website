@@ -1,16 +1,15 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useActionState } from "react";
 import { submitRsvp } from "@/app/actions/rsvp";
+import { Section } from "@/components/section";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { formatEventDay, formatEventTime } from "@/lib/format";
+import "./rsvp-section.css";
 
 type Household = {
   id: string;
@@ -41,6 +40,17 @@ function answerKey(guestId: string, eventId: string) {
   return `${guestId}:${eventId}`;
 }
 
+const petalConfigs = [
+  { x: "-170px", y: "-92px", r: "-95deg", color: "var(--color-event-ceremony)", delay: "0ms" },
+  { x: "-122px", y: "114px", r: "-34deg", color: "var(--color-event-haldi)", delay: "35ms" },
+  { x: "-48px", y: "-142px", r: "22deg", color: "var(--color-event-reception)", delay: "70ms" },
+  { x: "72px", y: "-142px", r: "58deg", color: "var(--primary)", delay: "20ms" },
+  { x: "154px", y: "-70px", r: "106deg", color: "var(--color-event-haldi)", delay: "90ms" },
+  { x: "168px", y: "76px", r: "138deg", color: "var(--color-event-ceremony)", delay: "55ms" },
+  { x: "68px", y: "142px", r: "188deg", color: "var(--color-event-reception)", delay: "110ms" },
+  { x: "-156px", y: "42px", r: "242deg", color: "var(--primary)", delay: "75ms" },
+];
+
 export function RsvpForm({
   household,
   guests,
@@ -69,24 +79,27 @@ export function RsvpForm({
   );
   const isInvited = (guestId: string, eventId: string) => invitedSet.has(answerKey(guestId, eventId));
 
-  // Only guests with something to answer for get a spot in the carousel.
   const rsvpGuests = useMemo(
     () => guests.filter((guest) => events.some((event) => isInvited(guest.id, event.id))),
     // eslint-disable-next-line react-hooks/exhaustive-deps -- isInvited is derived from guestEvents, already a dep
     [guests, events, guestEvents]
   );
 
-  const [mode, setMode] = useState<"readonly" | "edit">(
-    alreadySubmitted ? "readonly" : "edit"
-  );
+  const [mode, setMode] = useState<"readonly" | "edit">(alreadySubmitted ? "readonly" : "edit");
   const [activeGuestIndex, setActiveGuestIndex] = useState(0);
+  const [slideFromLeft, setSlideFromLeft] = useState(false);
+  const prevIndexRef = useRef(0);
+
+  const goToGuest = (index: number) => {
+    setSlideFromLeft(index < prevIndexRef.current);
+    prevIndexRef.current = index;
+    setActiveGuestIndex(index);
+  };
 
   const initialAnswers = useMemo(() => {
     const map: Record<string, "yes" | "no"> = {};
     for (const rsvp of existingRsvps) {
-      if (rsvp.attending) {
-        map[answerKey(rsvp.guest_id, rsvp.event_id)] = rsvp.attending;
-      }
+      if (rsvp.attending) map[answerKey(rsvp.guest_id, rsvp.event_id)] = rsvp.attending;
     }
     return map;
   }, [existingRsvps]);
@@ -95,6 +108,18 @@ export function RsvpForm({
   const [songRequest, setSongRequest] = useState(household.song_request ?? "");
 
   const [state, formAction, pending] = useActionState(submitRsvp, { error: null });
+
+  // Plays the stamp animation once, only on the submission that actually
+  // just happened -- a later visit to an already-submitted RSVP shows the
+  // stamp already settled, no animation.
+  const [stamping, setStamping] = useState(false);
+  const stampStarted = useRef(false);
+  useEffect(() => {
+    if (justSubmitted && !stampStarted.current) {
+      stampStarted.current = true;
+      setStamping(true);
+    }
+  }, [justSubmitted]);
 
   const answersArray = events.flatMap((event) =>
     guests
@@ -109,84 +134,114 @@ export function RsvpForm({
   const activeGuest = rsvpGuests[activeGuestIndex];
 
   return (
-    <div className="flex flex-col gap-4">
-      {deadline ? (
-        <p className="text-sm text-muted-foreground">
-          Please reply by {deadline.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
-        </p>
-      ) : null}
+    <Section id="rsvp" className="rv-section">
+      <div className={cn("rv-ticket", stamping && "rv-impact")}>
+        <div className="rv-heading">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-wide text-primary">RSVP</p>
+            <h2 className="font-heading">Will you join us?</h2>
+          </div>
+          <p>Reply for everyone in your household. Each event takes one quick yes or no.</p>
+        </div>
 
-      {deadlinePassed && !siteSettings?.late_edits_enabled ? (
-        <Alert variant="destructive">
-          <AlertTitle>RSVP closed</AlertTitle>
-          <AlertDescription>
-            The deadline to RSVP has passed. Reach out directly if anything needs to change.
-          </AlertDescription>
-        </Alert>
-      ) : null}
+        {deadline ? (
+          <div className="rv-deadline">
+            <span>
+              Please reply by{" "}
+              {deadline.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
+            </span>
+            <span>
+              {alreadySubmitted
+                ? "You've responded"
+                : deadlinePassed
+                  ? "RSVP closed"
+                  : "Reply when you are ready"}
+            </span>
+          </div>
+        ) : null}
 
-      {justSubmitted ? (
-        <Alert>
-          <AlertTitle>Stamped and received.</AlertTitle>
-          <AlertDescription>Your RSVP has been recorded.</AlertDescription>
-        </Alert>
-      ) : null}
-
-      {mode === "readonly" ? (
-        <Card>
-          <CardHeader>
-            <CardTitle>Your answers</CardTitle>
-          </CardHeader>
-          <CardContent className="flex flex-col gap-4">
-            {events.map((event) => (
-              <div key={event.id} className="flex flex-col gap-2">
-                <div className="flex items-center justify-between">
-                  <p className="font-medium">{event.name}</p>
-                  <span className="text-sm text-muted-foreground">
-                    {formatEventDay(event.event_date)} &middot; {formatEventTime(event.start_time)}
-                  </span>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {guests
-                    .filter((guest) => isInvited(guest.id, event.id))
-                    .map((guest) => {
-                      const answer = answers[answerKey(guest.id, event.id)];
-                      return (
-                        <Badge key={guest.id} variant={answer === "yes" ? "default" : "secondary"}>
-                          {guest.first_name}: {answer === "yes" ? "Yes" : answer === "no" ? "No" : "Not answered"}
-                        </Badge>
-                      );
-                    })}
-                </div>
+        {mode === "readonly" ? (
+          <div className="rv-confirmation">
+            <div className={cn("rv-stamp-stage", stamping && "rv-stamping")}>
+              <div className="rv-stamp-tool">
+                <span className="rv-stamp-handle" />
+                <span className="rv-stamp-base" />
               </div>
-            ))}
+              <div className={cn("rv-stamp-mark", !stamping && "rv-settled")}>
+                <span>Household</span>
+                <strong>RSVP received</strong>
+                <small>{household.display_name}</small>
+              </div>
+              <div className="rv-petals">
+                {petalConfigs.map((petal, i) => (
+                  <span
+                    key={i}
+                    style={
+                      {
+                        "--x": petal.x,
+                        "--y": petal.y,
+                        "--r": petal.r,
+                        "--petal-color": petal.color,
+                        "--delay": petal.delay,
+                      } as React.CSSProperties
+                    }
+                  />
+                ))}
+              </div>
+            </div>
+            <p className="text-xs font-bold uppercase tracking-wide text-primary">Your response is in</p>
+            <h3 className="font-heading text-2xl text-accent-foreground">Stamped and received.</h3>
+            <p className="text-sm text-muted-foreground">
+              Your answers stay read-only until you choose to make changes.
+            </p>
+
+            <ul className="rv-confirmation-list">
+              {events.flatMap((event) =>
+                guests
+                  .filter((guest) => isInvited(guest.id, event.id))
+                  .map((guest) => {
+                    const answer = answers[answerKey(guest.id, event.id)];
+                    return (
+                      <li key={`${guest.id}-${event.id}`}>
+                        <span>
+                          {guest.first_name} &middot; {event.name}
+                        </span>
+                        <strong className={answer === "yes" ? "rv-yes" : "rv-no"}>
+                          {answer === "yes" ? "Yes" : "No"}
+                        </strong>
+                      </li>
+                    );
+                  })
+              )}
+            </ul>
 
             {household.song_request ? (
-              <div>
-                <p className="text-sm font-medium">Song request</p>
-                <p className="text-sm text-muted-foreground">{household.song_request}</p>
-              </div>
+              <p className="mt-4 text-sm text-muted-foreground">
+                Song request: {household.song_request}
+              </p>
             ) : null}
 
             {canEdit ? (
-              <Button variant="outline" onClick={() => setMode("edit")} className="self-start">
-                Make Changes
-              </Button>
+              <button
+                type="button"
+                className="mt-4 border-b border-primary text-sm font-bold text-primary"
+                onClick={() => setMode("edit")}
+              >
+                Make changes
+              </button>
             ) : null}
-          </CardContent>
-        </Card>
-      ) : (
-        <form action={formAction} className="flex flex-col gap-6">
-          <input type="hidden" name="answers" value={JSON.stringify(answersArray)} />
+          </div>
+        ) : (
+          <form action={formAction} className="flex flex-col gap-2">
+            <input type="hidden" name="answers" value={JSON.stringify(answersArray)} />
 
-          {rsvpGuests.length > 0 ? (
-            <Card>
-              <CardContent className="flex flex-col gap-5">
-                <div className="flex items-center justify-between">
-                  <strong className="text-sm">
+            {rsvpGuests.length > 0 ? (
+              <>
+                <div className="rv-progress">
+                  <strong>
                     Guest {activeGuestIndex + 1} of {rsvpGuests.length}
                   </strong>
-                  <div className="flex gap-1.5" role="tablist" aria-label="Choose a guest">
+                  <div className="rv-dots" role="tablist" aria-label="Choose a guest">
                     {rsvpGuests.map((guest, index) => (
                       <button
                         key={guest.id}
@@ -194,13 +249,8 @@ export function RsvpForm({
                         role="tab"
                         aria-selected={index === activeGuestIndex}
                         aria-label={`${guest.first_name} ${guest.last_name}`}
-                        onClick={() => setActiveGuestIndex(index)}
-                        className={cn(
-                          "flex size-7 items-center justify-center rounded-full border text-sm",
-                          index === activeGuestIndex
-                            ? "border-primary bg-primary text-primary-foreground"
-                            : "border-border text-muted-foreground"
-                        )}
+                        onClick={() => goToGuest(index)}
+                        className="rv-dot"
                       >
                         {index + 1}
                       </button>
@@ -208,116 +258,105 @@ export function RsvpForm({
                   </div>
                 </div>
 
-                {activeGuest ? (
-                  <div className="flex flex-col gap-4">
-                    <h3 className="font-heading text-xl">
-                      {activeGuest.first_name} {activeGuest.last_name}
-                    </h3>
-                    <div className="grid gap-3 sm:grid-cols-2">
-                      {events
-                        .filter((event) => isInvited(activeGuest.id, event.id))
-                        .map((event) => {
-                          const key = answerKey(activeGuest.id, event.id);
-                          const value = answers[key];
-                          return (
-                            <div
-                              key={event.id}
-                              className="flex flex-col gap-2 rounded-lg border border-border/60 bg-background/60 p-3"
-                            >
-                              <strong className="text-sm">{event.name}</strong>
-                              <span className="text-xs text-muted-foreground">
-                                {formatEventDay(event.event_date)} &middot; {formatEventTime(event.start_time)}
-                              </span>
-                              <div className="flex gap-2">
-                                <button
-                                  type="button"
-                                  onClick={() =>
-                                    setAnswers((prev) => ({ ...prev, [key]: "yes" }))
-                                  }
-                                  aria-pressed={value === "yes"}
-                                  className={cn(
-                                    "flex-1 rounded border px-3 py-1.5 text-sm font-semibold transition-colors",
-                                    value === "yes"
-                                      ? "border-primary bg-primary text-primary-foreground"
-                                      : "border-border hover:bg-muted"
-                                  )}
-                                >
-                                  Yes
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={() =>
-                                    setAnswers((prev) => ({ ...prev, [key]: "no" }))
-                                  }
-                                  aria-pressed={value === "no"}
-                                  className={cn(
-                                    "flex-1 rounded border px-3 py-1.5 text-sm font-semibold transition-colors",
-                                    value === "no"
-                                      ? "border-primary bg-primary text-primary-foreground"
-                                      : "border-border hover:bg-muted"
-                                  )}
-                                >
-                                  No
-                                </button>
+                <div className="rv-carousel">
+                  {activeGuest ? (
+                    <div key={activeGuest.id} className={cn("rv-card", slideFromLeft && "rv-from-left")}>
+                      <div className="rv-guest-heading">
+                        <h3>
+                          {activeGuest.first_name} {activeGuest.last_name}
+                        </h3>
+                      </div>
+                      <div className="rv-choice-grid">
+                        {events
+                          .filter((event) => isInvited(activeGuest.id, event.id))
+                          .map((event) => {
+                            const key = answerKey(activeGuest.id, event.id);
+                            const value = answers[key];
+                            return (
+                              <div key={event.id} className="rv-choice">
+                                <div>
+                                  <strong>{event.name}</strong>
+                                  <small>
+                                    {formatEventDay(event.event_date)} &middot;{" "}
+                                    {formatEventTime(event.start_time)}
+                                  </small>
+                                </div>
+                                <div className="rv-yesno" role="group" aria-label={`${activeGuest.first_name} ${event.name} attendance`}>
+                                  <button
+                                    type="button"
+                                    className={cn(value === "yes" && "rv-selected")}
+                                    onClick={() => setAnswers((prev) => ({ ...prev, [key]: "yes" }))}
+                                  >
+                                    Yes
+                                  </button>
+                                  <button
+                                    type="button"
+                                    className={cn(value === "no" && "rv-selected")}
+                                    onClick={() => setAnswers((prev) => ({ ...prev, [key]: "no" }))}
+                                  >
+                                    No
+                                  </button>
+                                </div>
                               </div>
-                            </div>
-                          );
-                        })}
+                            );
+                          })}
+                      </div>
                     </div>
-                  </div>
-                ) : null}
+                  ) : null}
+                </div>
 
-                <div className="flex justify-between">
-                  <Button
+                <div className="rv-controls">
+                  <button
                     type="button"
-                    variant="outline"
+                    className="rv-nav"
                     disabled={activeGuestIndex === 0}
-                    onClick={() => setActiveGuestIndex((i) => Math.max(0, i - 1))}
+                    onClick={() => goToGuest(Math.max(0, activeGuestIndex - 1))}
                   >
                     &larr; Previous guest
-                  </Button>
-                  <Button
+                  </button>
+                  <button
                     type="button"
-                    variant="outline"
+                    className="rv-nav"
                     disabled={activeGuestIndex === rsvpGuests.length - 1}
-                    onClick={() =>
-                      setActiveGuestIndex((i) => Math.min(rsvpGuests.length - 1, i + 1))
-                    }
+                    onClick={() => goToGuest(Math.min(rsvpGuests.length - 1, activeGuestIndex + 1))}
                   >
                     Next guest &rarr;
-                  </Button>
+                  </button>
                 </div>
-              </CardContent>
-            </Card>
-          ) : (
-            <p className="text-muted-foreground">No events found for your household.</p>
-          )}
+              </>
+            ) : (
+              <p className="text-muted-foreground">No events found for your household.</p>
+            )}
 
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="song_request">Song request (optional)</Label>
-            <Textarea
-              id="song_request"
-              name="song_request"
-              value={songRequest}
-              onChange={(event) => setSongRequest(event.target.value)}
-              placeholder="Song title and artist"
-            />
-          </div>
+            <div className="rv-end">
+              <div>
+                <Label htmlFor="song_request">Song request (optional)</Label>
+                <Textarea
+                  id="song_request"
+                  name="song_request"
+                  value={songRequest}
+                  onChange={(event) => setSongRequest(event.target.value)}
+                  placeholder="Song title and artist"
+                  className="mt-2"
+                />
+              </div>
 
-          {state.error ? <p className="text-sm text-destructive">{state.error}</p> : null}
+              {state.error ? <p className="text-sm text-destructive">{state.error}</p> : null}
 
-          <div className="flex gap-2">
-            <Button type="submit" disabled={pending}>
-              {pending ? "Submitting..." : "Stamp our RSVP"}
-            </Button>
-            {alreadySubmitted ? (
-              <Button type="button" variant="outline" onClick={() => setMode("readonly")}>
-                Cancel
-              </Button>
-            ) : null}
-          </div>
-        </form>
-      )}
-    </div>
+              <div className="flex gap-2">
+                <Button type="submit" disabled={pending}>
+                  {pending ? "Submitting..." : "Stamp our RSVP"}
+                </Button>
+                {alreadySubmitted ? (
+                  <Button type="button" variant="outline" onClick={() => setMode("readonly")}>
+                    Cancel
+                  </Button>
+                ) : null}
+              </div>
+            </div>
+          </form>
+        )}
+      </div>
+    </Section>
   );
 }

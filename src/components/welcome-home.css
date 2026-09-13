@@ -1,0 +1,137 @@
+/*
+  Ported from the design handoff's ".welcome-home" block -- a two-panel
+  layout (art panel + content panel), distinct from the generic ".section"
+  treatment since it's the very first thing shown, not something that
+  reveals on scroll. Classes prefixed wh- to avoid collisions.
+*/
+
+.wh-home {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+  min-height: calc(100svh - 118px);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  overflow: hidden;
+  background: var(--background);
+}
+
+.wh-art {
+  position: relative;
+  overflow: hidden;
+  display: none;
+  place-items: center;
+  background: var(--background);
+}
+.wh-art::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--wh-hero-art) left center / auto 100% no-repeat;
+  opacity: 0;
+  clip-path: inset(100% 0 0);
+  transform: translateY(26px) scale(0.965);
+  transform-origin: bottom left;
+}
+.wh-home.wh-ready .wh-art::before {
+  animation: wh-botanical-grow 1500ms cubic-bezier(0.18, 0.78, 0.2, 1) both;
+}
+.wh-art-copy {
+  position: relative;
+  z-index: 1;
+  color: var(--accent-foreground);
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+  line-height: 1.35;
+  text-align: center;
+  opacity: 0;
+  transform: translateY(14px);
+}
+.wh-home.wh-ready .wh-art-copy { animation: wh-copy-in 620ms ease 520ms both; }
+.wh-map-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  margin-top: 10px;
+  color: #1f5c76;
+  border-bottom: 1px solid currentColor;
+  font-family: var(--font-sans);
+  font-size: 0.92rem;
+  font-weight: 750;
+  text-decoration: none;
+  transition: color 180ms ease;
+}
+.wh-map-link::after { content: "\2197"; margin-left: 6px; font-size: 0.9em; }
+.wh-map-link:hover { color: var(--primary); }
+
+.wh-panel {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-width: 0;
+  padding: 48px 6%;
+}
+.wh-panel::after {
+  content: "";
+  position: absolute;
+  right: -38px;
+  bottom: -55px;
+  width: 260px;
+  height: 300px;
+  background: var(--wh-floral-art) right bottom / auto 300px no-repeat;
+  opacity: 0;
+  clip-path: inset(100% 0 0);
+  pointer-events: none;
+}
+.wh-home.wh-ready .wh-panel::after {
+  animation: wh-corner-grow 1300ms cubic-bezier(0.18, 0.78, 0.2, 1) 600ms both;
+}
+
+.wh-content { position: relative; z-index: 1; width: min(640px, 100%); text-align: center; }
+.wh-content > .wh-eyebrow,
+.wh-content > .wh-message,
+.wh-content > .wh-actions { opacity: 0; transform: translateY(14px); }
+.wh-home.wh-ready .wh-content > .wh-eyebrow { animation: wh-copy-in 520ms ease 140ms both; }
+.wh-home.wh-ready .wh-content > .wh-message { animation: wh-copy-in 520ms ease 640ms both; }
+.wh-home.wh-ready .wh-content > .wh-actions { animation: wh-copy-in 520ms ease 1100ms both; }
+
+.wh-title {
+  width: 100%;
+  margin: 4px auto -4px;
+  padding: 0.16em 0.2em 0.24em;
+  overflow: visible;
+  color: var(--accent-foreground);
+  font-family: var(--font-script);
+  font-size: clamp(2.6rem, 6vw, 3.6rem);
+  line-height: 1.16;
+  text-wrap: balance;
+  text-shadow: 0 2px 0 rgba(255, 255, 255, 0.78), 0 13px 30px rgba(113, 43, 49, 0.16);
+  clip-path: inset(0 100% 0 0);
+}
+.wh-home.wh-ready .wh-title { animation: wh-script-write 1750ms cubic-bezier(0.18, 0.72, 0.2, 1) 260ms forwards; }
+
+.wh-message {
+  max-width: 560px;
+  min-height: 2.8em;
+  margin: 16px auto 0;
+  color: var(--muted-foreground);
+  font-size: 1rem;
+}
+.wh-actions { margin-top: 24px; display: flex; justify-content: center; gap: 10px; }
+
+@keyframes wh-copy-in { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes wh-botanical-grow {
+  0% { opacity: 0; clip-path: inset(100% 0 0); transform: translateY(24px) scale(0.96); }
+  76% { opacity: 1; clip-path: inset(0); transform: translateY(-3px) scale(1.01); }
+  100% { opacity: 1; clip-path: inset(0); transform: translateY(0) scale(1); }
+}
+@keyframes wh-corner-grow {
+  from { opacity: 0; clip-path: inset(100% 0 0); transform: translateY(20px); }
+  to { opacity: 0.1; clip-path: inset(0); transform: translateY(0); }
+}
+@keyframes wh-script-write { to { clip-path: inset(0); } }
+
+@media (min-width: 900px) {
+  .wh-home { grid-template-columns: minmax(360px, 0.8fr) minmax(0, 1.2fr); }
+  .wh-art { display: grid; }
+}
