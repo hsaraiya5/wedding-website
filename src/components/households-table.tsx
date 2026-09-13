@@ -2,18 +2,10 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { DeleteHouseholdButton } from "@/components/delete-household-button";
+import { cn } from "@/lib/utils";
 
 type EventRef = { name: string } | { name: string }[] | null;
 
@@ -33,16 +25,27 @@ type Household = {
   guests: Guest[];
 };
 
-function eventList(guest: Guest): { name: string; status: string }[] {
+function eventList(guest: Guest): { name: string; status: "yes" | "no" | "pending" }[] {
   const rsvpByEvent = new Map(guest.rsvps.map((r) => [r.event_id, r.attending]));
   return guest.guest_events.flatMap((ge) => {
     const events = Array.isArray(ge.events) ? ge.events : ge.events ? [ge.events] : [];
     return events.map((event) => {
       const attending = rsvpByEvent.get(ge.event_id);
-      const status = attending === "yes" ? "Yes" : attending === "no" ? "No" : "Pending";
-      return { name: event.name, status };
+      const status = attending === "yes" ? "yes" : attending === "no" ? "no" : "pending";
+      return { name: event.name, status: status as "yes" | "no" | "pending" };
     });
   });
+}
+
+function initials(name: string) {
+  const parts = name.trim().split(/\s+/);
+  return (parts[0]?.[0] ?? "") + (parts[1]?.[0] ?? "");
+}
+
+function responseSummary(household: Household) {
+  const invited = household.guests.reduce((sum, g) => sum + g.guest_events.length, 0);
+  const answered = household.guests.reduce((sum, g) => sum + g.rsvps.length, 0);
+  return { invited, answered, complete: invited > 0 && answered >= invited };
 }
 
 export function HouseholdsTable({ households }: { households: Household[] }) {
@@ -80,12 +83,12 @@ export function HouseholdsTable({ households }: { households: Household[] }) {
           placeholder="Search by household or guest name..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="max-w-xs"
+          className="max-w-xs rounded-full"
         />
         <select
           value={groupFilter}
           onChange={(e) => setGroupFilter(e.target.value)}
-          className="h-8 rounded-lg border border-input bg-transparent px-2.5 text-sm"
+          className="h-8 rounded-full border border-input bg-transparent px-3 text-sm"
         >
           <option value="">All groups</option>
           {groups.map((group) => (
@@ -99,68 +102,85 @@ export function HouseholdsTable({ households }: { households: Household[] }) {
         </span>
       </div>
 
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Household</TableHead>
-            <TableHead>Group</TableHead>
-            <TableHead>Code</TableHead>
-            <TableHead>Guests, invited events &amp; RSVP status</TableHead>
-            <TableHead></TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {filtered.map((household) => (
-            <TableRow key={household.id}>
-              <TableCell className="font-medium">
-                <Link href={`/admin/households/${household.id}`} className="hover:underline">
-                  {household.display_name}
-                </Link>
-              </TableCell>
-              <TableCell>
-                {household.group_tag ? <Badge variant="secondary">{household.group_tag}</Badge> : null}
-              </TableCell>
-              <TableCell>
-                <code>{household.code}</code>
-              </TableCell>
-              <TableCell className="text-sm">
-                <div className="flex flex-col gap-1">
+      {filtered.length === 0 ? (
+        <p className="py-8 text-center text-sm text-muted-foreground">
+          No households match your search.
+        </p>
+      ) : (
+        <div className="flex flex-col gap-4">
+          {filtered.map((household) => {
+            const summary = responseSummary(household);
+            return (
+              <div key={household.id} className="av-household-card">
+                <div className="av-household-header">
+                  <div className="flex flex-1 items-center gap-3">
+                    <span className="av-avatar">{initials(household.display_name)}</span>
+                    <div className="flex flex-wrap items-center gap-2.5">
+                      <Link
+                        href={`/admin/households/${household.id}`}
+                        className="font-heading text-base hover:text-primary"
+                      >
+                        {household.display_name}
+                      </Link>
+                      {household.group_tag ? (
+                        <span className="av-pill bg-accent text-accent-foreground">
+                          {household.group_tag}
+                        </span>
+                      ) : null}
+                      <code className="rounded-md bg-muted px-1.5 py-0.5 text-xs text-muted-foreground">
+                        {household.code}
+                      </code>
+                      {summary.invited > 0 ? (
+                        <span className={cn("av-response-badge", summary.complete && "av-complete")}>
+                          {summary.answered} of {summary.invited} answered
+                        </span>
+                      ) : null}
+                    </div>
+                  </div>
+
+                  <div className="flex shrink-0 gap-2">
+                    <Link
+                      href={`/admin/households/${household.id}`}
+                      className={buttonVariants({ variant: "outline", size: "sm", className: "rounded-full" })}
+                    >
+                      Edit
+                    </Link>
+                    <DeleteHouseholdButton householdId={household.id} displayName={household.display_name} />
+                  </div>
+                </div>
+
+                <div className="av-guest-summary-list">
                   {household.guests.map((guest) => {
                     const guestEventList = eventList(guest);
                     return (
-                      <div key={guest.id}>
-                        <span className="font-medium">{guest.first_name}:</span>{" "}
-                        {guestEventList.length > 0
-                          ? guestEventList.map((e, i) => (
-                              <span key={i}>
-                                {i > 0 ? ", " : ""}
-                                {e.name} ({e.status})
-                              </span>
-                            ))
-                          : "no invited events"}
+                      <div key={guest.id} className="av-guest-summary-row">
+                        <span className="av-guest-summary-name">{guest.first_name}</span>
+                        {guestEventList.length > 0 ? (
+                          guestEventList.map((e, i) => (
+                            <span
+                              key={i}
+                              className={cn(
+                                "av-pill",
+                                e.status === "yes" && "av-pill-yes",
+                                e.status === "no" && "av-pill-no",
+                                e.status === "pending" && "av-pill-pending"
+                              )}
+                            >
+                              {e.name}
+                            </span>
+                          ))
+                        ) : (
+                          <span className="text-xs text-muted-foreground">no invited events</span>
+                        )}
                       </div>
                     );
                   })}
                 </div>
-              </TableCell>
-              <TableCell>
-                <div className="flex gap-2">
-                  <Link
-                    href={`/admin/households/${household.id}`}
-                    className={buttonVariants({ variant: "outline", size: "sm" })}
-                  >
-                    Edit
-                  </Link>
-                  <DeleteHouseholdButton
-                    householdId={household.id}
-                    displayName={household.display_name}
-                  />
-                </div>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }

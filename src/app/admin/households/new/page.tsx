@@ -1,9 +1,9 @@
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { requireAdminUser } from "@/lib/admin-guard";
 import { getExistingGroupTags } from "@/lib/group-tags";
 import { NotAuthorized } from "@/components/not-authorized";
 import { HouseholdDetailsForm } from "@/components/household-details-form";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default async function NewHouseholdPage() {
   const supabase = await createClient();
@@ -19,21 +19,24 @@ export default async function NewHouseholdPage() {
   ]);
 
   return (
-    <main className="mx-auto flex max-w-xl flex-col gap-6 p-6">
-      <h1 className="text-2xl font-semibold">New household</h1>
+    <main className="av-page">
+      <Link href="/admin" className="av-back-link self-start">
+        &larr; Dashboard
+      </Link>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Household details</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <HouseholdDetailsForm
-            household={null}
-            existingGroupTags={existingGroupTags}
-            events={events ?? []}
-          />
-        </CardContent>
-      </Card>
+      <div>
+        <p className="text-xs font-bold uppercase tracking-wide text-primary">New household</p>
+        <h1 className="font-heading text-3xl">Add a household</h1>
+      </div>
+
+      <div className="av-section">
+        <h2 className="av-section-title">Household details</h2>
+        <HouseholdDetailsForm
+          household={null}
+          existingGroupTags={existingGroupTags}
+          events={events ?? []}
+        />
+      </div>
     </main>
   );
 }

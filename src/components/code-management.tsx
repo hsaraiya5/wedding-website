@@ -44,28 +44,37 @@ export function CodeManagement({
   };
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="av-field">
       <Label htmlFor="household-code">Invite code</Label>
-      <div className="flex items-center gap-2">
+      <div className="flex flex-wrap items-center gap-2">
         <Input
           id="household-code"
           value={codeInput}
           onChange={(e) => setCodeInput(e.target.value)}
+          className="max-w-[220px]"
         />
         <Button
           type="button"
           variant="outline"
           size="sm"
+          className="rounded-full"
           onClick={handleSaveCode}
           disabled={pending || codeInput.trim() === code}
         >
           {pending ? "Saving..." : "Save code"}
         </Button>
-        <Button type="button" variant="outline" size="sm" onClick={handleRegenerate} disabled={pending}>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          className="rounded-full"
+          onClick={handleRegenerate}
+          disabled={pending}
+        >
           {pending ? "Regenerating..." : "Regenerate"}
         </Button>
       </div>
-      <p className="text-xs text-muted-foreground">
+      <p className="av-section-hint">
         Changing or regenerating the code instantly invalidates the old one -- anyone still using it gets signed out.
       </p>
       {error ? <p className="text-sm text-destructive">{error}</p> : null}

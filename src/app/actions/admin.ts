@@ -106,8 +106,14 @@ export async function deleteHousehold(householdId: string) {
     throw new Error("Something went wrong deleting the household.");
   }
 
+  // No redirect() here -- this is called from two different places (the
+  // dashboard list and a household's own edit page), each of which needs
+  // different post-delete navigation. redirect()'ing to /admin was a no-op
+  // when already on /admin (same-path "redirect" doesn't force the client
+  // router to refetch), which is why deleting a household from the
+  // dashboard left stale counts/rows on screen. Each caller now handles
+  // its own navigation via router.push/refresh in DeleteHouseholdButton.
   revalidatePath("/admin");
-  redirect("/admin");
 }
 
 export async function saveGuest(
@@ -191,4 +197,10 @@ export async function saveGuestInvitations(
 
   revalidatePath(`/admin/households/${householdId}`);
   revalidatePath("/admin");
+}
+
+export async function signOutAdmin() {
+  const supabase = await createClient();
+  await supabase.auth.signOut();
+  redirect("/admin/login");
 }
