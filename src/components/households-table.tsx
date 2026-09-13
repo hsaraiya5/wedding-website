@@ -42,6 +42,12 @@ function initials(name: string) {
   return (parts[0]?.[0] ?? "") + (parts[1]?.[0] ?? "");
 }
 
+function responseSummary(household: Household) {
+  const invited = household.guests.reduce((sum, g) => sum + g.guest_events.length, 0);
+  const answered = household.guests.reduce((sum, g) => sum + g.rsvps.length, 0);
+  return { invited, answered, complete: invited > 0 && answered >= invited };
+}
+
 export function HouseholdsTable({ households }: { households: Household[] }) {
   const [search, setSearch] = useState("");
   const [groupFilter, setGroupFilter] = useState("");
@@ -101,73 +107,78 @@ export function HouseholdsTable({ households }: { households: Household[] }) {
           No households match your search.
         </p>
       ) : (
-        <div className="flex flex-col divide-y divide-border/60">
-          {filtered.map((household) => (
-            <div
-              key={household.id}
-              className="av-row flex flex-col gap-4 px-3 py-5 sm:flex-row sm:items-start sm:gap-6"
-            >
-              <div className="flex flex-1 items-start gap-4">
-                <span className="av-avatar">{initials(household.display_name)}</span>
-                <div className="flex flex-col gap-2.5">
-                  <div className="flex flex-wrap items-center gap-2.5">
+        <div className="flex flex-col gap-4">
+          {filtered.map((household) => {
+            const summary = responseSummary(household);
+            return (
+              <div key={household.id} className="av-household-card">
+                <div className="av-household-header">
+                  <div className="flex flex-1 items-center gap-3">
+                    <span className="av-avatar">{initials(household.display_name)}</span>
+                    <div className="flex flex-wrap items-center gap-2.5">
+                      <Link
+                        href={`/admin/households/${household.id}`}
+                        className="font-heading text-base hover:text-primary"
+                      >
+                        {household.display_name}
+                      </Link>
+                      {household.group_tag ? (
+                        <span className="av-pill bg-accent text-accent-foreground">
+                          {household.group_tag}
+                        </span>
+                      ) : null}
+                      <code className="rounded-md bg-muted px-1.5 py-0.5 text-xs text-muted-foreground">
+                        {household.code}
+                      </code>
+                      {summary.invited > 0 ? (
+                        <span className={cn("av-response-badge", summary.complete && "av-complete")}>
+                          {summary.answered} of {summary.invited} answered
+                        </span>
+                      ) : null}
+                    </div>
+                  </div>
+
+                  <div className="flex shrink-0 gap-2">
                     <Link
                       href={`/admin/households/${household.id}`}
-                      className="font-heading text-base hover:text-primary"
+                      className={buttonVariants({ variant: "outline", size: "sm", className: "rounded-full" })}
                     >
-                      {household.display_name}
+                      Edit
                     </Link>
-                    {household.group_tag ? (
-                      <span className="av-pill bg-accent text-accent-foreground">
-                        {household.group_tag}
-                      </span>
-                    ) : null}
-                    <code className="rounded-md bg-muted px-1.5 py-0.5 text-xs text-muted-foreground">
-                      {household.code}
-                    </code>
-                  </div>
-
-                  <div className="flex flex-col gap-2">
-                    {household.guests.map((guest) => {
-                      const guestEventList = eventList(guest);
-                      return (
-                        <div key={guest.id} className="flex flex-wrap items-center gap-2 text-sm">
-                          <span className="text-muted-foreground">{guest.first_name}:</span>
-                          {guestEventList.length > 0 ? (
-                            guestEventList.map((e, i) => (
-                              <span
-                                key={i}
-                                className={cn(
-                                  "av-pill",
-                                  e.status === "yes" && "av-pill-yes",
-                                  e.status === "no" && "av-pill-no",
-                                  e.status === "pending" && "av-pill-pending"
-                                )}
-                              >
-                                {e.name}
-                              </span>
-                            ))
-                          ) : (
-                            <span className="text-xs text-muted-foreground">no invited events</span>
-                          )}
-                        </div>
-                      );
-                    })}
+                    <DeleteHouseholdButton householdId={household.id} displayName={household.display_name} />
                   </div>
                 </div>
-              </div>
 
-              <div className="flex shrink-0 gap-2 sm:pt-1">
-                <Link
-                  href={`/admin/households/${household.id}`}
-                  className={buttonVariants({ variant: "outline", size: "sm", className: "rounded-full" })}
-                >
-                  Edit
-                </Link>
-                <DeleteHouseholdButton householdId={household.id} displayName={household.display_name} />
+                <div className="av-guest-summary-list">
+                  {household.guests.map((guest) => {
+                    const guestEventList = eventList(guest);
+                    return (
+                      <div key={guest.id} className="av-guest-summary-row">
+                        <span className="av-guest-summary-name">{guest.first_name}</span>
+                        {guestEventList.length > 0 ? (
+                          guestEventList.map((e, i) => (
+                            <span
+                              key={i}
+                              className={cn(
+                                "av-pill",
+                                e.status === "yes" && "av-pill-yes",
+                                e.status === "no" && "av-pill-no",
+                                e.status === "pending" && "av-pill-pending"
+                              )}
+                            >
+                              {e.name}
+                            </span>
+                          ))
+                        ) : (
+                          <span className="text-xs text-muted-foreground">no invited events</span>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

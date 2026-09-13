@@ -72,7 +72,7 @@ export default async function AdminDashboardPage() {
         ))}
       </div>
 
-      <div className="av-card p-8">
+      <div>
         <h2 className="mb-5 font-heading text-xl">Households</h2>
         <HouseholdsTable households={households ?? []} />
       </div>

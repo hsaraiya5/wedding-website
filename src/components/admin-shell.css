@@ -157,3 +157,63 @@
   transition: color 140ms ease;
 }
 .av-back-link:hover { color: var(--primary); }
+
+/* One card per household on the dashboard -- each its own bordered,
+   shadowed unit so households read as clearly separate at a glance,
+   instead of divider-separated rows crammed into one shared box. */
+.av-household-card {
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--border);
+  background: var(--card);
+  box-shadow: var(--av-shadow-sm);
+  padding: 20px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  transition: box-shadow 180ms ease;
+}
+.av-household-card:hover { box-shadow: var(--av-shadow-md); }
+
+.av-household-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.av-response-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border-radius: 999px;
+  padding: 3px 11px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  background: var(--muted);
+  color: var(--muted-foreground);
+}
+.av-response-badge.av-complete { background: color-mix(in oklch, var(--color-event-reception), white 78%); color: var(--color-event-reception); }
+
+/* Each guest gets their own visually distinct line within the household
+   card -- a light inset row rather than text wrapped inline with the
+   next guest, so scanning "who's doing what" doesn't turn into parsing
+   a paragraph. */
+.av-guest-summary-list { display: flex; flex-direction: column; gap: 8px; }
+.av-guest-summary-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  border-radius: var(--radius-lg);
+  background: var(--background);
+  padding: 10px 14px;
+}
+.av-guest-summary-name {
+  flex: 0 0 auto;
+  min-width: 6rem;
+  font-weight: 600;
+  font-size: 0.88rem;
+}
