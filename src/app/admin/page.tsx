@@ -43,7 +43,7 @@ export default async function AdminDashboardPage() {
   ];
 
   return (
-    <main className="mx-auto flex max-w-5xl flex-col gap-8 px-6 py-10">
+    <main className="mx-auto flex max-w-7xl flex-col gap-8 px-8 py-10">
       <Suspense fallback={null}>
         <HouseholdCreatedDialog />
       </Suspense>
@@ -63,7 +63,7 @@ export default async function AdminDashboardPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+      <div className="grid grid-cols-2 gap-5 sm:grid-cols-4">
         {stats.map((stat) => (
           <div key={stat.label} className="av-stat">
             <span className="av-stat-value">{stat.value}</span>
@@ -72,8 +72,8 @@ export default async function AdminDashboardPage() {
         ))}
       </div>
 
-      <div className="av-card p-6">
-        <h2 className="mb-4 font-heading text-xl">Households</h2>
+      <div className="av-card p-8">
+        <h2 className="mb-5 font-heading text-xl">Households</h2>
         <HouseholdsTable households={households ?? []} />
       </div>
     </main>

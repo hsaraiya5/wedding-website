@@ -6,7 +6,7 @@ export function AdminHeader({ email }: { email: string | undefined }) {
 
   return (
     <header className="border-b border-border/70 bg-card/60 backdrop-blur">
-      <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-8 py-4">
         <Link href="/admin" className="flex items-center gap-2">
           <span className="flex size-8 items-center justify-center rounded-full border border-primary/40 font-heading text-sm text-primary">
             G&nbsp;H

@@ -101,13 +101,16 @@ export function HouseholdsTable({ households }: { households: Household[] }) {
           No households match your search.
         </p>
       ) : (
-        <div className="flex flex-col divide-y divide-border/70">
+        <div className="flex flex-col divide-y divide-border/60">
           {filtered.map((household) => (
-            <div key={household.id} className="av-row flex flex-col gap-3 p-3 sm:flex-row sm:items-start">
-              <div className="flex flex-1 items-start gap-3">
+            <div
+              key={household.id}
+              className="av-row flex flex-col gap-4 px-3 py-5 sm:flex-row sm:items-start sm:gap-6"
+            >
+              <div className="flex flex-1 items-start gap-4">
                 <span className="av-avatar">{initials(household.display_name)}</span>
-                <div className="flex flex-col gap-1.5">
-                  <div className="flex flex-wrap items-center gap-2">
+                <div className="flex flex-col gap-2.5">
+                  <div className="flex flex-wrap items-center gap-2.5">
                     <Link
                       href={`/admin/households/${household.id}`}
                       className="font-heading text-base hover:text-primary"
@@ -124,11 +127,11 @@ export function HouseholdsTable({ households }: { households: Household[] }) {
                     </code>
                   </div>
 
-                  <div className="flex flex-col gap-1">
+                  <div className="flex flex-col gap-2">
                     {household.guests.map((guest) => {
                       const guestEventList = eventList(guest);
                       return (
-                        <div key={guest.id} className="flex flex-wrap items-center gap-1.5 text-sm">
+                        <div key={guest.id} className="flex flex-wrap items-center gap-2 text-sm">
                           <span className="text-muted-foreground">{guest.first_name}:</span>
                           {guestEventList.length > 0 ? (
                             guestEventList.map((e, i) => (
