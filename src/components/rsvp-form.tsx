@@ -138,7 +138,7 @@ export function RsvpForm({
       <div className={cn("rv-ticket", stamping && "rv-impact")}>
         <div className="rv-heading">
           <div>
-            <p className="text-xs font-bold uppercase tracking-wide text-primary">RSVP</p>
+            <p className="gh-eyebrow">RSVP</p>
             <h2 className="font-heading">Will you join us?</h2>
           </div>
           <p>Reply for everyone in your household. Each event takes one quick yes or no.</p>
@@ -189,7 +189,7 @@ export function RsvpForm({
                 ))}
               </div>
             </div>
-            <p className="text-xs font-bold uppercase tracking-wide text-primary">Your response is in</p>
+            <p className="gh-eyebrow">Your response is in</p>
             <h3 className="font-heading text-2xl text-accent-foreground">Stamped and received.</h3>
             <p className="text-sm text-muted-foreground">
               Your answers stay read-only until you choose to make changes.

@@ -160,7 +160,7 @@
   font-size: 1.4rem;
   line-height: 1;
 }
-.sh-overlay-eyebrow { color: var(--primary); font-size: 0.8rem; font-weight: 800; text-transform: uppercase; }
+.sh-overlay-eyebrow { color: var(--primary); font-size: 0.9rem; font-weight: 800; letter-spacing: 0; text-transform: uppercase; }
 .sh-overlay-nav { margin-top: 14px; display: grid; }
 .sh-overlay-nav a {
   border-bottom: 1px solid var(--border);

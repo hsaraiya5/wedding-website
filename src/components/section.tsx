@@ -111,7 +111,7 @@ export function SectionHeading({
 }) {
   return (
     <div className="sc-heading">
-      <p className="text-xs font-bold uppercase tracking-wide text-primary">{eyebrow}</p>
+      <p className="gh-eyebrow">{eyebrow}</p>
       <h2 className="font-heading">{title}</h2>
       {intro ? <TypedLine text={intro} /> : null}
     </div>

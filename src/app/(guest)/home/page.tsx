@@ -41,9 +41,7 @@ export default async function HomePage() {
         }
       />
       <WelcomePanel>
-        <p className="wh-eyebrow text-xs font-bold uppercase tracking-wide text-primary">
-          Gayathri &amp; Hrishikesh
-        </p>
+        <p className="wh-eyebrow gh-eyebrow">Gayathri &amp; Hrishikesh</p>
         <h1 className="wh-title">Welcome, {context.household.display_name}</h1>
         <p className="wh-message">
           We are so happy you will be celebrating this joyful weekend with us in Pittsburgh.
