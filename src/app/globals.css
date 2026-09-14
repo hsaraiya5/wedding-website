@@ -110,6 +110,29 @@
   html {
     @apply font-sans;
     font-size: 18px;
+    /* Single-page layout: nav items are anchors, so scrolling between
+       sections should glide rather than jump. */
+    scroll-behavior: smooth;
+    scrollbar-gutter: stable;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+  }
+  /* Clear the 78px sticky header (60px below the mobile breakpoint) so an
+     anchored section doesn't land underneath it. */
+  :target,
+  [id="welcome"],
+  [id="events"],
+  [id="rsvp"] {
+    scroll-margin-top: 78px;
+  }
+  @media (max-width: 700px) {
+    :target,
+    [id="welcome"],
+    [id="events"],
+    [id="rsvp"] {
+      scroll-margin-top: 60px;
+    }
   }
   @media (max-width: 700px) {
     html {

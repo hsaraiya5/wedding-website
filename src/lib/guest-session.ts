@@ -6,6 +6,8 @@ export type GuestContext = {
     display_name: string;
     rsvp_submitted_at: string | null;
     song_request: string | null;
+    contact_email: string | null;
+    updates_opt_in: boolean;
   };
   guests: { id: string; first_name: string; last_name: string }[];
   events: {

@@ -27,11 +27,15 @@ export async function submitRsvp(
   }
 
   const songRequest = String(formData.get("song_request") ?? "").trim() || null;
+  const contactEmail = String(formData.get("contact_email") ?? "").trim() || null;
+  const updatesOptIn = formData.get("updates_opt_in") === "on";
 
   const supabase = await createClient();
   const { error } = await supabase.rpc("submit_rsvp", {
     p_answers: answers,
     p_song_request: songRequest,
+    p_contact_email: contactEmail,
+    p_updates_opt_in: updatesOptIn,
   });
 
   if (error) {
@@ -40,11 +44,14 @@ export async function submitRsvp(
         error: "The RSVP deadline has passed and edits are no longer accepted.",
       };
     }
+    if (error.message.includes("invalid_contact_email")) {
+      return { error: "That email address doesn't look right. Please check it and try again." };
+    }
     return { error: "Something went wrong submitting your RSVP. Please try again." };
   }
 
   // The household's rsvp_submitted_at / rsvps just changed -- make sure the
   // read-only summary reflects that instead of a cached prior render.
-  revalidatePath("/rsvp");
-  redirect("/rsvp?submitted=1");
+  revalidatePath("/home");
+  redirect("/home?submitted=1#rsvp");
 }

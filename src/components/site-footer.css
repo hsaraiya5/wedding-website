@@ -1,0 +1,51 @@
+/*
+  Ported from the design handoff's "footer" block -- a centered sign-off
+  with the botanical art bleeding in from both edges under a soft mask.
+  Classes prefixed sf- to avoid collisions.
+*/
+
+.sf-footer {
+  position: relative;
+  min-height: 250px;
+  overflow: hidden;
+  display: grid;
+  place-content: center;
+  border-top: 1px solid var(--border);
+  background: var(--background);
+  padding: 64px 320px 48px;
+  color: var(--accent-foreground);
+  text-align: center;
+}
+.sf-footer::before,
+.sf-footer::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 330px;
+  background-image: var(--sf-floral-art);
+  background-size: auto 330px;
+  background-repeat: no-repeat;
+  pointer-events: none;
+}
+.sf-footer::before {
+  left: 0;
+  background-position: left center;
+  -webkit-mask-image: linear-gradient(to right, #000 72%, transparent 100%);
+  mask-image: linear-gradient(to right, #000 72%, transparent 100%);
+}
+.sf-footer::after {
+  right: 0;
+  background-position: right center;
+  -webkit-mask-image: linear-gradient(to left, #000 72%, transparent 100%);
+  mask-image: linear-gradient(to left, #000 72%, transparent 100%);
+}
+.sf-footer p { position: relative; z-index: 1; margin: 0; }
+.sf-names { font-family: var(--font-heading); font-size: 2.15rem; line-height: 1.16; }
+.sf-meta { margin-top: 9px; color: var(--muted-foreground); font-size: 1rem; }
+
+@media (max-width: 700px) {
+  .sf-footer { min-height: 290px; padding: 58px 24px 150px; }
+  .sf-footer::before,
+  .sf-footer::after { top: auto; bottom: 0; width: 50%; height: 150px; background-size: auto 220px; }
+}

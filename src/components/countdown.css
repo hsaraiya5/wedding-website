@@ -53,8 +53,9 @@
 .cd-root.cd-main .cd-value { min-height: 96px; font-size: 3.7rem; }
 /* 3.2rem (the handoff's own value) overflows the box with Libre
    Baskerville's wider numeral glyphs than the system Baskerville the
-   handoff was authored against -- dialed down to fit four digits. */
-.cd-root.cd-main .cd-unit.cd-long .cd-value { font-size: 2.75rem; }
+   handoff was authored against -- dialed down so four digits sit inside
+   the box with breathing room rather than touching both borders. */
+.cd-root.cd-main .cd-unit.cd-long .cd-value { font-size: 2.4rem; }
 .cd-root.cd-main .cd-label { padding: 10px 6px; font-size: 0.78rem; }
 
 @media (max-width: 700px) {

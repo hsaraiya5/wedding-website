@@ -33,3 +33,23 @@
   box-shadow: none;
 }
 .gh-button-secondary:hover { background: var(--accent); border-color: var(--primary); box-shadow: none; transform: none; }
+
+/* Handoff's ".text-link" -- an underlined action with a trailing arrow,
+   at the same 750 weight as the buttons. Used for "Make changes" on the
+   submitted-RSVP summary. */
+.gh-text-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  border: 0;
+  border-bottom: 1px solid currentColor;
+  background: transparent;
+  padding: 0;
+  color: var(--primary);
+  font-weight: 750;
+  text-decoration: none;
+  transition: color 180ms ease;
+}
+.gh-text-link::after { content: "\2192"; }
+.gh-text-link:hover { color: var(--accent-foreground); }

@@ -23,9 +23,13 @@ export function WelcomeHome({ children }: { children: ReactNode }) {
   const floralStyle = { "--wh-floral-art": `url(${designAssets.floral})` } as CSSProperties;
 
   return (
-    <div className={`wh-home ${ready ? "wh-ready" : ""}`.trim()} style={{ ...heroStyle, ...floralStyle }}>
+    <section
+      id="welcome"
+      className={`wh-home ${ready ? "wh-ready" : ""}`.trim()}
+      style={{ ...heroStyle, ...floralStyle }}
+    >
       {children}
-    </div>
+    </section>
   );
 }
 
