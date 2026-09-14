@@ -4,18 +4,20 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useActionState } from "react";
 import { submitRsvp } from "@/app/actions/rsvp";
 import { Section } from "@/components/section";
-import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { formatEventDay, formatEventTime } from "@/lib/format";
 import "./rsvp-section.css";
+import "./site-button.css";
 
 type Household = {
   id: string;
   display_name: string;
   rsvp_submitted_at: string | null;
   song_request: string | null;
+  contact_email: string | null;
+  updates_opt_in: boolean;
 };
 
 type Guest = { id: string; first_name: string; last_name: string };
@@ -106,6 +108,8 @@ export function RsvpForm({
 
   const [answers, setAnswers] = useState(initialAnswers);
   const [songRequest, setSongRequest] = useState(household.song_request ?? "");
+  const [contactEmail, setContactEmail] = useState(household.contact_email ?? "");
+  const [updatesOptIn, setUpdatesOptIn] = useState(household.updates_opt_in ?? false);
 
   const [state, formAction, pending] = useActionState(submitRsvp, { error: null });
 
@@ -138,7 +142,7 @@ export function RsvpForm({
       <div className={cn("rv-ticket", stamping && "rv-impact")}>
         <div className="rv-heading">
           <div>
-            <p className="text-xs font-bold uppercase tracking-wide text-primary">RSVP</p>
+            <p className="gh-eyebrow">RSVP</p>
             <h2 className="font-heading">Will you join us?</h2>
           </div>
           <p>Reply for everyone in your household. Each event takes one quick yes or no.</p>
@@ -189,7 +193,7 @@ export function RsvpForm({
                 ))}
               </div>
             </div>
-            <p className="text-xs font-bold uppercase tracking-wide text-primary">Your response is in</p>
+            <p className="gh-eyebrow">Your response is in</p>
             <h3 className="font-heading text-2xl text-accent-foreground">Stamped and received.</h3>
             <p className="text-sm text-muted-foreground">
               Your answers stay read-only until you choose to make changes.
@@ -227,11 +231,7 @@ export function RsvpForm({
             ) : null}
 
             {canEdit ? (
-              <button
-                type="button"
-                className="mt-4 border-b border-primary text-sm font-bold text-primary"
-                onClick={() => setMode("edit")}
-              >
+              <button type="button" className="gh-text-link" onClick={() => setMode("edit")}>
                 Make changes
               </button>
             ) : null}
@@ -279,13 +279,11 @@ export function RsvpForm({
                             const value = answers[key];
                             return (
                               <div key={event.id} className="rv-choice">
-                                <div>
-                                  <strong>{event.name}</strong>
-                                  <small>
-                                    {formatEventDay(event.event_date)} &middot;{" "}
-                                    {formatEventTime(event.start_time)}
-                                  </small>
-                                </div>
+                                <strong>{event.name}</strong>
+                                <small>
+                                  {formatEventDay(event.event_date)} &middot;{" "}
+                                  {formatEventTime(event.start_time)}
+                                </small>
                                 <div className="rv-yesno" role="group" aria-label={`${activeGuest.first_name} ${event.name} attendance`}>
                                   <button
                                     type="button"
@@ -334,30 +332,72 @@ export function RsvpForm({
             )}
 
             <div className="rv-end">
-              <div>
-                <Label htmlFor="song_request">Song request (optional)</Label>
+              <div className="rv-updates">
+                <div className="rv-updates-copy">
+                  <p className="gh-eyebrow">Household updates</p>
+                  <h4>Stay in the loop.</h4>
+                  <p>Enter one email for your household. We will use it for your RSVP receipt.</p>
+                </div>
+                <div>
+                  <Label htmlFor="contact_email">Household email</Label>
+                  <input
+                    id="contact_email"
+                    name="contact_email"
+                    type="email"
+                    autoComplete="email"
+                    placeholder="family@example.com"
+                    value={contactEmail}
+                    onChange={(event) => setContactEmail(event.target.value)}
+                    required
+                  />
+                  <label className="rv-consent" htmlFor="updates_opt_in">
+                    <input
+                      id="updates_opt_in"
+                      name="updates_opt_in"
+                      type="checkbox"
+                      checked={updatesOptIn}
+                      onChange={(event) => setUpdatesOptIn(event.target.checked)}
+                    />
+                    <span>
+                      <strong>Email us wedding updates</strong>
+                      <small>
+                        Receive hotel, schedule, and weekend announcements. You can unsubscribe at
+                        any time.
+                      </small>
+                    </span>
+                  </label>
+                </div>
+              </div>
+
+              <div className="rv-song-field">
+                <Label htmlFor="song_request">
+                  Song request <small>(optional)</small>
+                </Label>
                 <Textarea
                   id="song_request"
                   name="song_request"
                   value={songRequest}
                   onChange={(event) => setSongRequest(event.target.value)}
                   placeholder="Song title and artist"
-                  className="mt-2"
                 />
               </div>
 
-              {state.error ? <p className="text-sm text-destructive">{state.error}</p> : null}
-
-              <div className="flex gap-2">
-                <Button type="submit" disabled={pending}>
+              <div className="rv-submit">
+                <button type="submit" className="gh-button" disabled={pending}>
                   {pending ? "Submitting..." : "Stamp our RSVP"}
-                </Button>
+                </button>
                 {alreadySubmitted ? (
-                  <Button type="button" variant="outline" onClick={() => setMode("readonly")}>
+                  <button
+                    type="button"
+                    className="gh-button gh-button-secondary"
+                    onClick={() => setMode("readonly")}
+                  >
                     Cancel
-                  </Button>
+                  </button>
                 ) : null}
               </div>
+
+              {state.error ? <p className="rv-error">{state.error}</p> : null}
             </div>
           </form>
         )}

@@ -104,13 +104,65 @@
   * {
     @apply border-border outline-ring/50;
   }
-  body {
-    @apply bg-background text-foreground;
-  }
+  /* Handoff sets html to an 18px root (16px on small screens) -- every
+     rem value ported from its CSS assumes that base, so without this the
+     whole site renders ~11% smaller than the design everywhere at once. */
   html {
     @apply font-sans;
+    font-size: 18px;
+    /* Single-page layout: nav items are anchors, so scrolling between
+       sections should glide rather than jump. */
+    scroll-behavior: smooth;
+    scrollbar-gutter: stable;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+  }
+  /* Clear the 78px sticky header (60px below the mobile breakpoint) so an
+     anchored section doesn't land underneath it. */
+  :target,
+  [id="welcome"],
+  [id="events"],
+  [id="rsvp"] {
+    scroll-margin-top: 78px;
+  }
+  @media (max-width: 700px) {
+    :target,
+    [id="welcome"],
+    [id="events"],
+    [id="rsvp"] {
+      scroll-margin-top: 60px;
+    }
+  }
+  @media (max-width: 700px) {
+    html {
+      font-size: 16px;
+    }
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-size: 20px;
+    line-height: 1.58;
+  }
+  @media (max-width: 700px) {
+    body {
+      font-size: 18px;
+    }
   }
   h1, h2, h3 {
     @apply font-heading;
   }
+}
+
+/* Handoff's shared ".eyebrow" label style (small caps section label like
+   "Your itinerary", "Gayathri & Hrishikesh"). Several ported components
+   were approximating this with ad-hoc Tailwind classes (font-bold instead
+   of the spec's 800 weight, tracking-wide adding letter-spacing the
+   design deliberately doesn't have) -- this is the real thing to match. */
+.gh-eyebrow {
+  color: var(--primary);
+  font-size: 0.9rem;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: uppercase;
 }

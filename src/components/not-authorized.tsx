@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 export function NotAuthorized({ email }: { email: string | undefined }) {
   return (
@@ -13,7 +14,7 @@ export function NotAuthorized({ email }: { email: string | undefined }) {
           {email ? <>Signed in as {email}, but this</> : "This"} account isn&apos;t on the admin
           allowlist. If you think that&apos;s a mistake, reach out to the couple.
         </p>
-        <Link href="/" className={buttonVariants({ variant: "outline", className: "mt-1 rounded-full" })}>
+        <Link href="/" className={cn(buttonVariants({ variant: "outline", className: "mt-1 rounded-full" }))}>
           Back to the site
         </Link>
       </div>

@@ -141,7 +141,7 @@ export function HouseholdsTable({ households }: { households: Household[] }) {
                   <div className="flex shrink-0 gap-2">
                     <Link
                       href={`/admin/households/${household.id}`}
-                      className={buttonVariants({ variant: "outline", size: "sm", className: "rounded-full" })}
+                      className={cn(buttonVariants({ variant: "outline", size: "sm", className: "rounded-full" }))}
                     >
                       Edit
                     </Link>

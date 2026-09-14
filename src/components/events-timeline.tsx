@@ -68,9 +68,7 @@ export function EventsTimeline({ events }: { events: Event[] }) {
 
       <article className="tl-detail" key={active.id}>
         <div>
-          <p className="tl-detail-eyebrow text-xs font-bold uppercase tracking-wide">
-            {formatEventDayFull(active.event_date)}
-          </p>
+          <p className="tl-detail-eyebrow">{formatEventDayFull(active.event_date)}</p>
           <h3 className="font-heading">{active.name}</h3>
           {active.description ? <p className="tl-detail-copy">{active.description}</p> : null}
         </div>
