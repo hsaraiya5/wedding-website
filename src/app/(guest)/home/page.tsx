@@ -6,6 +6,7 @@ import { getWeddingStart } from "@/lib/countdown";
 import { WelcomeHome, WelcomeArt, WelcomePanel } from "@/components/welcome-home";
 import { Countdown } from "@/components/countdown";
 import { buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 // Depends on the session's bound household -- never cache.
 export const dynamic = "force-dynamic";
@@ -57,7 +58,7 @@ export default async function HomePage() {
           <Link href="/events" className={buttonVariants()}>
             View the itinerary
           </Link>
-          <Link href="/rsvp" className={buttonVariants({ variant: "outline" })}>
+          <Link href="/rsvp" className={cn(buttonVariants({ variant: "outline" }))}>
             RSVP
           </Link>
         </div>

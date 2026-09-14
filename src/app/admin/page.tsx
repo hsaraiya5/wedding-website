@@ -6,6 +6,7 @@ import { NotAuthorized } from "@/components/not-authorized";
 import { HouseholdsTable } from "@/components/households-table";
 import { HouseholdCreatedDialog } from "@/components/household-created-dialog";
 import { buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
@@ -74,7 +75,7 @@ export default async function AdminDashboardPage() {
           <h1 className="font-heading text-3xl">Wedding dashboard</h1>
         </div>
         <div className="flex gap-2">
-          <a href="/admin/export" className={buttonVariants({ variant: "outline" })}>
+          <a href="/admin/export" className={cn(buttonVariants({ variant: "outline" }))}>
             Export CSV
           </a>
           <Link href="/admin/households/new" className={buttonVariants()}>

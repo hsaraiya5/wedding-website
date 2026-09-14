@@ -1,10 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type CSSProperties } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Countdown } from "@/components/countdown";
+import { designAssets } from "@/lib/design-assets";
+import "./site-header.css";
 
 const links = [
   { href: "/home", label: "Welcome" },
@@ -17,18 +19,21 @@ export function SiteHeader({ weddingStartIso }: { weddingStartIso: string | null
   const [menuOpen, setMenuOpen] = useState(false);
   const weddingStart = weddingStartIso ? new Date(weddingStartIso) : null;
 
+  const artStyle = { "--sh-hero-art": `url(${designAssets.hero})` } as CSSProperties;
+  const floralStyle = { "--sh-floral-art": `url(${designAssets.floral})` } as CSSProperties;
+
   return (
     <>
-      <header className="border-b border-border/60 bg-background/80 backdrop-blur">
-        <div className="mx-auto flex max-w-3xl items-center justify-between p-4">
-          <Link href="/home" className="font-heading text-lg" aria-label="Return home">
+      <header className="sh-header">
+        <div className="sh-header-inner">
+          <Link href="/home" className="sh-monogram" aria-label="Return home">
             G&nbsp;H
           </Link>
-          <div className="flex items-center gap-2">
-            <Link
-              href="/rsvp"
-              className="hidden rounded border border-primary bg-primary px-4 py-1.5 text-sm font-bold text-primary-foreground transition-colors hover:bg-accent-foreground sm:inline-flex"
-            >
+          <Link href="/home" className="sh-title">
+            Gayathri &amp; Hrishikesh
+          </Link>
+          <div className="sh-actions">
+            <Link href="/rsvp" className="sh-rsvp">
               RSVP
             </Link>
             <button
@@ -36,58 +41,62 @@ export function SiteHeader({ weddingStartIso }: { weddingStartIso: string | null
               onClick={() => setMenuOpen(true)}
               aria-label="Open menu"
               aria-expanded={menuOpen}
-              className="flex flex-col gap-1.5 rounded p-2 hover:bg-muted"
+              className="sh-menu-button"
             >
-              <span className="block h-0.5 w-5 bg-foreground" />
-              <span className="block h-0.5 w-5 bg-foreground" />
-              <span className="block h-0.5 w-5 bg-foreground" />
+              <span className="sh-menu-icon" aria-hidden="true">
+                <span />
+                <span />
+                <span />
+              </span>
             </button>
           </div>
         </div>
       </header>
 
       {menuOpen ? (
-        <div
-          role="dialog"
-          aria-modal="true"
-          className="fixed inset-0 z-50 flex flex-col items-center justify-center gap-8 bg-background p-8"
-        >
-          <button
-            type="button"
-            onClick={() => setMenuOpen(false)}
-            aria-label="Close menu"
-            className="absolute right-4 top-4 rounded p-2 text-2xl leading-none hover:bg-muted"
-          >
-            &times;
-          </button>
+        <div role="dialog" aria-modal="true" className="sh-overlay" style={{ ...artStyle, ...floralStyle }}>
+          <div className="sh-overlay-art">
+            <div className="sh-overlay-art-inner">
+              <p>
+                May 29-30, 2027
+                <br />
+                Pittsburgh
+              </p>
+            </div>
+          </div>
+          <div className="sh-overlay-panel">
+            <button
+              type="button"
+              onClick={() => setMenuOpen(false)}
+              aria-label="Close menu"
+              className="sh-overlay-close"
+            >
+              &times;
+            </button>
 
-          <p className="text-xs font-bold uppercase tracking-wide text-primary">
-            Wedding weekend
-          </p>
+            <p className="sh-overlay-eyebrow">Wedding weekend</p>
 
-          <nav aria-label="Wedding website sections" className="flex flex-col items-center gap-4">
-            {links.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                onClick={() => setMenuOpen(false)}
-                className={cn(
-                  "font-heading text-3xl transition-colors hover:text-primary",
-                  pathname === link.href && "text-primary"
-                )}
-              >
-                {link.label}
-              </Link>
-            ))}
-          </nav>
+            <nav aria-label="Wedding website sections" className="sh-overlay-nav">
+              {links.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  onClick={() => setMenuOpen(false)}
+                  className={cn(pathname === link.href && "sh-active")}
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </nav>
 
-          <p className="text-sm text-muted-foreground">
-            Gayathri &amp; Hrishikesh &middot; Wyndham Pittsburgh
-          </p>
+            <p className="sh-overlay-venue">Gayathri &amp; Hrishikesh &middot; Wyndham Pittsburgh</p>
 
-          {weddingStart ? (
-            <Countdown target={weddingStart} title="Until the wedding weekend" />
-          ) : null}
+            {weddingStart ? (
+              <div className="sh-overlay-countdown">
+                <Countdown target={weddingStart} title="Until the wedding weekend" />
+              </div>
+            ) : null}
+          </div>
         </div>
       ) : null}
     </>

@@ -41,7 +41,7 @@
   z-index: 1;
   color: var(--accent-foreground);
   font-family: var(--font-heading);
-  font-size: 1.5rem;
+  font-size: 1.75rem;
   line-height: 1.35;
   text-align: center;
   opacity: 0;
@@ -52,11 +52,11 @@
   display: inline-flex;
   align-items: center;
   min-height: 40px;
-  margin-top: 10px;
+  margin-top: 12px;
   color: #1f5c76;
   border-bottom: 1px solid currentColor;
   font-family: var(--font-sans);
-  font-size: 0.92rem;
+  font-size: 0.98rem;
   font-weight: 750;
   text-decoration: none;
   transition: color 180ms ease;
@@ -69,16 +69,16 @@
   display: grid;
   place-items: center;
   min-width: 0;
-  padding: 48px 6%;
+  padding: 48px 8%;
 }
 .wh-panel::after {
   content: "";
   position: absolute;
   right: -38px;
   bottom: -55px;
-  width: 260px;
-  height: 300px;
-  background: var(--wh-floral-art) right bottom / auto 300px no-repeat;
+  width: 300px;
+  height: 340px;
+  background: var(--wh-floral-art) right bottom / auto 340px no-repeat;
   opacity: 0;
   clip-path: inset(100% 0 0);
   pointer-events: none;
@@ -87,7 +87,7 @@
   animation: wh-corner-grow 1300ms cubic-bezier(0.18, 0.78, 0.2, 1) 600ms both;
 }
 
-.wh-content { position: relative; z-index: 1; width: min(640px, 100%); text-align: center; }
+.wh-content { position: relative; z-index: 1; width: min(700px, 100%); text-align: center; }
 .wh-content > .wh-eyebrow,
 .wh-content > .wh-message,
 .wh-content > .wh-actions { opacity: 0; transform: translateY(14px); }
@@ -97,12 +97,12 @@
 
 .wh-title {
   width: 100%;
-  margin: 4px auto -4px;
+  margin: 4px auto -6px;
   padding: 0.16em 0.2em 0.24em;
   overflow: visible;
   color: var(--accent-foreground);
   font-family: var(--font-script);
-  font-size: clamp(2.6rem, 6vw, 3.6rem);
+  font-size: 3.2rem;
   line-height: 1.16;
   text-wrap: balance;
   text-shadow: 0 2px 0 rgba(255, 255, 255, 0.78), 0 13px 30px rgba(113, 43, 49, 0.16);
@@ -111,13 +111,13 @@
 .wh-home.wh-ready .wh-title { animation: wh-script-write 1750ms cubic-bezier(0.18, 0.72, 0.2, 1) 260ms forwards; }
 
 .wh-message {
-  max-width: 560px;
+  max-width: 610px;
   min-height: 2.8em;
-  margin: 16px auto 0;
+  margin: 18px auto 0;
   color: var(--muted-foreground);
-  font-size: 1rem;
+  font-size: 1.08rem;
 }
-.wh-actions { margin-top: 24px; display: flex; justify-content: center; gap: 10px; }
+.wh-actions { margin-top: 26px; display: flex; justify-content: center; gap: 12px; }
 
 @keyframes wh-copy-in { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes wh-botanical-grow {
@@ -132,6 +132,7 @@
 @keyframes wh-script-write { to { clip-path: inset(0); } }
 
 @media (min-width: 900px) {
-  .wh-home { grid-template-columns: minmax(360px, 0.8fr) minmax(0, 1.2fr); }
+  .wh-home { grid-template-columns: minmax(420px, 0.82fr) minmax(650px, 1.18fr); }
   .wh-art { display: grid; }
+  .wh-title { font-size: 4.1rem; }
 }

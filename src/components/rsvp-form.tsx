@@ -279,13 +279,11 @@ export function RsvpForm({
                             const value = answers[key];
                             return (
                               <div key={event.id} className="rv-choice">
-                                <div>
-                                  <strong>{event.name}</strong>
-                                  <small>
-                                    {formatEventDay(event.event_date)} &middot;{" "}
-                                    {formatEventTime(event.start_time)}
-                                  </small>
-                                </div>
+                                <strong>{event.name}</strong>
+                                <small>
+                                  {formatEventDay(event.event_date)} &middot;{" "}
+                                  {formatEventTime(event.start_time)}
+                                </small>
                                 <div className="rv-yesno" role="group" aria-label={`${activeGuest.first_name} ${event.name} attendance`}>
                                   <button
                                     type="button"
