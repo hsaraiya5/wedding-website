@@ -1,0 +1,61 @@
+/*
+  Ported from the design handoff's ".flip-unit"/".flip-value"/".flip-label"
+  -- individually boxed digit units with a card look. The handoff drives
+  these with a real 3D flip transition on digit change; that animation is
+  deliberately not built here yet (tracked as separate follow-up), but the
+  static box sizing/typography/spacing should still match so the countdown
+  doesn't read as a smaller, generic widget next to everything else that
+  has been ported. Classes prefixed cd- to avoid collisions.
+
+  Two variants: the default (used in the header's menu overlay, matching
+  the handoff's base ".flip-unit" size) and "cd-main" (used on the Home
+  page, matching the handoff's larger ".main-countdown .flip-unit" size).
+*/
+
+.cd-root { display: flex; flex-direction: column; align-items: center; gap: 0; }
+.cd-title { color: var(--muted-foreground); font-size: 0.84rem; font-weight: 800; text-transform: uppercase; }
+
+.cd-units { margin-top: 10px; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+.cd-unit {
+  width: 96px;
+  overflow: hidden;
+  border: 1px solid rgba(113, 43, 49, 0.18);
+  border-radius: 4px;
+  background: #fffdf6;
+  box-shadow: 0 10px 24px rgba(91, 45, 36, 0.1);
+  text-align: center;
+}
+.cd-value {
+  min-height: 55px;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(to bottom, #fffdf6 0 49.5%, #eadfd5 49.5% 50.5%, #fffaf0 50.5% 100%);
+  color: var(--accent-foreground);
+  font-family: var(--font-heading);
+  font-size: 2rem;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.cd-label {
+  display: block;
+  border-top: 1px solid rgba(113, 43, 49, 0.12);
+  padding: 6px 4px;
+  color: var(--muted-foreground);
+  font-size: 0.7rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+/* Home page's larger countdown */
+.cd-root.cd-main .cd-title { color: var(--primary); font-size: 0.95rem; }
+.cd-root.cd-main .cd-units { grid-template-columns: repeat(var(--cd-count, 5), minmax(0, 1fr)); display: grid; gap: 12px; }
+.cd-root.cd-main .cd-unit { width: auto; min-width: 0; box-shadow: 0 14px 30px rgba(91, 45, 36, 0.12); }
+.cd-root.cd-main .cd-value { min-height: 96px; font-size: 3.7rem; }
+.cd-root.cd-main .cd-unit.cd-long .cd-value { font-size: 3.2rem; }
+.cd-root.cd-main .cd-label { padding: 10px 6px; font-size: 0.78rem; }
+
+@media (max-width: 700px) {
+  .cd-root.cd-main .cd-units { gap: 8px; }
+  .cd-root.cd-main .cd-value { min-height: 76px; font-size: 2.6rem; }
+  .cd-root.cd-main .cd-unit.cd-long .cd-value { font-size: 2.15rem; }
+}

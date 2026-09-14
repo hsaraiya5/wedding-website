@@ -5,8 +5,7 @@ import { getGuestContext } from "@/lib/guest-session";
 import { getWeddingStart } from "@/lib/countdown";
 import { WelcomeHome, WelcomeArt, WelcomePanel } from "@/components/welcome-home";
 import { Countdown } from "@/components/countdown";
-import { buttonVariants } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import "@/components/site-button.css";
 
 // Depends on the session's bound household -- never cache.
 export const dynamic = "force-dynamic";
@@ -51,14 +50,14 @@ export default async function HomePage() {
         </p>
 
         {weddingStart ? (
-          <Countdown target={weddingStart} title="The wedding weekend begins in" showSeconds />
+          <Countdown target={weddingStart} title="The wedding weekend begins in" showSeconds variant="main" />
         ) : null}
 
         <div className="wh-actions">
-          <Link href="/events" className={buttonVariants()}>
+          <Link href="/events" className="gh-button">
             View the itinerary
           </Link>
-          <Link href="/rsvp" className={cn(buttonVariants({ variant: "outline" }))}>
+          <Link href="/rsvp" className="gh-button gh-button-secondary">
             RSVP
           </Link>
         </div>

@@ -4,12 +4,12 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useActionState } from "react";
 import { submitRsvp } from "@/app/actions/rsvp";
 import { Section } from "@/components/section";
-import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { formatEventDay, formatEventTime } from "@/lib/format";
 import "./rsvp-section.css";
+import "./site-button.css";
 
 type Household = {
   id: string;
@@ -347,13 +347,17 @@ export function RsvpForm({
               {state.error ? <p className="text-sm text-destructive">{state.error}</p> : null}
 
               <div className="flex gap-2">
-                <Button type="submit" disabled={pending}>
+                <button type="submit" className="gh-button" disabled={pending}>
                   {pending ? "Submitting..." : "Stamp our RSVP"}
-                </Button>
+                </button>
                 {alreadySubmitted ? (
-                  <Button type="button" variant="outline" onClick={() => setMode("readonly")}>
+                  <button
+                    type="button"
+                    className="gh-button gh-button-secondary"
+                    onClick={() => setMode("readonly")}
+                  >
                     Cancel
-                  </Button>
+                  </button>
                 ) : null}
               </div>
             </div>

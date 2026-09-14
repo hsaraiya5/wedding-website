@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getGuestContext } from "@/lib/guest-session";
 import { Section, SectionHeading } from "@/components/section";
 import { EventsTimeline } from "@/components/events-timeline";
-import { buttonVariants } from "@/components/ui/button";
+import "@/components/site-button.css";
 
 // This page's content depends on which household the caller's session is
 // bound to, which can change (e.g. redeeming a different invite code in the
@@ -39,7 +39,7 @@ export default async function EventsPage() {
 
       <div className="sc-reveal flex flex-col gap-6">
         <div className="flex justify-end">
-          <Link href="/rsvp" className={buttonVariants()}>
+          <Link href="/rsvp" className="gh-button">
             RSVP
           </Link>
         </div>
