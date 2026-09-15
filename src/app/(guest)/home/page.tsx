@@ -7,6 +7,9 @@ import { WelcomeHome, WelcomeArt, WelcomePanel } from "@/components/welcome-home
 import { Countdown } from "@/components/countdown";
 import { Section, SectionHeading } from "@/components/section";
 import { EventsTimeline } from "@/components/events-timeline";
+import { TravelSection } from "@/components/travel-section";
+import { WardrobePlanner } from "@/components/wardrobe-planner";
+import { FaqSection } from "@/components/faq-section";
 import { RsvpForm } from "@/components/rsvp-form";
 import { SiteFooter } from "@/components/site-footer";
 import "@/components/site-button.css";
@@ -38,7 +41,8 @@ export default async function HomePage({
     redirect("/");
   }
 
-  const { household, guests, events, guest_events, rsvps, site_settings } = context;
+  const { household, guests, events, guest_events, rsvps, site_settings, travel_options, faqs } =
+    context;
   const weddingStart = getWeddingStart(events);
   const { submitted } = await searchParams;
 
@@ -94,6 +98,39 @@ export default async function HomePage({
           <p className="text-center text-muted-foreground">No events found for your household.</p>
         )}
       </Section>
+
+      {travel_options.length > 0 ? (
+        <Section id="travel">
+          <SectionHeading
+            eyebrow="Travel & stay"
+            title="Three places to make your home base."
+            intro="We are arranging hotel blocks for the wedding weekend. Booking links and rates will be added here as soon as they are available."
+          />
+          <TravelSection travelOptions={travel_options} />
+        </Section>
+      ) : null}
+
+      {events.length > 0 ? (
+        <Section id="wardrobe">
+          <SectionHeading
+            eyebrow="Wardrobe planner"
+            title="Plan each look, one celebration at a time."
+            intro="Choose an event to explore Indian outfit ideas, a considered color palette, and the practical details that make getting dressed easy."
+          />
+          <WardrobePlanner events={events} />
+        </Section>
+      ) : null}
+
+      {faqs.length > 0 ? (
+        <Section id="faq">
+          <SectionHeading
+            eyebrow="A few details"
+            title="Questions, answered."
+            intro="We will keep this page current as plans are finalized, so you always have one reliable place to check."
+          />
+          <FaqSection faqs={faqs} />
+        </Section>
+      ) : null}
 
       <RsvpForm
         household={household}

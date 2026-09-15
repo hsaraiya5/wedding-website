@@ -199,6 +199,173 @@ export async function saveGuestInvitations(
   revalidatePath("/admin");
 }
 
+// Parses the wardrobe form's palette textarea -- one "Name: #hexcode" per
+// line -- into the array shape WardrobePlanner expects. A plain textarea
+// with a documented format is simpler than a repeating color-picker UI,
+// and gives admins full control (any number of swatches, easy to reorder)
+// without extra client-side plumbing.
+function parsePalette(raw: string): { name: string; hex: string }[] {
+  return raw
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .map((line) => {
+      const [name, hex] = line.split(":").map((part) => part.trim());
+      return { name: name || "Color", hex: hex || "#000000" };
+    })
+    .filter((color) => /^#[0-9a-fA-F]{3,8}$/.test(color.hex));
+}
+
+export async function saveEvent(_prevState: ActionState, formData: FormData): Promise<ActionState> {
+  const eventId = String(formData.get("event_id") ?? "").trim();
+  const name = String(formData.get("name") ?? "").trim();
+  const eventDate = String(formData.get("event_date") ?? "").trim() || null;
+  const startTime = String(formData.get("start_time") ?? "").trim() || null;
+  const endTime = String(formData.get("end_time") ?? "").trim() || null;
+  const venueName = String(formData.get("venue_name") ?? "").trim() || null;
+  const address = String(formData.get("address") ?? "").trim() || null;
+  const dressCode = String(formData.get("dress_code") ?? "").trim() || null;
+  const mealInfo = String(formData.get("meal_info") ?? "").trim() || null;
+  const description = String(formData.get("description") ?? "").trim() || null;
+  const wardrobeTitle = String(formData.get("wardrobe_title") ?? "").trim();
+  const wardrobeDescription = String(formData.get("wardrobe_description") ?? "").trim();
+  const wardrobeGoodToKnow = String(formData.get("wardrobe_good_to_know") ?? "").trim();
+  const wardrobePaletteRaw = String(formData.get("wardrobe_palette") ?? "");
+
+  if (!name) {
+    return { error: "Event name is required." };
+  }
+  if (!eventId) {
+    return { error: "Something went wrong. Please try again." };
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("admin_upsert_event", {
+    p_event_id: eventId,
+    p_name: name,
+    p_event_date: eventDate,
+    p_start_time: startTime,
+    p_end_time: endTime,
+    p_venue_name: venueName,
+    p_address: address,
+    p_dress_code: dressCode,
+    p_meal_info: mealInfo,
+    p_description: description,
+    p_extra_content: {
+      wardrobe: {
+        title: wardrobeTitle || undefined,
+        description: wardrobeDescription || undefined,
+        good_to_know: wardrobeGoodToKnow || undefined,
+        palette: parsePalette(wardrobePaletteRaw),
+      },
+    },
+  });
+
+  if (error) {
+    return { error: "Something went wrong saving the event. Please try again." };
+  }
+
+  revalidatePath("/admin/events");
+  revalidatePath(`/admin/events/${eventId}`);
+  revalidatePath("/home");
+  return { error: null };
+}
+
+export async function saveTravelOption(
+  _prevState: ActionState,
+  formData: FormData
+): Promise<ActionState> {
+  const travelOptionId = String(formData.get("travel_option_id") ?? "").trim() || null;
+  const type = String(formData.get("type") ?? "").trim();
+  const name = String(formData.get("name") ?? "").trim();
+  const bookingCode = String(formData.get("booking_code") ?? "").trim() || null;
+  const bookingLink = String(formData.get("booking_link") ?? "").trim() || null;
+  const nightlyRate = String(formData.get("nightly_rate") ?? "").trim() || null;
+  const rateCutoffDate = String(formData.get("rate_cutoff_date") ?? "").trim() || null;
+  const description = String(formData.get("description") ?? "").trim() || null;
+
+  if (!name) {
+    return { error: "Name is required." };
+  }
+  if (!["hotel-block", "other-hotel", "transport"].includes(type)) {
+    return { error: "Choose a type." };
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("admin_upsert_travel_option", {
+    p_travel_option_id: travelOptionId,
+    p_type: type,
+    p_name: name,
+    p_booking_code: bookingCode,
+    p_booking_link: bookingLink,
+    p_nightly_rate: nightlyRate,
+    p_rate_cutoff_date: rateCutoffDate,
+    p_description: description,
+  });
+
+  if (error) {
+    return { error: "Something went wrong saving this. Please try again." };
+  }
+
+  revalidatePath("/admin/travel");
+  revalidatePath("/home");
+  redirect("/admin/travel");
+}
+
+export async function deleteTravelOption(travelOptionId: string) {
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("admin_delete_travel_option", {
+    p_travel_option_id: travelOptionId,
+  });
+
+  if (error) {
+    throw new Error("Something went wrong deleting this.");
+  }
+
+  revalidatePath("/admin/travel");
+  revalidatePath("/home");
+}
+
+export async function saveFaq(_prevState: ActionState, formData: FormData): Promise<ActionState> {
+  const faqId = String(formData.get("faq_id") ?? "").trim() || null;
+  const question = String(formData.get("question") ?? "").trim();
+  const answer = String(formData.get("answer") ?? "").trim();
+  const orderIndexRaw = String(formData.get("order_index") ?? "").trim();
+  const orderIndex = orderIndexRaw ? Number.parseInt(orderIndexRaw, 10) : 0;
+
+  if (!question || !answer) {
+    return { error: "Both a question and an answer are required." };
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("admin_upsert_faq", {
+    p_faq_id: faqId,
+    p_question: question,
+    p_answer: answer,
+    p_order_index: Number.isNaN(orderIndex) ? 0 : orderIndex,
+  });
+
+  if (error) {
+    return { error: "Something went wrong saving this. Please try again." };
+  }
+
+  revalidatePath("/admin/faq");
+  revalidatePath("/home");
+  redirect("/admin/faq");
+}
+
+export async function deleteFaq(faqId: string) {
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("admin_delete_faq", { p_faq_id: faqId });
+
+  if (error) {
+    throw new Error("Something went wrong deleting this.");
+  }
+
+  revalidatePath("/admin/faq");
+  revalidatePath("/home");
+}
+
 export async function signOutAdmin() {
   const supabase = await createClient();
   await supabase.auth.signOut();

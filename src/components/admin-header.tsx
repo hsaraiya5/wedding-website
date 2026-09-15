@@ -7,12 +7,25 @@ export function AdminHeader({ email }: { email: string | undefined }) {
   return (
     <header className="border-b border-border/70 bg-card/60 backdrop-blur">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-8 py-4">
-        <Link href="/admin" className="flex items-center gap-2">
-          <span className="flex size-8 items-center justify-center rounded-full border border-primary/40 font-heading text-sm text-primary">
-            G&nbsp;H
-          </span>
-          <span className="font-heading text-lg leading-none">Wedding admin</span>
-        </Link>
+        <div className="flex items-center gap-6">
+          <Link href="/admin" className="flex items-center gap-2">
+            <span className="flex size-8 items-center justify-center rounded-full border border-primary/40 font-heading text-sm text-primary">
+              G&nbsp;H
+            </span>
+            <span className="font-heading text-lg leading-none">Wedding admin</span>
+          </Link>
+          <nav className="hidden items-center gap-4 text-sm font-medium text-muted-foreground sm:flex">
+            <Link href="/admin/events" className="transition-colors hover:text-foreground">
+              Events
+            </Link>
+            <Link href="/admin/travel" className="transition-colors hover:text-foreground">
+              Travel
+            </Link>
+            <Link href="/admin/faq" className="transition-colors hover:text-foreground">
+              FAQ
+            </Link>
+          </nav>
+        </div>
 
         <div className="flex items-center gap-3">
           <div className="hidden items-center gap-2 rounded-full border border-border bg-background/70 py-1 pr-3 pl-1 text-sm sm:flex">

@@ -123,6 +123,9 @@
   :target,
   [id="welcome"],
   [id="events"],
+  [id="travel"],
+  [id="wardrobe"],
+  [id="faq"],
   [id="rsvp"] {
     scroll-margin-top: 78px;
   }
@@ -130,6 +133,9 @@
     :target,
     [id="welcome"],
     [id="events"],
+    [id="travel"],
+    [id="wardrobe"],
+    [id="faq"],
     [id="rsvp"] {
       scroll-margin-top: 60px;
     }

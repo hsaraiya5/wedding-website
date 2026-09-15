@@ -3,6 +3,10 @@
   layout (art panel + content panel), distinct from the generic ".section"
   treatment since it's the very first thing shown, not something that
   reveals on scroll. Classes prefixed wh- to avoid collisions.
+
+  The handoff is desktop-first with three tiers (base >=1180, 781-1179,
+  <=780). This file is mobile-first, so the tiers read in the opposite
+  order, but the values at each width match the handoff.
 */
 
 .wh-home {
@@ -19,9 +23,11 @@
 .wh-art {
   position: relative;
   overflow: hidden;
-  display: none;
+  display: grid;
   place-items: center;
+  min-height: 280px;
   background: var(--background);
+  container-type: inline-size;
 }
 .wh-art::before {
   content: "";
@@ -36,17 +42,43 @@
 .wh-home.wh-ready .wh-art::before {
   animation: wh-botanical-grow 1500ms cubic-bezier(0.18, 0.78, 0.2, 1) both;
 }
+
+/*
+  The date/venue copy sits centred over a full-bleed botanical whose dense
+  areas move under the text as the column resizes, which made it hard to
+  read at some widths. It now sits on a paper placard -- the same treatment
+  the countdown units and invite card use (hairline warm-red rule, ~5px
+  radius, soft warm shadow), so the illustration still reads through as
+  texture instead of competing with the words.
+*/
 .wh-art-copy {
   position: relative;
   z-index: 1;
+  width: min(430px, calc(100% - 40px));
+  border: 1px solid rgba(113, 43, 49, 0.18);
+  border-radius: 5px;
+  padding: 24px;
+  background: rgba(255, 253, 246, 0.82);
+  -webkit-backdrop-filter: blur(7px) saturate(1.06);
+  backdrop-filter: blur(7px) saturate(1.06);
+  box-shadow: 0 14px 34px rgba(91, 45, 36, 0.13), 0 1px 0 rgba(255, 255, 255, 0.6) inset;
   color: var(--accent-foreground);
   font-family: var(--font-heading);
-  font-size: 1.75rem;
+  /* Scales with the art column (not the viewport) so the venue line fits
+     without wrapping from the mobile band up to the widest desktop tier. */
+  font-size: clamp(1.15rem, 6.5cqw, 1.75rem);
   line-height: 1.35;
   text-align: center;
+  text-wrap: balance;
   opacity: 0;
   transform: translateY(14px);
 }
+/* Browsers without backdrop-filter get an opaque paper fill rather than a
+   translucent one, so the botanical never shows through as noise. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .wh-art-copy { background: #fffdf6; }
+}
+.wh-art-copy p { margin: 0; }
 .wh-home.wh-ready .wh-art-copy { animation: wh-copy-in 620ms ease 520ms both; }
 .wh-map-link {
   display: inline-flex;
@@ -58,18 +90,20 @@
   font-family: var(--font-sans);
   font-size: 0.98rem;
   font-weight: 750;
+  line-height: 1.2;
   text-decoration: none;
   transition: color 180ms ease;
 }
 .wh-map-link::after { content: "\2197"; margin-left: 6px; font-size: 0.9em; }
-.wh-map-link:hover { color: var(--primary); }
+.wh-map-link:hover,
+.wh-map-link:focus-visible { color: var(--primary); }
 
 .wh-panel {
   position: relative;
   display: grid;
   place-items: center;
   min-width: 0;
-  padding: 48px 8%;
+  padding: 52px 22px 64px;
 }
 .wh-panel::after {
   content: "";
@@ -102,7 +136,7 @@
   overflow: visible;
   color: var(--accent-foreground);
   font-family: var(--font-script);
-  font-size: 3.2rem;
+  font-size: 2.7rem;
   line-height: 1.16;
   text-wrap: balance;
   text-shadow: 0 2px 0 rgba(255, 255, 255, 0.78), 0 13px 30px rgba(113, 43, 49, 0.16);
@@ -112,12 +146,26 @@
 
 .wh-message {
   max-width: 610px;
-  min-height: 2.8em;
+  min-height: 3.1em;
   margin: 18px auto 0;
   color: var(--muted-foreground);
-  font-size: 1.08rem;
+  font-size: 1rem;
 }
-.wh-actions { margin-top: 26px; display: flex; justify-content: center; gap: 12px; }
+
+/* The handoff strips the countdown's own chrome inside the welcome panel
+   and gives it real breathing room above -- without this the countdown
+   label collides with the welcome message. */
+.wh-home .cd-root.cd-main {
+  width: 100%;
+  margin: 26px 0 0;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  box-shadow: none;
+}
+.wh-home .cd-root.cd-main .cd-units { margin-top: 12px; }
+
+.wh-actions { margin-top: 26px; display: grid; justify-content: center; gap: 12px; }
 
 @keyframes wh-copy-in { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes wh-botanical-grow {
@@ -131,8 +179,50 @@
 }
 @keyframes wh-script-write { to { clip-path: inset(0); } }
 
-@media (min-width: 900px) {
+@media (min-width: 701px) {
+  .wh-home { min-height: auto; }
+  .wh-art { min-height: 340px; }
+  .wh-panel { padding: 64px 32px 72px; }
+  .wh-title { font-size: 3.2rem; }
+  .wh-actions { display: flex; }
+}
+
+/* Two-column tier. The content column is minmax(0, ...) here so the grid
+   can actually shrink to the viewport instead of forcing a ~1070px floor
+   and overflowing (which is what squeezed this layout at mid widths). */
+@media (min-width: 781px) {
+  .wh-home {
+    min-height: calc(100svh - 118px);
+    grid-template-columns: minmax(330px, 0.72fr) minmax(0, 1.28fr);
+  }
+  .wh-art { min-height: 0; }
+  .wh-panel { padding: 42px 5%; }
+  .wh-title { font-size: 3.15rem; }
+  .wh-message { margin-top: 14px; font-size: 1rem; }
+  .wh-home .cd-root.cd-main { margin-top: 20px; }
+  .wh-home .cd-root.cd-main .cd-units { gap: 9px; }
+  .wh-home .cd-root.cd-main .cd-value { min-height: 76px; }
+  .wh-actions { margin-top: 20px; }
+}
+
+@media (min-width: 1180px) {
   .wh-home { grid-template-columns: minmax(420px, 0.82fr) minmax(650px, 1.18fr); }
-  .wh-art { display: grid; }
+  .wh-panel { padding: 48px 8%; }
   .wh-title { font-size: 4.1rem; }
+  .wh-message { margin-top: 18px; font-size: 1.08rem; }
+  .wh-home .cd-root.cd-main { margin-top: 26px; }
+  .wh-home .cd-root.cd-main .cd-units { gap: 12px; }
+  .wh-home .cd-root.cd-main .cd-value { min-height: 96px; }
+  .wh-actions { margin-top: 26px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wh-home .wh-art::before,
+  .wh-home .wh-panel::after { opacity: 1; clip-path: inset(0); transform: none; animation: none; }
+  .wh-home .wh-panel::after { opacity: 0.1; }
+  .wh-home .wh-art-copy,
+  .wh-home .wh-content > .wh-eyebrow,
+  .wh-home .wh-content > .wh-message,
+  .wh-home .wh-content > .wh-actions { opacity: 1; transform: none; animation: none; }
+  .wh-home .wh-title { clip-path: inset(0); animation: none; }
 }
