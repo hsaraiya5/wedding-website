@@ -15,9 +15,26 @@
 .cd-root { display: flex; flex-direction: column; align-items: center; gap: 0; }
 .cd-title { color: var(--muted-foreground); font-size: 0.84rem; font-weight: 800; text-transform: uppercase; }
 
-.cd-units { margin-top: 10px; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+/* The handoff wraps this row at a fixed 96px-per-unit width until its own
+   max-width:700px breakpoint, where it switches units to "flex: 1;
+   min-width: 0" so they shrink to fill the row instead of wrapping. That
+   breakpoint assumed 4 units (months/weeks/days/minutes); with Hours added
+   as a 5th, wrapping kicks in far earlier -- e.g. mid-width menu-overlay
+   panels now wrap a lone "Minutes" box onto its own row. Shrinking always,
+   with the box-relative font-size below, gets the handoff's fixed-width
+   look wherever there's room and degrades smoothly instead of wrapping. */
+/* width: 100% is load-bearing: .cd-unit below has min-width: 0 so it can
+   shrink, but that also removes its min-content size floor. Without an
+   explicit width here, .cd-units (and the .cd-root flex column around it)
+   shrink-wraps to that floor and the whole row collapses to a few px --
+   the same failure mode as the cd-main grid earlier in this file. */
+.cd-units { margin-top: 10px; display: flex; flex-wrap: nowrap; justify-content: center; width: 100%; gap: 10px; }
 .cd-unit {
-  width: 96px;
+  flex: 1 1 96px;
+  min-width: 0;
+  /* Lets .cd-value size itself against its own box rather than against the
+     viewport. */
+  container-type: inline-size;
   overflow: hidden;
   border: 1px solid rgba(113, 43, 49, 0.18);
   border-radius: 4px;
@@ -32,7 +49,10 @@
   background: linear-gradient(to bottom, #fffdf6 0 49.5%, #eadfd5 49.5% 50.5%, #fffaf0 50.5% 100%);
   color: var(--accent-foreground);
   font-family: var(--font-heading);
-  font-size: 2rem;
+  /* Same reasoning as the cd-main rule below: "00" measures about 1.43x the
+     font size, so a fixed 2rem crowds the borders once the flex-basis
+     above actually shrinks a unit below ~90px. */
+  font-size: min(2rem, 55cqw);
   line-height: 1;
   font-variant-numeric: tabular-nums;
 }
@@ -48,18 +68,21 @@
 
 /* Home page's larger countdown */
 .cd-root.cd-main .cd-title { color: var(--primary); font-size: 0.95rem; }
-.cd-root.cd-main .cd-units { grid-template-columns: repeat(var(--cd-count, 5), minmax(0, 1fr)); display: grid; gap: 12px; }
+.cd-root.cd-main .cd-units { grid-template-columns: repeat(var(--cd-count, 5), minmax(0, 1fr)); display: grid; width: 100%; gap: 12px; }
 .cd-root.cd-main .cd-unit { width: auto; min-width: 0; box-shadow: 0 14px 30px rgba(91, 45, 36, 0.12); }
-.cd-root.cd-main .cd-value { min-height: 96px; font-size: 3.7rem; }
-/* 3.2rem (the handoff's own value) overflows the box with Libre
-   Baskerville's wider numeral glyphs than the system Baskerville the
-   handoff was authored against -- dialed down so four digits sit inside
-   the box with breathing room rather than touching both borders. */
-.cd-root.cd-main .cd-unit.cd-long .cd-value { font-size: 2.4rem; }
+/* The handoff's 3.7rem is a ceiling, not a fixed size: "00" measures about
+   1.43x the font size, so below ~120px of box the fixed size crowds the
+   borders -- which now happens routinely, since adding an Hours unit (the
+   handoff itself only ever showed months/weeks/days/minutes/seconds) means
+   up to 6 boxes share the row instead of 5. Shrinking against each box's
+   own width keeps the design's size wherever it fits and degrades
+   gracefully where it doesn't, instead of needing a fixed size per
+   breakpoint. */
+.cd-root.cd-main .cd-value { min-height: 96px; font-size: min(3.7rem, 55cqw); }
+
 .cd-root.cd-main .cd-label { padding: 10px 6px; font-size: 0.78rem; }
 
-@media (max-width: 700px) {
+@media (max-width: 780px) {
   .cd-root.cd-main .cd-units { gap: 8px; }
-  .cd-root.cd-main .cd-value { min-height: 76px; font-size: 2.6rem; }
-  .cd-root.cd-main .cd-unit.cd-long .cd-value { font-size: 1.85rem; }
+  .cd-root.cd-main .cd-value { min-height: 76px; }
 }

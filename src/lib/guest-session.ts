@@ -26,6 +26,17 @@ export type GuestContext = {
   guest_events: { guest_id: string; event_id: string }[];
   rsvps: { guest_id: string; event_id: string; attending: "yes" | "no" | null }[];
   site_settings: { rsvp_deadline: string | null; late_edits_enabled: boolean } | null;
+  travel_options: {
+    id: string;
+    type: "hotel-block" | "other-hotel" | "transport";
+    name: string;
+    booking_code: string | null;
+    booking_link: string | null;
+    nightly_rate: string | null;
+    rate_cutoff_date: string | null;
+    description: string | null;
+  }[];
+  faqs: { id: string; question: string; answer: string; order_index: number }[];
 };
 
 // Everything a guest-facing page (/events, /rsvp) needs, in one round-trip

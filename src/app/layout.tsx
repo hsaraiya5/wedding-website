@@ -38,6 +38,15 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
+      // globals.css sets scroll-behavior: smooth for the guest site's
+      // single-page anchor nav (Welcome/Itinerary/Travel/...). Without this
+      // attribute, Next's router inherits that for its own route-transition
+      // scroll resets too -- harmless on the guest site (there's only ever
+      // one real page), but every admin page is a real route, so clicking
+      // between Dashboard/Events/Travel/FAQ animated the scroll reset on
+      // each navigation instead of snapping instantly. This tells Next to
+      // handle that itself rather than picking up the CSS rule.
+      data-scroll-behavior="smooth"
       className={`${displayFont.variable} ${bodyFont.variable} ${scriptFont.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">{children}</body>

@@ -9,6 +9,9 @@ import "./site-header.css";
 const links = [
   { href: "#welcome", label: "Welcome" },
   { href: "#events", label: "Itinerary" },
+  { href: "#travel", label: "Travel" },
+  { href: "#wardrobe", label: "Wardrobe" },
+  { href: "#faq", label: "FAQ" },
   { href: "#rsvp", label: "RSVP" },
 ];
 

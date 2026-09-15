@@ -7,6 +7,7 @@ export type CountdownParts = {
   months: number;
   weeks: number;
   days: number;
+  hours: number;
   minutes: number;
   seconds: number;
 };
@@ -28,7 +29,7 @@ function dateAfterMonths(date: Date, months: number): Date {
 
 export function getCountdownParts(target: Date, now: Date = new Date()): CountdownParts {
   if (now >= target) {
-    return { months: 0, weeks: 0, days: 0, minutes: 0, seconds: 0 };
+    return { months: 0, weeks: 0, days: 0, hours: 0, minutes: 0, seconds: 0 };
   }
 
   let months =
@@ -44,11 +45,13 @@ export function getCountdownParts(target: Date, now: Date = new Date()): Countdo
   remaining -= weeks * 604800000;
   const days = Math.floor(remaining / 86400000);
   remaining -= days * 86400000;
+  const hours = Math.floor(remaining / 3600000);
+  remaining -= hours * 3600000;
   const minutes = Math.floor(remaining / 60000);
   remaining -= minutes * 60000;
   const seconds = Math.floor(remaining / 1000);
 
-  return { months, weeks, days, minutes, seconds };
+  return { months, weeks, days, hours, minutes, seconds };
 }
 
 // The wedding weekend "starts" at the earliest invited event's date/time.

@@ -5,21 +5,11 @@ import { getCountdownParts, type CountdownParts } from "@/lib/countdown";
 import { cn } from "@/lib/utils";
 import "./countdown.css";
 
-function Unit({
-  value,
-  label,
-  digits,
-  long,
-}: {
-  value: number | null;
-  label: string;
-  digits: number;
-  long?: boolean;
-}) {
+function Unit({ value, label }: { value: number | null; label: string }) {
   return (
-    <div className={cn("cd-unit", long && "cd-long")}>
+    <div className="cd-unit">
       <span className="cd-value">
-        {value === null ? "-".repeat(digits) : String(value).padStart(digits, "0")}
+        {value === null ? "--" : String(value).padStart(2, "0")}
       </span>
       <span className="cd-label">{label}</span>
     </div>
@@ -53,12 +43,13 @@ export function Countdown({
   return (
     <div className={cn("cd-root", variant === "main" && "cd-main")}>
       <p className="cd-title">{title}</p>
-      <div className="cd-units" style={{ "--cd-count": showSeconds ? 5 : 4 } as React.CSSProperties}>
-        <Unit value={parts?.months ?? null} label="Months" digits={2} />
-        <Unit value={parts?.weeks ?? null} label="Weeks" digits={2} />
-        <Unit value={parts?.days ?? null} label="Days" digits={2} />
-        <Unit value={parts?.minutes ?? null} label="Minutes" digits={4} long />
-        {showSeconds ? <Unit value={parts?.seconds ?? null} label="Seconds" digits={2} /> : null}
+      <div className="cd-units" style={{ "--cd-count": showSeconds ? 6 : 5 } as React.CSSProperties}>
+        <Unit value={parts?.months ?? null} label="Months" />
+        <Unit value={parts?.weeks ?? null} label="Weeks" />
+        <Unit value={parts?.days ?? null} label="Days" />
+        <Unit value={parts?.hours ?? null} label="Hours" />
+        <Unit value={parts?.minutes ?? null} label="Minutes" />
+        {showSeconds ? <Unit value={parts?.seconds ?? null} label="Seconds" /> : null}
       </div>
     </div>
   );
