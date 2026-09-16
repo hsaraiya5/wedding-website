@@ -86,7 +86,7 @@ export default async function HomePage({
               View the itinerary
             </a>
             <a href="#rsvp" className="gh-button gh-button-secondary">
-              RSVP
+              {household.rsvp_submitted_at ? "View RSVP" : "RSVP"}
             </a>
           </div>
         </WelcomePanel>

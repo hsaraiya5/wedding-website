@@ -1,24 +1,25 @@
 import type { Metadata } from "next";
-import { Libre_Baskerville, Nunito_Sans, Mrs_Saint_Delafield, Geist_Mono } from "next/font/google";
+import { Cormorant_Garamond, Lora, MonteCarlo, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
-// Design system fonts (see Decision Log): the handoff design specifies
-// Optima/Baskerville/Snell Roundhand, which are macOS-only system fonts
-// with no web fallback. These are close free equivalents loaded properly
-// via next/font so every visitor sees a consistent look regardless of OS.
-// Libre Baskerville is the actual open-source counterpart to Baskerville.
-const displayFont = Libre_Baskerville({
+// Design system fonts (see Decision Log): the 09/16/26 v2 handoff pins the
+// exact web font stack -- Cormorant Garamond (display/menu), Lora (body),
+// and MonteCarlo (calligraphy) -- loaded via next/font so every visitor
+// gets the same look regardless of OS.
+const displayFont = Cormorant_Garamond({
   variable: "--font-display",
-  weight: ["400", "700"],
+  weight: ["400", "500", "600", "700"],
+  style: ["normal", "italic"],
   subsets: ["latin"],
 });
 
-const bodyFont = Nunito_Sans({
+const bodyFont = Lora({
   variable: "--font-body",
+  weight: ["400", "500", "600", "700"],
   subsets: ["latin"],
 });
 
-const scriptFont = Mrs_Saint_Delafield({
+const scriptFont = MonteCarlo({
   variable: "--font-script",
   weight: "400",
   subsets: ["latin"],

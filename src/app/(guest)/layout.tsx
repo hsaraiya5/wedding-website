@@ -14,7 +14,10 @@ export default async function GuestLayout({ children }: { children: React.ReactN
 
   return (
     <>
-      <SiteHeader weddingStartIso={weddingStart?.toISOString() ?? null} />
+      <SiteHeader
+        weddingStartIso={weddingStart?.toISOString() ?? null}
+        rsvpSubmitted={context?.household.rsvp_submitted_at != null}
+      />
       {children}
     </>
   );
