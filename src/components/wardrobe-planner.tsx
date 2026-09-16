@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type CSSProperties } from "react";
+import { useRef, useState, type CSSProperties, type KeyboardEvent } from "react";
 import { formatEventTime } from "@/lib/format";
 import "./wardrobe-planner.css";
 
@@ -54,9 +54,30 @@ const garmentSketches = [
 
 export function WardrobePlanner({ events }: { events: Event[] }) {
   const [activeIndex, setActiveIndex] = useState(0);
+  const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const active = events[activeIndex];
 
   if (!active) return null;
+
+  const select = (index: number, moveFocus: boolean) => {
+    const next = (index + events.length) % events.length;
+    setActiveIndex(next);
+    if (moveFocus) tabRefs.current[next]?.focus({ preventScroll: true });
+  };
+
+  // Matches the handoff's attire-tab keydown handler: arrow keys both move
+  // focus and activate the tab immediately (roving tabindex, no separate
+  // Enter/Space step), same convention as OurStory's dot navigation.
+  const handleTabKeyDown = (event: KeyboardEvent<HTMLButtonElement>, index: number) => {
+    let next = index;
+    if (event.key === "ArrowRight" || event.key === "ArrowDown") next = index + 1;
+    else if (event.key === "ArrowLeft" || event.key === "ArrowUp") next = index - 1;
+    else if (event.key === "Home") next = 0;
+    else if (event.key === "End") next = events.length - 1;
+    else return;
+    event.preventDefault();
+    select(next, true);
+  };
 
   const wardrobe = (active.extra_content as { wardrobe?: WardrobeContent })?.wardrobe;
 
@@ -98,26 +119,35 @@ export function WardrobePlanner({ events }: { events: Event[] }) {
         </div>
       </div>
 
-      <div
-        className="wp-tabs"
-        role="tablist"
-        aria-label="Wardrobe by event"
-        style={{ "--wp-count": events.length } as CSSProperties}
-      >
-        {events.map((event, index) => (
-          <button
-            key={event.id}
-            type="button"
-            role="tab"
-            aria-selected={index === activeIndex}
-            onClick={() => setActiveIndex(index)}
-            className="wp-tab"
-            style={{ "--wp-tab-color": accentColors[index % accentColors.length] } as CSSProperties}
-          >
-            <span>{formatEventTime(event.start_time)}</span>
-            <strong>{event.name}</strong>
-          </button>
-        ))}
+      <div className="wp-rail">
+        <p className="wp-rail-heading">The weekend edit</p>
+        <div
+          className="wp-tabs"
+          role="tablist"
+          aria-label="Wardrobe by event"
+          style={{ "--wp-count": events.length } as CSSProperties}
+        >
+          {events.map((event, index) => (
+            <button
+              key={event.id}
+              type="button"
+              role="tab"
+              aria-selected={index === activeIndex}
+              tabIndex={index === activeIndex ? 0 : -1}
+              ref={(node) => {
+                tabRefs.current[index] = node;
+              }}
+              onClick={() => select(index, false)}
+              onKeyDown={(event) => handleTabKeyDown(event, index)}
+              className="wp-tab"
+              style={{ "--wp-tab-color": accentColors[index % accentColors.length] } as CSSProperties}
+            >
+              <span className="wp-tab-look">Look {String(index + 1).padStart(2, "0")}</span>
+              <span>{formatEventTime(event.start_time)}</span>
+              <strong>{event.name}</strong>
+            </button>
+          ))}
+        </div>
       </div>
     </div>
   );

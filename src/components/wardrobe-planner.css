@@ -6,6 +6,20 @@
 
 .wp-explorer { display: flex; flex-direction: column; gap: 18px; }
 
+/* Ported from the handoff's ".lookbook-rail"/".lookbook-rail-heading" --
+   a small label above the tab row. The outer page Section already carries
+   a "Wardrobe planner" eyebrow, so this only repeats the handoff's second
+   ("The weekend edit") line rather than both, to avoid saying "Wardrobe
+   planner" twice back to back. */
+.wp-rail { display: flex; flex-direction: column; }
+.wp-rail-heading {
+  margin: 0 0 10px;
+  color: var(--accent-foreground);
+  font-family: var(--font-heading);
+  font-size: 1.15rem;
+  font-weight: 600;
+}
+
 .wp-tabs {
   display: grid;
   grid-template-columns: repeat(var(--wp-count, 4), minmax(0, 1fr));
@@ -43,6 +57,17 @@
 .wp-tab strong { font-family: var(--font-heading); font-size: 1.1rem; font-weight: 400; line-height: 1.1; }
 .wp-tab:hover, .wp-tab[aria-selected="true"] { background: var(--background); color: var(--accent-foreground); }
 .wp-tab[aria-selected="true"]::before { opacity: 1; transform: scaleX(1); }
+.wp-tab-look {
+  position: absolute;
+  top: 10px;
+  right: 14px;
+  color: rgba(74, 62, 52, 0.46);
+  font-family: var(--font-script);
+  font-size: 1rem;
+  font-weight: 400;
+  text-transform: none;
+}
+.wp-tab[aria-selected="true"] .wp-tab-look { color: var(--wp-tab-color); }
 
 .wp-detail {
   position: relative;
