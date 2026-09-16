@@ -121,7 +121,15 @@ export function InviteEntrance() {
                   G&nbsp;H
                 </div>
                 <p className="ie-eyebrow">Gayathri &amp; Hrishikesh</p>
-                <p className="ie-script" role="status">
+                <p
+                  className="ie-script"
+                  role="status"
+                  style={
+                    {
+                      "--ie-welcome-chars": `Welcome, ${state.householdName ?? ""}`.length,
+                    } as CSSProperties
+                  }
+                >
                   <span>Welcome, {state.householdName}</span>
                 </p>
                 <p className="ie-access-date">May 29-30, 2027 &middot; Wyndham Grand, Pittsburgh Downtown</p>
