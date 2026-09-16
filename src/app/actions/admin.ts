@@ -12,9 +12,10 @@ export async function saveHousehold(
 ): Promise<ActionState> {
   const householdId = String(formData.get("household_id") ?? "").trim() || null;
   const displayName = String(formData.get("display_name") ?? "").trim();
-  const contactEmail = String(formData.get("contact_email") ?? "").trim() || null;
   const code = String(formData.get("code") ?? "").trim() || null;
   const groupTag = String(formData.get("group_tag") ?? "").trim() || null;
+  const rsvpDeadlineId = String(formData.get("rsvp_deadline_id") ?? "").trim() || null;
+  const hotelCoveredByHost = formData.get("hotel_covered_by_host") === "on";
   const guestsRaw = String(formData.get("guests") ?? "");
 
   if (!displayName) {
@@ -23,6 +24,10 @@ export async function saveHousehold(
 
   if (!groupTag) {
     return { error: "Group is required." };
+  }
+
+  if (!rsvpDeadlineId) {
+    return { error: "RSVP date is required." };
   }
 
   let guests: { first_name: string; last_name: string; event_ids?: string[] }[] | null = null;
@@ -41,8 +46,9 @@ export async function saveHousehold(
   const { error } = await supabase.rpc("admin_upsert_household", {
     p_household_id: householdId,
     p_display_name: displayName,
-    p_contact_email: contactEmail,
     p_code: code,
+    p_rsvp_deadline_id: rsvpDeadlineId,
+    p_hotel_covered_by_host: hotelCoveredByHost,
     p_guests: guests,
     p_group_tag: groupTag,
   });
@@ -118,6 +124,50 @@ export async function deleteHousehold(householdId: string) {
   // dashboard left stale counts/rows on screen. Each caller now handles
   // its own navigation via router.push/refresh in DeleteHouseholdButton.
   revalidatePath("/admin");
+}
+
+export async function saveRsvpDeadline(
+  _prevState: ActionState,
+  formData: FormData
+): Promise<ActionState> {
+  const rsvpDeadlineId = String(formData.get("rsvp_deadline_id") ?? "").trim() || null;
+  const label = String(formData.get("label") ?? "").trim();
+  const deadline = String(formData.get("deadline") ?? "").trim() || null;
+
+  if (!label) {
+    return { error: "A label is required." };
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("admin_upsert_rsvp_deadline", {
+    p_rsvp_deadline_id: rsvpDeadlineId,
+    p_label: label,
+    p_deadline: deadline,
+  });
+
+  if (error) {
+    return { error: "Something went wrong saving this. Please try again." };
+  }
+
+  revalidatePath("/admin/rsvp-dates");
+  revalidatePath("/admin/households/new");
+  return { error: null };
+}
+
+export async function deleteRsvpDeadline(rsvpDeadlineId: string) {
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("admin_delete_rsvp_deadline", {
+    p_rsvp_deadline_id: rsvpDeadlineId,
+  });
+
+  if (error) {
+    if (error.message.includes("rsvp_deadline_in_use")) {
+      throw new Error("This date is assigned to a household -- reassign it first.");
+    }
+    throw new Error("Something went wrong deleting this.");
+  }
+
+  revalidatePath("/admin/rsvp-dates");
 }
 
 export async function saveGuest(

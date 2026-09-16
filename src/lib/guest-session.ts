@@ -6,8 +6,8 @@ export type GuestContext = {
     display_name: string;
     rsvp_submitted_at: string | null;
     song_request: string | null;
-    contact_email: string | null;
-    updates_opt_in: boolean;
+    rsvp_deadline: string | null;
+    hotel_covered_by_host: boolean;
   };
   guests: { id: string; first_name: string; last_name: string }[];
   events: {
@@ -37,6 +37,7 @@ export type GuestContext = {
     description: string | null;
   }[];
   faqs: { id: string; question: string; answer: string; order_index: number }[];
+  whatsapp_numbers: { id: string; phone_number: string; label: string | null }[];
 };
 
 // Everything a guest-facing page (/events, /rsvp) needs, in one round-trip

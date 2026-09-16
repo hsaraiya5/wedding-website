@@ -17,11 +17,14 @@ type Guest = {
   rsvps: { event_id: string; attending: "yes" | "no" | null }[];
 };
 
+type WhatsappNumber = { phone_number: string; label: string | null };
+
 type Household = {
   id: string;
   display_name: string;
   code: string;
   group_tag: string | null;
+  household_whatsapp_numbers: WhatsappNumber[];
   guests: Guest[];
 };
 
@@ -148,6 +151,15 @@ export function HouseholdsTable({ households }: { households: Household[] }) {
                     <DeleteHouseholdButton householdId={household.id} displayName={household.display_name} />
                   </div>
                 </div>
+
+                {household.household_whatsapp_numbers.length > 0 ? (
+                  <p className="text-xs text-muted-foreground">
+                    WhatsApp:{" "}
+                    {household.household_whatsapp_numbers
+                      .map((n) => (n.label ? `${n.phone_number} (${n.label})` : n.phone_number))
+                      .join(", ")}
+                  </p>
+                ) : null}
 
                 <div className="av-guest-summary-list">
                   {household.guests.map((guest) => {
