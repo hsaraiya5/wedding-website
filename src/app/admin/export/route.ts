@@ -28,7 +28,7 @@ export async function GET(request: Request) {
     supabase
       .from("households")
       .select(
-        "id, display_name, code, group_tag, rsvp_submitted_at, household_whatsapp_numbers(phone_number, label), guests(id, first_name, last_name, guest_events(events(name)))"
+        "id, display_name, code, group_tag, rsvp_submitted_at, household_whatsapp_numbers(phone_number), guests(id, first_name, last_name, guest_events(events(name)))"
       )
       .order("display_name"),
     supabase.from("rsvps").select("guest_id, event_id, attending"),
@@ -66,7 +66,7 @@ export async function GET(request: Request) {
 
   for (const household of households ?? []) {
     const whatsappNumbers = household.household_whatsapp_numbers
-      .map((n) => (n.label ? `${n.phone_number} (${n.label})` : n.phone_number))
+      .map((n) => n.phone_number)
       .join("; ");
 
     for (const guest of household.guests) {

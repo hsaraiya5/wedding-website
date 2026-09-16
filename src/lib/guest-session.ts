@@ -37,7 +37,7 @@ export type GuestContext = {
     description: string | null;
   }[];
   faqs: { id: string; question: string; answer: string; order_index: number }[];
-  whatsapp_numbers: { id: string; phone_number: string; label: string | null }[];
+  whatsapp_numbers: { id: string; phone_number: string }[];
 };
 
 // Everything a guest-facing page (/events, /rsvp) needs, in one round-trip
