@@ -2,9 +2,17 @@
 
 import { useActionState, useState } from "react";
 import { saveHousehold } from "@/app/actions/admin";
+import { GROUP_TAGS } from "@/lib/group-tags";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 type Household = {
   id: string;
@@ -20,11 +28,9 @@ type NewGuest = { first_name: string; last_name: string; event_ids: string[] };
 
 export function HouseholdDetailsForm({
   household,
-  existingGroupTags,
   events = [],
 }: {
   household: Household;
-  existingGroupTags: string[];
   events?: Event[];
 }) {
   const [state, formAction, pending] = useActionState(saveHousehold, { error: null });
@@ -104,18 +110,18 @@ export function HouseholdDetailsForm({
 
       <div className="av-field">
         <Label htmlFor="group_tag">Group</Label>
-        <Input
-          id="group_tag"
-          name="group_tag"
-          defaultValue={household?.group_tag ?? ""}
-          placeholder="e.g. Saraiya, Manchella, Hrishikesh Friends"
-          list="group-tag-suggestions"
-        />
-        <datalist id="group-tag-suggestions">
-          {existingGroupTags.map((tag) => (
-            <option key={tag} value={tag} />
-          ))}
-        </datalist>
+        <Select name="group_tag" defaultValue={household?.group_tag ?? undefined} required>
+          <SelectTrigger id="group_tag" className="w-full">
+            <SelectValue placeholder="Select a group" />
+          </SelectTrigger>
+          <SelectContent>
+            {GROUP_TAGS.map((tag) => (
+              <SelectItem key={tag} value={tag}>
+                {tag}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
       {!household ? (

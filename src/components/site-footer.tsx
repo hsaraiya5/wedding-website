@@ -8,7 +8,7 @@ export function SiteFooter() {
   return (
     <footer className="sf-footer" style={floralStyle}>
       <p className="sf-names">Gayathri &amp; Hrishikesh</p>
-      <p className="sf-meta">May 29-30, 2027 &middot; Wyndham Pittsburgh</p>
+      <p className="sf-meta">May 29-30, 2027 &middot; Wyndham Grand, Pittsburgh Downtown</p>
     </footer>
   );
 }

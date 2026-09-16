@@ -154,13 +154,13 @@
    sit on one row aligned to their bottoms -- which is what puts "Stamp our
    RSVP" in the bottom-right corner of the ticket. */
 .rv-end {
-  margin-top: 24px;
+  margin-top: 32px;
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
-  gap: 16px;
+  gap: 22px;
   align-items: end;
   border-top: 1px dashed rgba(113, 43, 49, 0.28);
-  padding-top: 22px;
+  padding-top: 30px;
 }
 .rv-end label { display: block; color: var(--foreground); font-family: var(--font-heading); font-size: 1rem; }
 .rv-end input[type="email"] {
@@ -188,7 +188,7 @@
   align-items: end;
   gap: 36px;
   border-bottom: 1px solid var(--border);
-  padding-bottom: 24px;
+  padding-bottom: 32px;
 }
 .rv-updates-copy .gh-eyebrow { margin-bottom: 6px; }
 .rv-updates-copy h4 {
@@ -387,6 +387,21 @@
 .rv-person-event.rv-yes::before { content: "\2713"; }
 .rv-person-event.rv-no::before { content: "\00d7"; }
 
+.rv-edit-pill {
+  margin-top: 28px;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  border: 1px solid var(--primary);
+  border-radius: 999px;
+  background: transparent;
+  padding: 10px 24px;
+  color: var(--primary);
+  font-weight: 750;
+  transition: background 180ms ease, color 180ms ease, transform 180ms ease;
+}
+.rv-edit-pill:hover { background: var(--primary); color: var(--primary-foreground); transform: translateY(-1px); }
+
 @media (min-width: 560px) {
   .rv-person-card { flex-direction: row; align-items: center; gap: 20px; }
   .rv-person-name { flex: 0 0 140px; }
@@ -398,8 +413,8 @@
 }
 
 @media (max-width: 700px) {
-  .rv-end { grid-template-columns: 1fr; }
-  .rv-updates { grid-template-columns: 1fr; gap: 18px; }
+  .rv-end { grid-template-columns: 1fr; gap: 26px; }
+  .rv-updates { grid-template-columns: 1fr; gap: 22px; }
   .rv-submit { flex-direction: column; }
   .rv-submit .gh-button { width: 100%; }
   .rv-ticket { padding: 34px 22px; }

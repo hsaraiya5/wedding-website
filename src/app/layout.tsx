@@ -31,7 +31,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Gayathri & Hrishikesh | May 29-30, 2027",
-  description: "Gayathri and Hrishikesh's wedding weekend at Wyndham Pittsburgh, May 29-30, 2027.",
+  description:
+    "Gayathri and Hrishikesh's wedding weekend at Wyndham Grand, Pittsburgh Downtown, May 29-30, 2027.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

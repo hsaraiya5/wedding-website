@@ -137,7 +137,7 @@ export function SiteHeader({ weddingStartIso }: { weddingStartIso: string | null
             <p>
               May 29-30, 2027
               <br />
-              Pittsburgh
+              Wyndham Grand, Pittsburgh Downtown
             </p>
           </div>
         </div>
@@ -168,7 +168,9 @@ export function SiteHeader({ weddingStartIso }: { weddingStartIso: string | null
             ))}
           </nav>
 
-          <p className="sh-overlay-venue">Gayathri &amp; Hrishikesh &middot; Wyndham Pittsburgh</p>
+          <p className="sh-overlay-venue">
+            Gayathri &amp; Hrishikesh &middot; Wyndham Grand, Pittsburgh Downtown
+          </p>
 
           {weddingStart ? (
             <div className="sh-overlay-countdown">

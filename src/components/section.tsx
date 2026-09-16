@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, type ReactNode, type CSSProperties } from "react";
 import { designAssets } from "@/lib/design-assets";
+import { useTypedText } from "@/lib/use-typed-text";
 import "./section.css";
 
 // Reveals once, the first time the section scrolls into view -- matches
@@ -62,39 +63,44 @@ export function Section({
 }
 
 // Character-by-character typed intro line, matching the design's timing
-// (18ms/char) and respecting prefers-reduced-motion (shows the full text
-// immediately instead of animating).
+// (18ms/char). Waits for its own scroll-into-view (same observer shape as
+// Section above) instead of starting at mount -- every section renders up
+// front on this single-page layout, so starting on mount meant the typing
+// always finished off-screen before a guest ever scrolled down to see it.
 function TypedLine({ text }: { text: string }) {
-  const [typed, setTyped] = useState("");
-  const startedRef = useRef(false);
-  // Derived, not stored -- avoids a second setState call competing with
-  // `typed` inside the same effect.
-  const typing = typed.length > 0 && typed.length < text.length;
+  const ref = useRef<HTMLParagraphElement>(null);
+  const [active, setActive] = useState(false);
 
   useEffect(() => {
-    if (startedRef.current) return;
-    startedRef.current = true;
+    const node = ref.current;
+    if (!node) return;
 
-    const showFullText = () => setTyped(text);
+    const activate = () => setActive(true);
 
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      showFullText();
+    if (!("IntersectionObserver" in window)) {
+      activate();
       return;
     }
 
-    let index = 0;
-    const interval = setInterval(() => {
-      index += 1;
-      setTyped(text.slice(0, index));
-      if (index >= text.length) {
-        clearInterval(interval);
-      }
-    }, 18);
-    return () => clearInterval(interval);
-  }, [text]);
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            activate();
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.12, rootMargin: "0px 0px -10% 0px" }
+    );
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, []);
+
+  const { typed, typing } = useTypedText(text, active);
 
   return (
-    <p className={`sc-typed-line ${typing ? "sc-typing" : ""}`.trim()} aria-label={text}>
+    <p ref={ref} className={`sc-typed-line ${typing ? "sc-typing" : ""}`.trim()} aria-label={text}>
       <span aria-hidden="true">{typed}</span>
     </p>
   );

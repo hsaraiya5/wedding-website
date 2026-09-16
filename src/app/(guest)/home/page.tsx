@@ -1,9 +1,8 @@
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getGuestContext } from "@/lib/guest-session";
 import { getWeddingStart } from "@/lib/countdown";
-import { WelcomeHome, WelcomeArt, WelcomePanel } from "@/components/welcome-home";
+import { WelcomeHome, WelcomeArt, WelcomePanel, WelcomeMessage } from "@/components/welcome-home";
 import { Countdown } from "@/components/countdown";
 import { Section, SectionHeading } from "@/components/section";
 import { EventsTimeline } from "@/components/events-timeline";
@@ -55,16 +54,14 @@ export default async function HomePage({
             <>
               May 29-30, 2027
               <br />
-              Wyndham Pittsburgh
+              Wyndham Grand, Pittsburgh Downtown
             </>
           }
         />
         <WelcomePanel>
           <p className="wh-eyebrow gh-eyebrow">Gayathri &amp; Hrishikesh</p>
           <h1 className="wh-title">Welcome, {household.display_name}</h1>
-          <p className="wh-message">
-            We are so happy you will be celebrating this joyful weekend with us in Pittsburgh.
-          </p>
+          <WelcomeMessage text="We are so happy you will be celebrating this joyful weekend with us in Pittsburgh." />
 
           {weddingStart ? (
             <Countdown
@@ -76,12 +73,12 @@ export default async function HomePage({
           ) : null}
 
           <div className="wh-actions">
-            <Link href="#events" className="gh-button">
+            <a href="#events" className="gh-button">
               View the itinerary
-            </Link>
-            <Link href="#rsvp" className="gh-button gh-button-secondary">
+            </a>
+            <a href="#rsvp" className="gh-button gh-button-secondary">
               RSVP
-            </Link>
+            </a>
           </div>
         </WelcomePanel>
       </WelcomeHome>

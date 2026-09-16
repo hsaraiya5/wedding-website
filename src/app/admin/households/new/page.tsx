@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { requireAdminUser } from "@/lib/admin-guard";
-import { getExistingGroupTags } from "@/lib/group-tags";
 import { NotAuthorized } from "@/components/not-authorized";
 import { HouseholdDetailsForm } from "@/components/household-details-form";
 
@@ -13,10 +12,10 @@ export default async function NewHouseholdPage() {
     return <NotAuthorized email={user.email} />;
   }
 
-  const [existingGroupTags, { data: events }] = await Promise.all([
-    getExistingGroupTags(supabase),
-    supabase.from("events").select("id, name, event_date").order("event_date"),
-  ]);
+  const { data: events } = await supabase
+    .from("events")
+    .select("id, name, event_date")
+    .order("event_date");
 
   return (
     <main className="av-page">
@@ -31,11 +30,7 @@ export default async function NewHouseholdPage() {
 
       <div className="av-section">
         <h2 className="av-section-title">Household details</h2>
-        <HouseholdDetailsForm
-          household={null}
-          existingGroupTags={existingGroupTags}
-          events={events ?? []}
-        />
+        <HouseholdDetailsForm household={null} events={events ?? []} />
       </div>
     </main>
   );

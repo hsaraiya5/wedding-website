@@ -148,21 +148,21 @@ export function RsvpForm({
           <p>Reply for everyone in your household. Each event takes one quick yes or no.</p>
         </div>
 
-        {deadline ? (
-          <div className="rv-deadline">
-            <span>
-              Please reply by{" "}
-              {deadline.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
-            </span>
-            <span>
-              {alreadySubmitted
-                ? "You've responded"
-                : deadlinePassed
-                  ? "RSVP closed"
-                  : "Reply when you are ready"}
-            </span>
-          </div>
-        ) : null}
+        <div className="rv-deadline">
+          <span>
+            Please reply by{" "}
+            {deadline
+              ? deadline.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })
+              : "date to be announced"}
+          </span>
+          <span>
+            {alreadySubmitted
+              ? "You've responded"
+              : deadlinePassed
+                ? "RSVP closed"
+                : "Reply when you are ready"}
+          </span>
+        </div>
 
         {mode === "readonly" ? (
           <div className="rv-confirmation">
@@ -231,7 +231,7 @@ export function RsvpForm({
             ) : null}
 
             {canEdit ? (
-              <button type="button" className="gh-text-link" onClick={() => setMode("edit")}>
+              <button type="button" className="rv-edit-pill" onClick={() => setMode("edit")}>
                 Make changes
               </button>
             ) : null}
