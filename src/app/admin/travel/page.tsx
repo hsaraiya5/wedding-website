@@ -26,7 +26,7 @@ export default async function AdminTravelPage() {
   const { data: travelOptions } = await supabase
     .from("travel_options")
     .select("*")
-    .order("type")
+    .order("sort_order")
     .order("name");
 
   return (
@@ -38,17 +38,21 @@ export default async function AdminTravelPage() {
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <p className="text-xs font-bold uppercase tracking-wide text-primary">Travel & stay</p>
-          <h1 className="font-heading text-3xl">Hotel blocks & transport</h1>
+          <h1 className="font-heading text-3xl">Hotels</h1>
+          <p className="av-section-hint">
+            The shuttle note underneath the hotels on the wedding site is fixed copy, not editable
+            here.
+          </p>
         </div>
         <Link href="/admin/travel/new" className={buttonVariants()}>
-          New option
+          New hotel
         </Link>
       </div>
 
       <div className="flex flex-col gap-4">
         {(travelOptions ?? []).length === 0 ? (
           <p className="text-muted-foreground">
-            Nothing here yet -- add a hotel block or transport note to show it on the wedding site.
+            Nothing here yet -- add a hotel to show it on the wedding site.
           </p>
         ) : null}
         {(travelOptions ?? []).map((option) => (

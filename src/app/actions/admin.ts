@@ -324,16 +324,19 @@ export async function saveTravelOption(
   const travelOptionId = String(formData.get("travel_option_id") ?? "").trim() || null;
   const type = String(formData.get("type") ?? "").trim();
   const name = String(formData.get("name") ?? "").trim();
-  const bookingCode = String(formData.get("booking_code") ?? "").trim() || null;
-  const bookingLink = String(formData.get("booking_link") ?? "").trim() || null;
-  const nightlyRate = String(formData.get("nightly_rate") ?? "").trim() || null;
-  const rateCutoffDate = String(formData.get("rate_cutoff_date") ?? "").trim() || null;
+  const label = String(formData.get("label") ?? "").trim() || null;
   const description = String(formData.get("description") ?? "").trim() || null;
+  const roomBlock = String(formData.get("room_block") ?? "").trim() || null;
+  const address = String(formData.get("address") ?? "").trim() || null;
+  const bookingDetails = String(formData.get("booking_details") ?? "").trim() || null;
+  const bookingLink = String(formData.get("booking_link") ?? "").trim() || null;
+  const sortOrderRaw = String(formData.get("sort_order") ?? "").trim();
+  const sortOrder = sortOrderRaw ? Number.parseInt(sortOrderRaw, 10) : 0;
 
   if (!name) {
     return { error: "Name is required." };
   }
-  if (!["hotel-block", "other-hotel", "transport"].includes(type)) {
+  if (!["hotel-block", "other-hotel"].includes(type)) {
     return { error: "Choose a type." };
   }
 
@@ -342,11 +345,13 @@ export async function saveTravelOption(
     p_travel_option_id: travelOptionId,
     p_type: type,
     p_name: name,
-    p_booking_code: bookingCode,
-    p_booking_link: bookingLink,
-    p_nightly_rate: nightlyRate,
-    p_rate_cutoff_date: rateCutoffDate,
+    p_label: label,
     p_description: description,
+    p_room_block: roomBlock,
+    p_address: address,
+    p_booking_details: bookingDetails,
+    p_booking_link: bookingLink,
+    p_sort_order: Number.isNaN(sortOrder) ? 0 : sortOrder,
   });
 
   if (error) {

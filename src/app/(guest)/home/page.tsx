@@ -117,8 +117,16 @@ export default async function HomePage({
         <Section id="travel">
           <SectionHeading
             eyebrow="Travel & stay"
-            title="Three places to make your home base."
-            intro="We are arranging hotel blocks for the wedding weekend. Booking links and rates will be added here as soon as they are available."
+            title={
+              household.hotel_covered_by_host
+                ? "Your stay is already taken care of."
+                : "Two downtown homes for the weekend."
+            }
+            intro={
+              household.hotel_covered_by_host
+                ? "Your room is booked and the cost is covered. We will contact your family personally with every hotel detail, so there is nothing you need to reserve."
+                : "We have reserved two hotel blocks near every celebration. Booking links, rates, and deadlines will be added as soon as the blocks open."
+            }
           />
           <TravelSection
             travelOptions={travel_options}
