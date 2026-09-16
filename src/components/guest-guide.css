@@ -1,0 +1,61 @@
+/* Ported from the handoff's ".guest-guide-grid"/".guide-panel"/
+   ".city-picks". Classes prefixed gg- to avoid collisions. */
+
+.gg-grid { display: grid; gap: 24px; }
+
+.gg-panel {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: rgba(255, 250, 240, 0.8);
+  padding: 36px;
+  box-shadow: 0 16px 38px rgba(72, 48, 31, 0.08);
+}
+.gg-panel::after {
+  content: "";
+  position: absolute;
+  right: -30px;
+  bottom: -30px;
+  width: 170px;
+  height: 200px;
+  background: var(--gg-floral-art) right bottom / auto 190px no-repeat;
+  opacity: 0.08;
+  pointer-events: none;
+}
+.gg-panel > * { position: relative; z-index: 1; }
+.gg-panel h3 { margin-top: 9px; color: var(--accent-foreground); font-size: 2rem; line-height: 1.05; }
+.gg-panel > p:not(.gh-eyebrow) { margin-top: 14px; color: var(--muted-foreground); font-size: 0.95rem; }
+
+.gg-picks {
+  margin-top: 28px;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+.gg-pick { min-width: 0; padding: 24px; border-right: 1px solid var(--border); }
+.gg-pick:last-child { border-right: 0; }
+.gg-pick span { color: var(--primary); font-size: 0.74rem; font-weight: 800; text-transform: uppercase; }
+.gg-pick h4 { margin-top: 8px; color: var(--foreground); font-family: var(--font-display); font-size: 1.35rem; }
+.gg-pick p { margin-top: 9px; color: var(--muted-foreground); font-size: 0.86rem; line-height: 1.5; }
+.gg-pick a { display: inline-flex; margin-top: 15px; color: var(--accent-foreground); font-weight: 800; text-decoration: underline; text-underline-offset: 4px; }
+
+.gg-updated {
+  margin-top: 28px;
+  color: var(--muted-foreground);
+  font-size: 0.78rem;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+@media (max-width: 900px) {
+  .gg-picks { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .gg-pick { border-bottom: 1px solid var(--border); }
+  .gg-pick:nth-child(3n) { border-right: 0; }
+}
+
+@media (max-width: 640px) {
+  .gg-picks { grid-template-columns: 1fr; }
+  .gg-pick { border-right: 0; }
+}

@@ -1,0 +1,131 @@
+/* Ported from the handoff's ".story-carousel". Classes prefixed os-
+   (our-story) to avoid collisions. */
+
+.os-carousel {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--background);
+  box-shadow: 0 28px 68px rgba(71, 42, 27, 0.15);
+}
+
+.os-viewport { position: relative; aspect-ratio: 16 / 8.6; overflow: hidden; }
+
+.os-slide {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  opacity: 0;
+  visibility: hidden;
+  transform: scale(1.035);
+  transition: opacity 700ms ease, visibility 700ms ease, transform 1400ms cubic-bezier(0.2, 0.72, 0.2, 1);
+}
+.os-slide.os-active { opacity: 1; visibility: visible; transform: scale(1); }
+.os-slide::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: var(--os-image);
+  background-position: var(--os-position, center);
+  background-size: var(--os-size, cover);
+  background-repeat: no-repeat;
+  filter: saturate(0.92) contrast(0.98);
+  transform: scale(1.02);
+  transition: transform 8s linear;
+}
+.os-slide.os-active::before { transform: scale(1.075); }
+.os-slide::after {
+  content: "";
+  position: absolute;
+  inset: 22px;
+  border: 1px solid rgba(255, 250, 240, 0.75);
+  box-shadow: 0 0 0 1px rgba(113, 43, 49, 0.18);
+  pointer-events: none;
+}
+.os-slide-label {
+  position: relative;
+  z-index: 1;
+  max-width: 760px;
+  padding: 28px 48px 34px;
+  background: rgba(255, 250, 240, 0.9);
+  color: var(--accent-foreground);
+  font-family: var(--font-script);
+  font-size: 3.45rem;
+  line-height: 1.1;
+  text-align: center;
+  text-shadow: 0 2px 0 #fff, 0 12px 24px rgba(83, 45, 29, 0.13);
+  box-shadow: 0 20px 55px rgba(76, 42, 25, 0.14);
+}
+
+.os-controls {
+  display: grid;
+  grid-template-columns: 54px minmax(0, 1fr) 54px;
+  align-items: center;
+  gap: 18px;
+  border-top: 1px solid rgba(113, 43, 49, 0.16);
+  padding: 15px 20px;
+}
+.os-arrow {
+  width: 48px;
+  height: 48px;
+  border: 1px solid rgba(113, 43, 49, 0.28);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--accent-foreground);
+  font-size: 1.3rem;
+  transition: background 180ms ease, color 180ms ease, transform 180ms ease;
+}
+.os-arrow:hover { background: var(--primary); color: #fffaf0; transform: translateY(-2px); }
+.os-dots { display: flex; justify-content: center; gap: 12px; }
+.os-dot {
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  background: transparent;
+  padding: 0;
+}
+.os-dot::before {
+  content: "";
+  width: 10px;
+  height: 10px;
+  border: 1px solid var(--primary);
+  border-radius: 50%;
+  transition: background 180ms ease, transform 180ms ease;
+}
+.os-dot[aria-selected="true"]::before { background: var(--primary); transform: scale(1.35); }
+
+.os-copy {
+  margin-top: 42px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 54px;
+  border-top: 1px solid rgba(113, 43, 49, 0.2);
+  padding-top: 38px;
+}
+.os-copy p { color: var(--muted-foreground); font-size: 1.12rem; line-height: 1.78; }
+.os-copy p::first-letter {
+  float: left;
+  margin: 8px 10px 0 0;
+  color: var(--accent-foreground);
+  font-family: var(--font-heading);
+  font-size: 3.55rem;
+  line-height: 0.75;
+}
+
+@media (max-width: 900px) {
+  .os-slide-label { font-size: 2.6rem; }
+}
+
+@media (max-width: 700px) {
+  .os-viewport { aspect-ratio: 4 / 5; }
+  .os-slide-label { max-width: calc(100% - 56px); padding: 22px 24px 26px; font-size: 2.1rem; }
+  .os-slide::after { inset: 12px; }
+  .os-controls { grid-template-columns: 48px minmax(0, 1fr) 48px; gap: 8px; padding: 12px; }
+  .os-copy { grid-template-columns: 1fr; gap: 24px; margin-top: 28px; padding-top: 28px; }
+}

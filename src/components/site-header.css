@@ -90,9 +90,24 @@
   background: #fffdf6;
   padding: 0;
   color: var(--primary);
+  transition: border-color 180ms ease, background 180ms ease, color 180ms ease, transform 180ms ease;
+}
+.sh-menu-button:hover {
+  border-color: var(--primary);
+  background: var(--accent);
+  color: var(--accent-foreground);
+  transform: translateY(-2px);
 }
 .sh-menu-icon { width: 17px; display: grid; gap: 4px; }
-.sh-menu-icon span { display: block; width: 17px; height: 1px; background: currentColor; }
+.sh-menu-icon span {
+  display: block;
+  width: 17px;
+  height: 1px;
+  background: currentColor;
+  transition: transform 180ms ease, width 180ms ease;
+}
+.sh-menu-button:hover .sh-menu-icon span:first-child { transform: translateX(2px); }
+.sh-menu-button:hover .sh-menu-icon span:last-child { width: 13px; }
 
 @media (max-width: 700px) {
   .sh-header { height: 60px; }
