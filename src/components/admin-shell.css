@@ -79,8 +79,8 @@
   height: 34px;
   flex: 0 0 34px;
   border-radius: 50%;
-  background: var(--accent);
-  color: var(--accent-foreground);
+  background: var(--muted);
+  color: var(--foreground);
   font-family: var(--font-heading);
   font-size: 0.85rem;
   font-weight: 600;
@@ -221,7 +221,7 @@
   background: var(--muted);
   color: var(--muted-foreground);
 }
-.av-response-badge.av-complete { background: color-mix(in oklch, var(--color-event-reception), white 78%); color: var(--color-event-reception); }
+.av-response-badge.av-complete { background: var(--background); border: 1px solid var(--foreground); color: var(--foreground); }
 
 /* Each guest gets their own visually distinct line within the household
    card -- a light inset row rather than text wrapped inline with the

@@ -40,11 +40,6 @@ function eventList(guest: Guest): { name: string; status: "yes" | "no" | "pendin
   });
 }
 
-function initials(name: string) {
-  const parts = name.trim().split(/\s+/);
-  return (parts[0]?.[0] ?? "") + (parts[1]?.[0] ?? "");
-}
-
 function responseSummary(household: Household) {
   const invited = household.guests.reduce((sum, g) => sum + g.guest_events.length, 0);
   const answered = household.guests.reduce((sum, g) => sum + g.rsvps.length, 0);
@@ -117,7 +112,6 @@ export function HouseholdsTable({ households }: { households: Household[] }) {
               <div key={household.id} className="av-household-card">
                 <div className="av-household-header">
                   <div className="flex flex-1 items-center gap-3">
-                    <span className="av-avatar">{initials(household.display_name)}</span>
                     <div className="flex flex-wrap items-center gap-2.5">
                       <Link
                         href={`/admin/households/${household.id}`}
@@ -126,12 +120,12 @@ export function HouseholdsTable({ households }: { households: Household[] }) {
                         {household.display_name}
                       </Link>
                       {household.group_tag ? (
-                        <span className="av-pill bg-accent text-accent-foreground">
+                        <span className="av-pill bg-muted text-foreground">
                           {household.group_tag}
                         </span>
                       ) : null}
                       <code className="rounded-md bg-muted px-1.5 py-0.5 text-xs text-muted-foreground">
-                        {household.code}
+                        Invite code: {household.code}
                       </code>
                       {summary.invited > 0 ? (
                         <span className={cn("av-response-badge", summary.complete && "av-complete")}>

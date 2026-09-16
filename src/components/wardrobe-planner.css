@@ -1,10 +1,7 @@
 /*
   Ported from the handoff's ".attire-explorer"/".attire-tabs"/".attire-tab"/
   ".attire-detail"/".attire-panel"/".wardrobe-visual"/".garment-sketch"/
-  ".swatches". Classes prefixed wp- to avoid collisions. The handoff's
-  stroke-drawing animation on the garment sketches is deliberately not
-  ported (same "later polish pass" bucket as the other motion work still
-  outstanding), but static sizing/spacing matches.
+  ".swatches". Classes prefixed wp- to avoid collisions.
 */
 
 .wp-explorer { display: flex; flex-direction: column; gap: 18px; }
@@ -92,8 +89,26 @@
   background: color-mix(in oklch, var(--wp-wash, var(--accent)), white 78%);
   color: var(--accent-foreground);
 }
-.wp-sketch { width: min(100%, 300px); }
+.wp-sketch {
+  width: min(100%, 300px);
+  animation: wp-sketch-in 900ms cubic-bezier(0.2, 0.72, 0.2, 1) 100ms both;
+}
 .wp-sketch svg { width: 100%; height: auto; }
+@keyframes wp-sketch-in {
+  from {
+    opacity: 0;
+    filter: grayscale(1) contrast(0.94) blur(3px) drop-shadow(0 8px 12px rgba(91, 45, 36, 0.04));
+    transform: translateY(14px) scale(0.975);
+  }
+  to {
+    opacity: 1;
+    filter: grayscale(1) contrast(1.04) blur(0) drop-shadow(0 16px 20px rgba(91, 45, 36, 0.09));
+    transform: translateY(0) scale(1);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .wp-sketch { animation: none; }
+}
 .wp-palette-label { color: var(--muted-foreground); font-size: 0.74rem; font-weight: 800; text-transform: uppercase; text-align: center; }
 .wp-swatches { margin-top: 9px; display: flex; justify-content: center; gap: 10px; }
 .wp-swatch { width: 32px; height: 32px; border: 3px solid var(--background); border-radius: 50%; box-shadow: 0 0 0 1px rgba(51, 41, 34, 0.18), 0 6px 13px rgba(51, 41, 34, 0.1); }

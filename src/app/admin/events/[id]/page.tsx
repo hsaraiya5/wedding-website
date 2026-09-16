@@ -17,6 +17,16 @@ export default async function EditEventPage({ params }: { params: Promise<{ id: 
 
   const { data: event } = await supabase.from("events").select("*").eq("id", id).single();
 
+  // Matches the guest-facing ordering (see get_guest_context), so the
+  // preview's accent color lines up with what guests actually see for
+  // this event instead of always defaulting to the first color.
+  const { data: orderedEvents } = await supabase
+    .from("events")
+    .select("id")
+    .order("event_date", { ascending: true })
+    .order("start_time", { ascending: true });
+  const eventIndex = Math.max(0, orderedEvents?.findIndex((e) => e.id === id) ?? 0);
+
   if (!event) {
     return (
       <main className="av-page items-center text-center">
@@ -40,7 +50,7 @@ export default async function EditEventPage({ params }: { params: Promise<{ id: 
       </div>
 
       <div className="av-section">
-        <EventDetailsForm event={event} />
+        <EventDetailsForm event={event} eventIndex={eventIndex} />
       </div>
     </main>
   );

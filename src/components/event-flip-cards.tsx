@@ -102,7 +102,7 @@ function CalendarButton({ event }: { event: Event }) {
   );
 }
 
-export function EventFlipCards({ events }: { events: Event[] }) {
+export function EventFlipCards({ events, startIndex = 0 }: { events: Event[]; startIndex?: number }) {
   const [openKey, setOpenKey] = useState<string | null>(null);
   const [peelingKey, setPeelingKey] = useState<string | null>(null);
   const triggerRefs = useRef<Record<string, HTMLButtonElement | null>>({});
@@ -153,8 +153,9 @@ export function EventFlipCards({ events }: { events: Event[] }) {
   return (
     <div className={`ef-grid ${openKey ? "ef-has-open" : ""}`.trim()} style={floralStyle}>
       {events.map((event, index) => {
-        const accent = accents[index % accents.length];
-        const motifPosition = index % 2 === 0 ? "left bottom" : "right bottom";
+        const position = startIndex + index;
+        const accent = accents[position % accents.length];
+        const motifPosition = position % 2 === 0 ? "left bottom" : "right bottom";
         const itinerary = (event.extra_content as { itinerary?: ItineraryContent })?.itinerary;
         const isOpen = openKey === event.id;
         const isPeeling = peelingKey === event.id;
@@ -187,7 +188,7 @@ export function EventFlipCards({ events }: { events: Event[] }) {
                   onClick={() => openCard(event.id)}
                 >
                   <span className="ef-heading">
-                    <span className="ef-number">Event {index + 1}</span>
+                    <span className="ef-number">Event {position + 1}</span>
                     <h3 className="font-heading">{event.name}</h3>
                     {itinerary?.subtitle ? <span className="ef-subtitle">{itinerary.subtitle}</span> : null}
                     <span className="ef-date">{formatEventDayFull(event.event_date)}</span>
@@ -231,7 +232,7 @@ export function EventFlipCards({ events }: { events: Event[] }) {
                     <p className="gh-eyebrow" style={{ color: "var(--ef-color)" } as CSSProperties}>
                       What to expect
                     </p>
-                    <span className="ef-number">Event {index + 1}</span>
+                    <span className="ef-number">Event {position + 1}</span>
                   </div>
                   <div className="ef-back-heading">
                     <h3 className="font-heading">{event.name}</h3>
