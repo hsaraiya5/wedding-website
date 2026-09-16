@@ -180,7 +180,9 @@
   inset: 7%;
   z-index: 2;
   display: grid;
-  place-items: center;
+  justify-items: center;
+  align-content: start;
+  padding-top: 8%;
   overflow: hidden;
   background: #fffaf0 var(--ie-hero-art) center / 100% 100% no-repeat;
   border: 1px solid rgba(113, 43, 49, 0.15);
@@ -221,7 +223,12 @@
   margin-top: 10px;
   color: #712b31;
   font-family: var(--font-script);
-  font-size: clamp(2.4rem, 5vw, 3.9rem);
+  /* Default/SSR fallback before JS measures the real text width via
+     canvas and sets an inline font-size (see InviteEntrance) -- that
+     measurement is what actually makes "Welcome, <Household>" fill the
+     card regardless of name length; this clamp only covers the brief
+     window before that effect runs. */
+  font-size: clamp(1.6rem, 5vw, 3.9rem);
   line-height: 1.12;
   text-align: center;
   text-shadow: 0 2px 0 rgba(255, 255, 255, 0.72), 0 12px 30px rgba(113, 43, 49, 0.16);
@@ -229,7 +236,7 @@
 .ie-script span {
   display: block;
   overflow: hidden;
-  white-space: nowrap;
+  white-space: normal;
   clip-path: inset(0 100% 0 0);
 }
 .ie-script::after {

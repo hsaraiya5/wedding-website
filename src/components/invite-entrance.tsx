@@ -23,6 +23,49 @@ export function InviteEntrance() {
   const [state, formAction, pending] = useActionState(redeemInviteCode, initialState);
   const [phaseIndex, setPhaseIndex] = useState<PhaseIndex>(0);
   const startedRef = useRef(false);
+  const insertCopyRef = useRef<HTMLDivElement>(null);
+  const scriptRef = useRef<HTMLParagraphElement>(null);
+  const [scriptFontSize, setScriptFontSize] = useState<number | null>(null);
+
+  // Measures the actual rendered width of "Welcome, <Household>" (via an
+  // offscreen canvas, using the real script font) and picks the largest
+  // font-size that fills the card's width without overflowing -- a fixed
+  // clamp() couldn't do this accurately since MonteCarlo's average glyph
+  // width doesn't match the usual character-count heuristics. Re-measures
+  // on resize since the card's own width is itself responsive.
+  useEffect(() => {
+    const insertCopy = insertCopyRef.current;
+    const script = scriptRef.current;
+    if (!insertCopy || !script || !state.householdName) return;
+
+    const text = `Welcome, ${state.householdName}`;
+    const rootPx = Number.parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
+    const minPx = 1.6 * rootPx;
+    const maxPx = 3.9 * rootPx;
+    const fillFraction = 0.96;
+
+    const measure = () => {
+      const containerWidth = insertCopy.clientWidth;
+      if (containerWidth === 0) return;
+
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return;
+
+      const referenceSize = 100;
+      ctx.font = `${referenceSize}px ${getComputedStyle(script).fontFamily}`;
+      const textWidth = ctx.measureText(text).width;
+      if (textWidth === 0) return;
+
+      const idealSize = (referenceSize * containerWidth * fillFraction) / textWidth;
+      setScriptFontSize(Math.min(Math.max(idealSize, minPx), maxPx));
+    };
+
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(insertCopy);
+    return () => observer.disconnect();
+  }, [state.householdName]);
 
   // If the browser restores this page from its back/forward cache (e.g.
   // after redeeming a code, then hitting Back), the restored snapshot can
@@ -116,12 +159,17 @@ export function InviteEntrance() {
 
           <div className="ie-face ie-back" aria-hidden={!isFlipped}>
             <div className="ie-insert" aria-label="Wedding invitation card">
-              <div className="ie-insert-copy">
+              <div className="ie-insert-copy" ref={insertCopyRef}>
                 <div className="ie-monogram" aria-hidden="true">
                   G&nbsp;H
                 </div>
                 <p className="ie-eyebrow">Gayathri &amp; Hrishikesh</p>
-                <p className="ie-script" role="status">
+                <p
+                  className="ie-script"
+                  role="status"
+                  ref={scriptRef}
+                  style={scriptFontSize ? { fontSize: `${scriptFontSize}px` } : undefined}
+                >
                   <span>Welcome, {state.householdName}</span>
                 </p>
                 <p className="ie-access-date">May 29-30, 2027 &middot; Wyndham Grand, Pittsburgh Downtown</p>
