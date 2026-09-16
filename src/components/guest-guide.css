@@ -39,7 +39,7 @@
 .gg-pick span { color: var(--primary); font-size: 0.74rem; font-weight: 800; text-transform: uppercase; }
 .gg-pick h4 { margin-top: 8px; color: var(--foreground); font-family: var(--font-display); font-size: 1.35rem; }
 .gg-pick p { margin-top: 9px; color: var(--muted-foreground); font-size: 0.86rem; line-height: 1.5; }
-.gg-pick a { display: inline-flex; margin-top: 15px; color: var(--accent-foreground); font-weight: 800; text-underline-offset: 4px; }
+.gg-pick a { display: inline-flex; margin-top: 15px; color: var(--accent-foreground); font-weight: 800; text-decoration: underline; text-underline-offset: 4px; }
 
 .gg-updated {
   margin-top: 28px;
