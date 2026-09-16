@@ -8,4 +8,8 @@ export const designAssets = {
   floral: `${baseUrl}/jaipur-botanical-transparent.png`,
   floralLeft: `${baseUrl}/jaipur-botanical-left.png`,
   floralRight: `${baseUrl}/jaipur-botanical-right.png`,
+  wardrobeHaldi: `${baseUrl}/wardrobe-haldi-pencil.png`,
+  wardrobeSangeet: `${baseUrl}/wardrobe-sangeet-pencil.png`,
+  wardrobeWedding: `${baseUrl}/wardrobe-wedding-pencil.png`,
+  wardrobeReception: `${baseUrl}/wardrobe-reception-pencil.png`,
 };
