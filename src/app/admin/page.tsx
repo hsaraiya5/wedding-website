@@ -22,7 +22,7 @@ export default async function AdminDashboardPage() {
     supabase
       .from("households")
       .select(
-        "id, display_name, code, group_tag, guests(id, first_name, last_name, guest_events(event_id, events(name)), rsvps(event_id, attending))"
+        "id, display_name, code, group_tag, household_whatsapp_numbers(phone_number, label), guests(id, first_name, last_name, guest_events(event_id, events(name)), rsvps(event_id, attending))"
       )
       .order("display_name"),
     supabase.from("events").select("id, name, event_date").order("event_date"),

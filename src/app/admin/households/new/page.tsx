@@ -12,10 +12,10 @@ export default async function NewHouseholdPage() {
     return <NotAuthorized email={user.email} />;
   }
 
-  const { data: events } = await supabase
-    .from("events")
-    .select("id, name, event_date")
-    .order("event_date");
+  const [{ data: events }, { data: rsvpDeadlines }] = await Promise.all([
+    supabase.from("events").select("id, name, event_date").order("event_date"),
+    supabase.from("rsvp_deadlines").select("id, label, deadline").order("deadline"),
+  ]);
 
   return (
     <main className="av-page">
@@ -30,7 +30,7 @@ export default async function NewHouseholdPage() {
 
       <div className="av-section">
         <h2 className="av-section-title">Household details</h2>
-        <HouseholdDetailsForm household={null} events={events ?? []} />
+        <HouseholdDetailsForm household={null} events={events ?? []} rsvpDeadlines={rsvpDeadlines ?? []} />
       </div>
     </main>
   );

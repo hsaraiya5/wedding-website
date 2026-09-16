@@ -16,9 +16,11 @@ type Household = {
   display_name: string;
   rsvp_submitted_at: string | null;
   song_request: string | null;
-  contact_email: string | null;
-  updates_opt_in: boolean;
+  rsvp_deadline: string | null;
+  hotel_covered_by_host: boolean;
 };
+
+type WhatsappNumber = { id: string; phone_number: string; label: string | null };
 
 type Guest = { id: string; first_name: string; last_name: string };
 
@@ -34,7 +36,6 @@ type GuestEvent = { guest_id: string; event_id: string };
 type Rsvp = { guest_id: string; event_id: string; attending: "yes" | "no" | null };
 
 type SiteSettings = {
-  rsvp_deadline: string | null;
   late_edits_enabled: boolean;
 } | null;
 
@@ -60,6 +61,7 @@ export function RsvpForm({
   guestEvents,
   existingRsvps,
   siteSettings,
+  whatsappNumbers,
   justSubmitted,
 }: {
   household: Household;
@@ -68,10 +70,11 @@ export function RsvpForm({
   guestEvents: GuestEvent[];
   existingRsvps: Rsvp[];
   siteSettings: SiteSettings;
+  whatsappNumbers: WhatsappNumber[];
   justSubmitted: boolean;
 }) {
   const alreadySubmitted = household.rsvp_submitted_at !== null;
-  const deadline = siteSettings?.rsvp_deadline ? new Date(siteSettings.rsvp_deadline) : null;
+  const deadline = household.rsvp_deadline ? new Date(household.rsvp_deadline) : null;
   const deadlinePassed = deadline ? new Date() > deadline : false;
   const canEdit = !deadlinePassed || Boolean(siteSettings?.late_edits_enabled);
 
@@ -108,8 +111,21 @@ export function RsvpForm({
 
   const [answers, setAnswers] = useState(initialAnswers);
   const [songRequest, setSongRequest] = useState(household.song_request ?? "");
-  const [contactEmail, setContactEmail] = useState(household.contact_email ?? "");
-  const [updatesOptIn, setUpdatesOptIn] = useState(household.updates_opt_in ?? false);
+  const [phoneNumbers, setPhoneNumbers] = useState<{ phone_number: string; label: string }[]>(
+    whatsappNumbers.length > 0
+      ? whatsappNumbers.map((n) => ({ phone_number: n.phone_number, label: n.label ?? "" }))
+      : [{ phone_number: "", label: "" }]
+  );
+
+  const updatePhoneNumber = (index: number, field: "phone_number" | "label", value: string) => {
+    setPhoneNumbers((prev) =>
+      prev.map((entry, i) => (i === index ? { ...entry, [field]: value } : entry))
+    );
+  };
+  const addPhoneNumber = () =>
+    setPhoneNumbers((prev) => [...prev, { phone_number: "", label: "" }]);
+  const removePhoneNumber = (index: number) =>
+    setPhoneNumbers((prev) => prev.filter((_, i) => i !== index));
 
   const [state, formAction, pending] = useActionState(submitRsvp, { error: null });
 
@@ -136,6 +152,10 @@ export function RsvpForm({
   );
 
   const activeGuest = rsvpGuests[activeGuestIndex];
+
+  const whatsappNumbersArray = phoneNumbers
+    .filter((entry) => entry.phone_number.trim())
+    .map((entry) => ({ phone_number: entry.phone_number.trim(), label: entry.label.trim() }));
 
   return (
     <Section id="rsvp" className="rv-section">
@@ -239,6 +259,11 @@ export function RsvpForm({
         ) : (
           <form action={formAction} className="flex flex-col gap-2">
             <input type="hidden" name="answers" value={JSON.stringify(answersArray)} />
+            <input
+              type="hidden"
+              name="whatsapp_numbers"
+              value={JSON.stringify(whatsappNumbersArray)}
+            />
 
             {rsvpGuests.length > 0 ? (
               <>
@@ -336,36 +361,49 @@ export function RsvpForm({
                 <div className="rv-updates-copy">
                   <p className="gh-eyebrow">Household updates</p>
                   <h4>Stay in the loop.</h4>
-                  <p>Enter one email for your household. We will use it for your RSVP receipt.</p>
+                  <p>
+                    Add one or more phone numbers to join the WhatsApp group for hotel, schedule,
+                    and weekend announcements.
+                  </p>
                 </div>
-                <div>
-                  <Label htmlFor="contact_email">Household email</Label>
-                  <input
-                    id="contact_email"
-                    name="contact_email"
-                    type="email"
-                    autoComplete="email"
-                    placeholder="family@example.com"
-                    value={contactEmail}
-                    onChange={(event) => setContactEmail(event.target.value)}
-                    required
-                  />
-                  <label className="rv-consent" htmlFor="updates_opt_in">
-                    <input
-                      id="updates_opt_in"
-                      name="updates_opt_in"
-                      type="checkbox"
-                      checked={updatesOptIn}
-                      onChange={(event) => setUpdatesOptIn(event.target.checked)}
-                    />
-                    <span>
-                      <strong>Email us wedding updates</strong>
-                      <small>
-                        Receive hotel, schedule, and weekend announcements. You can unsubscribe at
-                        any time.
-                      </small>
-                    </span>
-                  </label>
+                <div className="flex flex-col gap-2">
+                  {phoneNumbers.map((entry, index) => (
+                    <div key={index} className="flex items-center gap-2">
+                      <div className="flex-1">
+                        <Label htmlFor={`phone_number_${index}`}>Phone number</Label>
+                        <input
+                          id={`phone_number_${index}`}
+                          type="tel"
+                          autoComplete="tel"
+                          placeholder="(555) 123-4567"
+                          value={entry.phone_number}
+                          onChange={(event) => updatePhoneNumber(index, "phone_number", event.target.value)}
+                        />
+                      </div>
+                      <div className="flex-1">
+                        <Label htmlFor={`phone_label_${index}`}>Whose number? (optional)</Label>
+                        <input
+                          id={`phone_label_${index}`}
+                          type="text"
+                          placeholder="e.g. Mom"
+                          value={entry.label}
+                          onChange={(event) => updatePhoneNumber(index, "label", event.target.value)}
+                        />
+                      </div>
+                      {phoneNumbers.length > 1 ? (
+                        <button
+                          type="button"
+                          className="rv-edit-pill"
+                          onClick={() => removePhoneNumber(index)}
+                        >
+                          Remove
+                        </button>
+                      ) : null}
+                    </div>
+                  ))}
+                  <button type="button" className="rv-edit-pill self-start" onClick={addPhoneNumber}>
+                    Add another number
+                  </button>
                 </div>
               </div>
 

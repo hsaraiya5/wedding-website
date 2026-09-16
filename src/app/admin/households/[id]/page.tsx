@@ -22,11 +22,13 @@ export default async function EditHouseholdPage({
     return <NotAuthorized email={user.email} />;
   }
 
-  const [{ data: household }, { data: guests }, { data: events }] = await Promise.all([
-    supabase.from("households").select("*").eq("id", id).single(),
-    supabase.from("guests").select("*").eq("household_id", id).order("first_name"),
-    supabase.from("events").select("id, name, event_date").order("event_date"),
-  ]);
+  const [{ data: household }, { data: guests }, { data: events }, { data: rsvpDeadlines }] =
+    await Promise.all([
+      supabase.from("households").select("*").eq("id", id).single(),
+      supabase.from("guests").select("*").eq("household_id", id).order("first_name"),
+      supabase.from("events").select("id, name, event_date").order("event_date"),
+      supabase.from("rsvp_deadlines").select("id, label, deadline").order("deadline"),
+    ]);
 
   if (!household) {
     return (
@@ -61,7 +63,7 @@ export default async function EditHouseholdPage({
 
       <div className="av-section">
         <h2 className="av-section-title">Household details</h2>
-        <HouseholdDetailsForm household={household} />
+        <HouseholdDetailsForm household={household} rsvpDeadlines={rsvpDeadlines ?? []} />
         <div className="border-t border-border pt-5">
           <CodeManagement key={household.code} householdId={household.id} code={household.code} />
         </div>

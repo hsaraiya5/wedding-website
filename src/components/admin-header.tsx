@@ -24,6 +24,9 @@ export function AdminHeader({ email }: { email: string | undefined }) {
             <Link href="/admin/faq" className="transition-colors hover:text-foreground">
               FAQ
             </Link>
+            <Link href="/admin/rsvp-dates" className="transition-colors hover:text-foreground">
+              RSVP dates
+            </Link>
           </nav>
         </div>
 

@@ -17,21 +17,26 @@ import {
 type Household = {
   id: string;
   display_name: string;
-  contact_email: string | null;
   code: string;
   group_tag: string | null;
+  rsvp_deadline_id: string;
+  hotel_covered_by_host: boolean;
 } | null;
 
 type Event = { id: string; name: string; event_date: string | null };
+
+type RsvpDeadline = { id: string; label: string; deadline: string | null };
 
 type NewGuest = { first_name: string; last_name: string; event_ids: string[] };
 
 export function HouseholdDetailsForm({
   household,
   events = [],
+  rsvpDeadlines = [],
 }: {
   household: Household;
   events?: Event[];
+  rsvpDeadlines?: RsvpDeadline[];
 }) {
   const [state, formAction, pending] = useActionState(saveHousehold, { error: null });
 
@@ -88,18 +93,55 @@ export function HouseholdDetailsForm({
           placeholder="e.g. The Smith Family"
           required
         />
+        <p className="av-section-hint">
+          This is what the guest sees when they log in -- e.g. &ldquo;Welcome, {household?.display_name || "Smith Family"}&rdquo;. Use whatever name they&apos;d recognize themselves by.
+        </p>
       </div>
 
       <div className="av-field">
-        <Label htmlFor="contact_email">Contact email</Label>
-        <Input
-          id="contact_email"
-          name="contact_email"
-          type="email"
-          defaultValue={household?.contact_email ?? ""}
-          placeholder="For RSVP confirmations and reminders"
-        />
+        <Label htmlFor="rsvp_deadline_id">RSVP date</Label>
+        <Select name="rsvp_deadline_id" defaultValue={household?.rsvp_deadline_id ?? undefined} required>
+          <SelectTrigger id="rsvp_deadline_id" className="w-full">
+            <SelectValue placeholder="Select an RSVP date">
+              {(value: string | null) => {
+                const rd = rsvpDeadlines.find((d) => d.id === value);
+                if (!rd) return "Select an RSVP date";
+                return rd.deadline ? `${rd.label} (${new Date(rd.deadline).toLocaleDateString()})` : rd.label;
+              }}
+            </SelectValue>
+          </SelectTrigger>
+          <SelectContent>
+            {rsvpDeadlines.map((rd) => (
+              <SelectItem key={rd.id} value={rd.id}>
+                {rd.label}
+                {rd.deadline ? ` (${new Date(rd.deadline).toLocaleDateString()})` : ""}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        {rsvpDeadlines.length === 0 ? (
+          <p className="av-section-hint">
+            No RSVP dates yet -- add one on the <a href="/admin/rsvp-dates">RSVP dates</a> page first.
+          </p>
+        ) : null}
       </div>
+
+      <label htmlFor="hotel_covered_by_host" className="flex items-start gap-2.5">
+        <input
+          id="hotel_covered_by_host"
+          name="hotel_covered_by_host"
+          type="checkbox"
+          className="mt-1"
+          defaultChecked={household?.hotel_covered_by_host ?? false}
+        />
+        <span className="flex flex-col">
+          <span className="text-sm font-medium">Host is covering this household&apos;s hotel stay</span>
+          <span className="av-section-hint">
+            The guest won&apos;t see hotel block info on their page -- they&apos;ll see a note to
+            contact the hosts for their reservation details instead.
+          </span>
+        </span>
+      </label>
 
       {!household ? (
         <div className="av-field">

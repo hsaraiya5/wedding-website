@@ -40,8 +40,17 @@ export default async function HomePage({
     redirect("/");
   }
 
-  const { household, guests, events, guest_events, rsvps, site_settings, travel_options, faqs } =
-    context;
+  const {
+    household,
+    guests,
+    events,
+    guest_events,
+    rsvps,
+    site_settings,
+    travel_options,
+    faqs,
+    whatsapp_numbers,
+  } = context;
   const weddingStart = getWeddingStart(events);
   const { submitted } = await searchParams;
 
@@ -96,14 +105,17 @@ export default async function HomePage({
         )}
       </Section>
 
-      {travel_options.length > 0 ? (
+      {travel_options.length > 0 || household.hotel_covered_by_host ? (
         <Section id="travel">
           <SectionHeading
             eyebrow="Travel & stay"
             title="Three places to make your home base."
             intro="We are arranging hotel blocks for the wedding weekend. Booking links and rates will be added here as soon as they are available."
           />
-          <TravelSection travelOptions={travel_options} />
+          <TravelSection
+            travelOptions={travel_options}
+            hotelCoveredByHost={household.hotel_covered_by_host}
+          />
         </Section>
       ) : null}
 
@@ -136,6 +148,7 @@ export default async function HomePage({
         guestEvents={guest_events}
         existingRsvps={rsvps}
         siteSettings={site_settings}
+        whatsappNumbers={whatsapp_numbers}
         justSubmitted={submitted === "1"}
       />
 

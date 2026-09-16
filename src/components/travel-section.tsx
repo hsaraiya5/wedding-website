@@ -61,17 +61,42 @@ function TransportCard({ option }: { option: TravelOption }) {
   );
 }
 
-export function TravelSection({ travelOptions }: { travelOptions: TravelOption[] }) {
-  if (travelOptions.length === 0) return null;
+// Shown instead of hotel-block cards when the host is covering the
+// household's stay -- no rate/booking-code info is relevant to them.
+function HotelCoveredCard() {
+  return (
+    <article className="tv-card tv-transport">
+      <div>
+        <p className="gh-eyebrow">Your stay</p>
+        <h3 className="font-heading">You&apos;re all set.</h3>
+      </div>
+      <p>
+        Your stay has been covered by the host family, we can&apos;t wait to celebrate with you!
+        Please reach out to the hosts to get your hotel reservation details.
+      </p>
+    </article>
+  );
+}
+
+export function TravelSection({
+  travelOptions,
+  hotelCoveredByHost = false,
+}: {
+  travelOptions: TravelOption[];
+  hotelCoveredByHost?: boolean;
+}) {
+  if (travelOptions.length === 0 && !hotelCoveredByHost) return null;
 
   const hotels = travelOptions.filter((t) => t.type === "hotel-block" || t.type === "other-hotel");
   const transport = travelOptions.filter((t) => t.type === "transport");
 
   return (
     <div className="tv-grid">
-      {hotels.map((option, index) => (
-        <HotelCard key={option.id} option={option} index={index} />
-      ))}
+      {hotelCoveredByHost ? (
+        <HotelCoveredCard />
+      ) : (
+        hotels.map((option, index) => <HotelCard key={option.id} option={option} index={index} />)
+      )}
       {transport.map((option) => (
         <TransportCard key={option.id} option={option} />
       ))}
