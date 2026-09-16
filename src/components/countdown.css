@@ -162,3 +162,45 @@
   .cd-root.cd-main .cd-units { gap: 8px; }
   .cd-root.cd-main .cd-value { min-height: 76px; }
 }
+
+/* Home page's main countdown reveals with the rest of WelcomeHome's
+   content, staggered per unit -- matches the handoff's
+   ".welcome-home.ready .main-countdown .flip-unit:nth-child(n)". */
+.wh-home .cd-root.cd-main .cd-unit { opacity: 0; transform: translateY(10px) scale(0.98); }
+.wh-home.wh-ready .cd-root.cd-main .cd-unit { animation: cd-unit-in 620ms ease both; }
+.wh-home.wh-ready .cd-root.cd-main .cd-unit:nth-child(1) { animation-delay: 720ms; }
+.wh-home.wh-ready .cd-root.cd-main .cd-unit:nth-child(2) { animation-delay: 820ms; }
+.wh-home.wh-ready .cd-root.cd-main .cd-unit:nth-child(3) { animation-delay: 920ms; }
+.wh-home.wh-ready .cd-root.cd-main .cd-unit:nth-child(4) { animation-delay: 1020ms; }
+.wh-home.wh-ready .cd-root.cd-main .cd-unit:nth-child(5) { animation-delay: 1120ms; }
+.wh-home.wh-ready .cd-root.cd-main .cd-unit:nth-child(6) { animation-delay: 1220ms; }
+@keyframes cd-unit-in {
+  from { opacity: 0; transform: translateY(10px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* The nav menu overlay's countdown flips each digit box up into place on
+   open, staggered -- matches the handoff's ".menu-overlay.open
+   .flip-unit:nth-child(n) .flip-value" / "flip-number-in". Scoped to the
+   mini variant only: the main countdown above uses the simpler
+   translateY reveal, matching which keyframe the handoff pairs with each
+   one. */
+.sh-overlay .cd-root:not(.cd-main) .cd-value { opacity: 0; transform: perspective(360px) rotateX(-88deg); }
+.sh-overlay.sh-open .cd-root:not(.cd-main) .cd-value {
+  animation: cd-number-in 620ms cubic-bezier(0.2, 0.78, 0.2, 1) both;
+}
+.sh-overlay.sh-open .cd-root:not(.cd-main) .cd-unit:nth-child(1) .cd-value { animation-delay: 500ms; }
+.sh-overlay.sh-open .cd-root:not(.cd-main) .cd-unit:nth-child(2) .cd-value { animation-delay: 590ms; }
+.sh-overlay.sh-open .cd-root:not(.cd-main) .cd-unit:nth-child(3) .cd-value { animation-delay: 680ms; }
+.sh-overlay.sh-open .cd-root:not(.cd-main) .cd-unit:nth-child(4) .cd-value { animation-delay: 770ms; }
+.sh-overlay.sh-open .cd-root:not(.cd-main) .cd-unit:nth-child(5) .cd-value { animation-delay: 860ms; }
+@keyframes cd-number-in {
+  0% { opacity: 0; transform: perspective(360px) rotateX(-88deg); }
+  65% { opacity: 1; transform: perspective(360px) rotateX(8deg); }
+  100% { opacity: 1; transform: perspective(360px) rotateX(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wh-home .cd-root.cd-main .cd-unit,
+  .sh-overlay .cd-root:not(.cd-main) .cd-value { opacity: 1; transform: none; animation: none; }
+}
