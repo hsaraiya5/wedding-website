@@ -126,7 +126,7 @@ export function HouseholdsTable({ households }: { households: Household[] }) {
                         {household.display_name}
                       </Link>
                       {household.group_tag ? (
-                        <span className="av-pill bg-accent text-accent-foreground">
+                        <span className="av-pill bg-muted text-foreground">
                           {household.group_tag}
                         </span>
                       ) : null}
