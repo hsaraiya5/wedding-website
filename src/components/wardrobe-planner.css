@@ -75,12 +75,25 @@
 .wp-detail {
   position: relative;
   overflow: hidden;
+  display: grid;
   background: var(--background);
   animation: wp-panel-in 420ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
 }
 @keyframes wp-panel-in { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
 
-.wp-panel-inner { display: grid; grid-template-columns: minmax(280px, 0.94fr) minmax(0, 1.06fr); align-items: stretch; min-height: 620px; }
+/* height: 100% (not just min-height) is load-bearing: .wp-detail is a
+   stretched grid item of .wp-explorer, so its resolved height can end up
+   taller than 620px whenever the rail's content (wrapped tab labels) is
+   the tallest column. Without height: 100% this box stayed pinned to
+   620px, leaving a gap below it where .wp-visual's tinted background
+   should have continued to the shared bottom border. */
+.wp-panel-inner {
+  display: grid;
+  grid-template-columns: minmax(280px, 0.94fr) minmax(0, 1.06fr);
+  align-items: stretch;
+  min-height: 620px;
+  height: 100%;
+}
 
 .wp-copy { grid-column: 1; display: grid; align-content: center; gap: 0; padding: 48px; }
 .wp-copy h3 { margin-top: 10px; color: var(--accent-foreground); font-size: 2.6rem; line-height: 1; }
