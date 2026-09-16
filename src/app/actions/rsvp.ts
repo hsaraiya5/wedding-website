@@ -27,6 +27,9 @@ export async function submitRsvp(
   }
 
   const songRequest = String(formData.get("song_request") ?? "").trim() || null;
+  const dietaryNeeds = String(formData.get("dietary_needs") ?? "").trim() || null;
+  const accessibilityNeeds = String(formData.get("accessibility_needs") ?? "").trim() || null;
+  const householdNote = String(formData.get("household_note") ?? "").trim() || null;
   const whatsappNumbersRaw = String(formData.get("whatsapp_numbers") ?? "");
 
   let whatsappNumbers: { phone_number: string }[] = [];
@@ -41,6 +44,9 @@ export async function submitRsvp(
     p_answers: answers,
     p_song_request: songRequest,
     p_whatsapp_numbers: whatsappNumbers,
+    p_dietary_needs: dietaryNeeds,
+    p_accessibility_needs: accessibilityNeeds,
+    p_household_note: householdNote,
   });
 
   if (error) {
