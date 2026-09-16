@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { requireAdminUser } from "@/lib/admin-guard";
-import { getExistingGroupTags } from "@/lib/group-tags";
 import { NotAuthorized } from "@/components/not-authorized";
 import { HouseholdDetailsForm } from "@/components/household-details-form";
 import { CodeManagement } from "@/components/code-management";
@@ -41,12 +40,10 @@ export default async function EditHouseholdPage({
   }
 
   const guestIds = (guests ?? []).map((g) => g.id);
-  const [{ data: guestEvents }, existingGroupTags] = await Promise.all([
+  const { data: guestEvents } =
     guestIds.length > 0
-      ? supabase.from("guest_events").select("guest_id, event_id").in("guest_id", guestIds)
-      : Promise.resolve({ data: [] }),
-    getExistingGroupTags(supabase),
-  ]);
+      ? await supabase.from("guest_events").select("guest_id, event_id").in("guest_id", guestIds)
+      : { data: [] };
 
   return (
     <main className="av-page">
@@ -64,7 +61,7 @@ export default async function EditHouseholdPage({
 
       <div className="av-section">
         <h2 className="av-section-title">Household details</h2>
-        <HouseholdDetailsForm household={household} existingGroupTags={existingGroupTags} />
+        <HouseholdDetailsForm household={household} />
         <div className="border-t border-border pt-5">
           <CodeManagement key={household.code} householdId={household.id} code={household.code} />
         </div>

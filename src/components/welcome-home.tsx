@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect, useState, type CSSProperties, type ReactNode } from "react";
+import { ChevronDown } from "lucide-react";
 import { designAssets } from "@/lib/design-assets";
+import { useTypedText } from "@/lib/use-typed-text";
 import "./welcome-home.css";
 
 // Reveals immediately on mount (not scroll-triggered like Section --
@@ -29,6 +31,9 @@ export function WelcomeHome({ children }: { children: ReactNode }) {
       style={{ ...heroStyle, ...floralStyle }}
     >
       {children}
+      <a href="#events" className="wh-scroll-cue" aria-label="Scroll to your itinerary">
+        <ChevronDown aria-hidden="true" />
+      </a>
     </section>
   );
 }
@@ -43,6 +48,28 @@ export function WelcomeArt({ mapUrl, caption }: { mapUrl: string; caption: React
         </a>
       </div>
     </div>
+  );
+}
+
+// Types the message out character by character, matching the design's
+// timing. Starts on the same ~640ms delay as the message's own fade-in
+// (see .wh-message's animation-delay in welcome-home.css) rather than
+// waiting on scroll -- this is the first thing shown, nothing to scroll
+// into view yet.
+export function WelcomeMessage({ text }: { text: string }) {
+  const [active, setActive] = useState(false);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => setActive(true), 640);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const { typed, typing } = useTypedText(text, active);
+
+  return (
+    <p className={`wh-message ${typing ? "wh-typing" : ""}`.trim()} aria-label={text}>
+      <span aria-hidden="true">{typed}</span>
+    </p>
   );
 }
 

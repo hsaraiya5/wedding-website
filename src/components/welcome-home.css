@@ -13,7 +13,10 @@
   position: relative;
   width: 100%;
   min-width: 0;
-  min-height: calc(100svh - 118px);
+  /* 61px = the mobile site-header's 60px height + its 1px border, so this
+     section sits flush under it instead of leaving the next section's top
+     peeking in as a sliver. */
+  min-height: calc(100svh - 61px);
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   overflow: hidden;
@@ -33,7 +36,7 @@
   content: "";
   position: absolute;
   inset: 0;
-  background: var(--wh-hero-art) left center / auto 100% no-repeat;
+  background: var(--wh-hero-art) left center / cover no-repeat;
   opacity: 0;
   clip-path: inset(100% 0 0);
   transform: translateY(26px) scale(0.965);
@@ -54,7 +57,7 @@
 .wh-art-copy {
   position: relative;
   z-index: 1;
-  width: min(430px, calc(100% - 40px));
+  width: min(520px, calc(100% - 40px));
   border: 1px solid rgba(113, 43, 49, 0.18);
   border-radius: 5px;
   padding: 24px;
@@ -151,6 +154,18 @@
   color: var(--muted-foreground);
   font-size: 1rem;
 }
+.wh-message span::after {
+  content: "";
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  margin-left: 4px;
+  background: currentColor;
+  vertical-align: -0.08em;
+  opacity: 0;
+}
+.wh-message.wh-typing span::after { animation: wh-typing-caret 620ms steps(1) infinite; opacity: 0.65; }
+@keyframes wh-typing-caret { 50% { opacity: 0; } }
 
 /* The handoff strips the countdown's own chrome inside the welcome panel
    and gives it real breathing room above -- without this the countdown
@@ -167,7 +182,35 @@
 
 .wh-actions { margin-top: 26px; display: grid; justify-content: center; gap: 12px; }
 
+/* Cues that there is more below instead of letting the next section's top
+   peek into view as an unexplained sliver. */
+.wh-scroll-cue {
+  position: absolute;
+  left: 50%;
+  bottom: 18px;
+  z-index: 1;
+  margin-left: -18px;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: rgba(255, 253, 246, 0.82);
+  color: var(--primary);
+  opacity: 0;
+}
+.wh-scroll-cue svg { width: 18px; height: 18px; }
+.wh-home.wh-ready .wh-scroll-cue {
+  animation: wh-cue-in 520ms ease 1300ms both, wh-cue-bounce 1800ms ease-in-out 1820ms infinite;
+}
+@keyframes wh-cue-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
 @keyframes wh-copy-in { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes wh-cue-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(6px); }
+}
 @keyframes wh-botanical-grow {
   0% { opacity: 0; clip-path: inset(100% 0 0); transform: translateY(24px) scale(0.96); }
   76% { opacity: 1; clip-path: inset(0); transform: translateY(-3px) scale(1.01); }
@@ -192,7 +235,8 @@
    and overflowing (which is what squeezed this layout at mid widths). */
 @media (min-width: 781px) {
   .wh-home {
-    min-height: calc(100svh - 118px);
+    /* 79px = the desktop site-header's 78px height + its 1px border. */
+    min-height: calc(100svh - 79px);
     grid-template-columns: minmax(330px, 0.72fr) minmax(0, 1.28fr);
   }
   .wh-art { min-height: 0; }
@@ -223,6 +267,7 @@
   .wh-home .wh-art-copy,
   .wh-home .wh-content > .wh-eyebrow,
   .wh-home .wh-content > .wh-message,
-  .wh-home .wh-content > .wh-actions { opacity: 1; transform: none; animation: none; }
+  .wh-home .wh-content > .wh-actions,
+  .wh-scroll-cue { opacity: 1; transform: none; animation: none; }
   .wh-home .wh-title { clip-path: inset(0); animation: none; }
 }

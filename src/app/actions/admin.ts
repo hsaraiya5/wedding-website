@@ -21,6 +21,10 @@ export async function saveHousehold(
     return { error: "Household name is required." };
   }
 
+  if (!groupTag) {
+    return { error: "Group is required." };
+  }
+
   let guests: { first_name: string; last_name: string; event_ids?: string[] }[] | null = null;
   if (!householdId) {
     try {

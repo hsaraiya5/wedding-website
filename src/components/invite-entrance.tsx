@@ -88,7 +88,7 @@ export function InviteEntrance() {
               </div>
               <p className="ie-eyebrow">You are invited</p>
               <h1 id="ie-access-title">Gayathri &amp; Hrishikesh</h1>
-              <p className="ie-access-date">May 29-30, 2027 &middot; Wyndham Pittsburgh</p>
+              <p className="ie-access-date">May 29-30, 2027 &middot; Wyndham Grand, Pittsburgh Downtown</p>
               <form action={formAction} className="ie-code-form">
                 <label htmlFor="invite-code">Invitation code</label>
                 <input
@@ -124,7 +124,7 @@ export function InviteEntrance() {
                 <p className="ie-script" role="status">
                   <span>Welcome, {state.householdName}</span>
                 </p>
-                <p className="ie-access-date">May 29-30, 2027 &middot; Wyndham Pittsburgh</p>
+                <p className="ie-access-date">May 29-30, 2027 &middot; Wyndham Grand, Pittsburgh Downtown</p>
               </div>
             </div>
             <div className="ie-env-side ie-left" />

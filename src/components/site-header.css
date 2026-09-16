@@ -37,7 +37,7 @@
 .sh-header-inner {
   position: relative;
   z-index: 1;
-  width: min(1880px, calc(100% - 64px));
+  width: calc(100% - 64px);
   height: 100%;
   margin: 0 auto;
   display: grid;
@@ -133,12 +133,13 @@
   place-items: center;
   background: var(--background);
   padding: 22px;
+  container-type: inline-size;
 }
 .sh-overlay-art::before {
   content: "";
   position: absolute;
   inset: 0;
-  background: var(--sh-hero-art) left center / auto 100% no-repeat;
+  background: var(--sh-hero-art) left center / cover no-repeat;
   opacity: 0;
   clip-path: inset(100% 0 0);
   transform: translateY(24px) scale(0.96);
@@ -157,9 +158,12 @@
   text-align: center;
 }
 .sh-overlay-art-inner p {
+  width: min(440px, calc(100% - 48px));
   color: var(--accent-foreground);
   font-family: var(--font-heading);
-  font-size: 2rem;
+  font-size: clamp(1.3rem, 7cqw, 2rem);
+  line-height: 1.25;
+  text-wrap: balance;
   opacity: 0;
   transform: translateY(12px);
 }
