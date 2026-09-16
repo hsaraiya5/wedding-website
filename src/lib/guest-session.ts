@@ -30,11 +30,12 @@ export type GuestContext = {
     id: string;
     type: "hotel-block" | "other-hotel" | "transport";
     name: string;
-    booking_code: string | null;
-    booking_link: string | null;
-    nightly_rate: string | null;
-    rate_cutoff_date: string | null;
+    label: string | null;
     description: string | null;
+    room_block: string | null;
+    address: string | null;
+    booking_details: string | null;
+    booking_link: string | null;
   }[];
   faqs: { id: string; question: string; answer: string; order_index: number }[];
   whatsapp_numbers: { id: string; phone_number: string }[];

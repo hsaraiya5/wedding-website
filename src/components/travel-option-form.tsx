@@ -11,11 +11,12 @@ type TravelOption = {
   id: string;
   type: "hotel-block" | "other-hotel" | "transport";
   name: string;
-  booking_code: string | null;
-  booking_link: string | null;
-  nightly_rate: string | null;
-  rate_cutoff_date: string | null;
+  label: string | null;
   description: string | null;
+  room_block: string | null;
+  address: string | null;
+  booking_details: string | null;
+  booking_link: string | null;
 } | null;
 
 export function TravelOptionForm({ travelOption }: { travelOption: TravelOption }) {
@@ -35,9 +36,8 @@ export function TravelOptionForm({ travelOption }: { travelOption: TravelOption 
           defaultValue={travelOption?.type ?? "hotel-block"}
           className="h-9 rounded-lg border border-input bg-transparent px-2.5 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
         >
-          <option value="hotel-block">Hotel block</option>
+          <option value="hotel-block">Venue hotel</option>
           <option value="other-hotel">Other hotel</option>
-          <option value="transport">Transport note</option>
         </select>
       </div>
 
@@ -52,23 +52,29 @@ export function TravelOptionForm({ travelOption }: { travelOption: TravelOption 
         />
       </div>
 
+      <div className="av-field">
+        <Label htmlFor="label">Label</Label>
+        <Input
+          id="label"
+          name="label"
+          defaultValue={travelOption?.label ?? ""}
+          placeholder="e.g. Venue hotel"
+        />
+        <p className="av-section-hint">Shown above the hotel name, e.g. &quot;Venue hotel&quot; or &quot;Shuttle hotel&quot;.</p>
+      </div>
+
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
         <div className="av-field">
-          <Label htmlFor="booking_code">Booking code</Label>
-          <Input id="booking_code" name="booking_code" defaultValue={travelOption?.booking_code ?? ""} />
+          <Label htmlFor="room_block">Room block</Label>
+          <Input id="room_block" name="room_block" defaultValue={travelOption?.room_block ?? ""} placeholder="e.g. 75 King rooms" />
         </div>
         <div className="av-field">
-          <Label htmlFor="nightly_rate">Nightly rate</Label>
-          <Input id="nightly_rate" name="nightly_rate" defaultValue={travelOption?.nightly_rate ?? ""} />
+          <Label htmlFor="address">Address</Label>
+          <Input id="address" name="address" defaultValue={travelOption?.address ?? ""} />
         </div>
         <div className="av-field">
-          <Label htmlFor="rate_cutoff_date">Reserve by</Label>
-          <Input
-            id="rate_cutoff_date"
-            name="rate_cutoff_date"
-            type="date"
-            defaultValue={travelOption?.rate_cutoff_date ?? ""}
-          />
+          <Label htmlFor="booking_details">Booking details</Label>
+          <Input id="booking_details" name="booking_details" defaultValue={travelOption?.booking_details ?? ""} placeholder="Coming soon" />
         </div>
       </div>
 
