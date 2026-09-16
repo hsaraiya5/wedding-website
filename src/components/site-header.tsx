@@ -11,8 +11,10 @@ const links = [
   { href: "#events", label: "Itinerary" },
   { href: "#travel", label: "Travel & stay" },
   { href: "#wardrobe", label: "Wardrobe planner" },
+  { href: "#guest-guide", label: "Guest guide" },
   { href: "#faq", label: "Questions" },
   { href: "#rsvp", label: "RSVP" },
+  { href: "#story", label: "Our story" },
 ];
 
 export function SiteHeader({
