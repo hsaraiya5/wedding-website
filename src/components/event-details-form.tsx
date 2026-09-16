@@ -14,6 +14,12 @@ type WardrobeContent = {
   palette?: { name: string; hex: string }[];
 };
 
+type ItineraryContent = {
+  subtitle?: string;
+  tradition_intro?: string;
+  tradition_list?: { label: string; text: string }[];
+};
+
 type Event = {
   id: string;
   name: string;
@@ -25,7 +31,7 @@ type Event = {
   dress_code: string | null;
   meal_info: string | null;
   description: string | null;
-  extra_content: { wardrobe?: WardrobeContent } | Record<string, unknown>;
+  extra_content: { wardrobe?: WardrobeContent; itinerary?: ItineraryContent } | Record<string, unknown>;
 };
 
 // Closes the surfaced US-A6 gap (admins edit event details without a code
@@ -37,6 +43,10 @@ export function EventDetailsForm({ event }: { event: Event }) {
   const wardrobe = (event.extra_content as { wardrobe?: WardrobeContent })?.wardrobe;
   const paletteText = (wardrobe?.palette ?? [])
     .map((color) => `${color.name}: ${color.hex}`)
+    .join("\n");
+  const itinerary = (event.extra_content as { itinerary?: ItineraryContent })?.itinerary;
+  const traditionListText = (itinerary?.tradition_list ?? [])
+    .map((item) => `${item.label}: ${item.text}`)
     .join("\n");
 
   return (
@@ -96,7 +106,46 @@ export function EventDetailsForm({ event }: { event: Event }) {
             defaultValue={event.description ?? ""}
             rows={2}
           />
-          <p className="av-section-hint">Shown on the itinerary timeline.</p>
+          <p className="av-section-hint">Used as the calendar-download event description.</p>
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-5 border-t border-border pt-6">
+        <div>
+          <h3 className="av-section-title">Itinerary card</h3>
+          <p className="av-section-hint">Shown on the flip-card in the Itinerary section.</p>
+        </div>
+
+        <div className="av-field">
+          <Label htmlFor="itinerary_subtitle">Subtitle</Label>
+          <Input
+            id="itinerary_subtitle"
+            name="itinerary_subtitle"
+            defaultValue={itinerary?.subtitle ?? ""}
+            placeholder="e.g. A bright beginning."
+          />
+        </div>
+
+        <div className="av-field">
+          <Label htmlFor="itinerary_tradition_intro">Tradition</Label>
+          <Textarea
+            id="itinerary_tradition_intro"
+            name="itinerary_tradition_intro"
+            defaultValue={itinerary?.tradition_intro ?? ""}
+            rows={3}
+          />
+        </div>
+
+        <div className="av-field">
+          <Label htmlFor="itinerary_tradition_list">What to expect</Label>
+          <Textarea
+            id="itinerary_tradition_list"
+            name="itinerary_tradition_list"
+            defaultValue={traditionListText}
+            rows={4}
+            placeholder={"One item per line, as Label: text\ne.g.\nThe atmosphere: Music, laughter, and plenty of yellow."}
+          />
+          <p className="av-section-hint">One item per line, as &quot;Label: text&quot;.</p>
         </div>
       </div>
 

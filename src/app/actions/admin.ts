@@ -270,6 +270,20 @@ function parsePalette(raw: string): { name: string; hex: string }[] {
     .filter((color) => /^#[0-9a-fA-F]{3,8}$/.test(color.hex));
 }
 
+// Parses the itinerary form's "what to expect" textarea -- one "Label:
+// text" per line -- same convention as parsePalette above.
+function parseTraditionList(raw: string): { label: string; text: string }[] {
+  return raw
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .map((line) => {
+      const [label, ...rest] = line.split(":");
+      return { label: label.trim(), text: rest.join(":").trim() };
+    })
+    .filter((item) => item.label && item.text);
+}
+
 export async function saveEvent(_prevState: ActionState, formData: FormData): Promise<ActionState> {
   const eventId = String(formData.get("event_id") ?? "").trim();
   const name = String(formData.get("name") ?? "").trim();
@@ -285,6 +299,9 @@ export async function saveEvent(_prevState: ActionState, formData: FormData): Pr
   const wardrobeDescription = String(formData.get("wardrobe_description") ?? "").trim();
   const wardrobeGoodToKnow = String(formData.get("wardrobe_good_to_know") ?? "").trim();
   const wardrobePaletteRaw = String(formData.get("wardrobe_palette") ?? "");
+  const itinerarySubtitle = String(formData.get("itinerary_subtitle") ?? "").trim();
+  const itineraryTraditionIntro = String(formData.get("itinerary_tradition_intro") ?? "").trim();
+  const itineraryTraditionListRaw = String(formData.get("itinerary_tradition_list") ?? "");
 
   if (!name) {
     return { error: "Event name is required." };
@@ -311,6 +328,11 @@ export async function saveEvent(_prevState: ActionState, formData: FormData): Pr
         description: wardrobeDescription || undefined,
         good_to_know: wardrobeGoodToKnow || undefined,
         palette: parsePalette(wardrobePaletteRaw),
+      },
+      itinerary: {
+        subtitle: itinerarySubtitle || undefined,
+        tradition_intro: itineraryTraditionIntro || undefined,
+        tradition_list: parseTraditionList(itineraryTraditionListRaw),
       },
     },
   });

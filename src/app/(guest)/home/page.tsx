@@ -5,7 +5,7 @@ import { getWeddingStart } from "@/lib/countdown";
 import { WelcomeHome, WelcomeArt, WelcomePanel, WelcomeMessage } from "@/components/welcome-home";
 import { Countdown } from "@/components/countdown";
 import { Section, SectionHeading } from "@/components/section";
-import { EventsTimeline } from "@/components/events-timeline";
+import { EventFlipCards } from "@/components/event-flip-cards";
 import { TravelSection } from "@/components/travel-section";
 import { WardrobePlanner } from "@/components/wardrobe-planner";
 import { FaqSection } from "@/components/faq-section";
@@ -95,11 +95,19 @@ export default async function HomePage({
       <Section id="events">
         <SectionHeading
           eyebrow="Your itinerary"
-          title="Your weekend, at a glance."
-          intro="Four celebrations, two joyful days, and every detail gathered in one place."
+          title={
+            events.length === 4
+              ? "Four celebrations, each with a story."
+              : "Your wedding day, at a glance."
+          }
+          intro={
+            events.length === 4
+              ? "Four celebrations, two joyful days, and every detail gathered in one place."
+              : "Your invitation includes the wedding ceremony and reception, with every detail gathered in one place."
+          }
         />
         {events.length > 0 ? (
-          <EventsTimeline events={events} />
+          <EventFlipCards events={events} />
         ) : (
           <p className="text-center text-muted-foreground">No events found for your household.</p>
         )}
