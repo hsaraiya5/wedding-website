@@ -35,3 +35,24 @@ export function formatEventTime(time: string | null): string {
   const date = new Date(2000, 0, 1, hours, minutes);
   return date.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
 }
+
+export function formatEventWeekday(eventDate: string | null): string {
+  if (!eventDate) return "";
+  const date = new Date(`${eventDate}T00:00:00`);
+  if (Number.isNaN(date.getTime())) return eventDate;
+  return date.toLocaleDateString("en-US", { weekday: "long" });
+}
+
+// "Saturday morning" / "Saturday evening" -- the wardrobe planner's rail
+// labels. Derived from the actual date/time rather than hardcoded per
+// event, same reasoning as EventFlipCards' position-cycled accents: it
+// keeps working regardless of what the admin names or schedules each
+// event.
+export function formatEventDayPart(eventDate: string | null, time: string | null): string {
+  const weekday = formatEventWeekday(eventDate);
+  if (!weekday || !time) return weekday;
+  const hours = Number(time.split(":")[0]);
+  if (Number.isNaN(hours)) return weekday;
+  const part = hours < 12 ? "morning" : hours < 17 ? "afternoon" : "evening";
+  return `${weekday} ${part}`;
+}

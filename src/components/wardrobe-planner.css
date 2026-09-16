@@ -1,63 +1,102 @@
 /*
-  Ported from the handoff's ".attire-explorer"/".attire-tabs"/".attire-tab"/
-  ".attire-detail"/".attire-panel"/".wardrobe-visual"/".garment-sketch"/
-  ".swatches". Classes prefixed wp- to avoid collisions.
+  Ported from the handoff's ".lookbook"/".lookbook-rail"/
+  ".lookbook-rail-heading"/".attire-tabs"/".attire-tab"/".attire-detail"/
+  ".attire-panel"/".wardrobe-visual"/".garment-sketch"/".swatches". Classes
+  prefixed wp- to avoid collisions. A vertical rail of tabs down the left,
+  detail panel (copy + illustration) filling the rest -- matches the
+  designer's mockup exactly rather than the earlier horizontal-tabs-below
+  layout.
 */
 
-.wp-explorer { display: flex; flex-direction: column; gap: 18px; }
+.wp-explorer {
+  display: grid;
+  grid-template-columns: minmax(210px, 0.34fr) minmax(0, 1.66fr);
+  min-height: 620px;
+  border: 1px solid var(--border);
+  background: rgba(255, 250, 240, 0.74);
+  box-shadow: 0 24px 60px rgba(85, 54, 42, 0.08);
+}
+
+.wp-rail {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  border-right: 1px solid var(--border);
+  background: var(--muted);
+}
+.wp-rail-heading {
+  margin: 0;
+  border-bottom: 1px solid var(--border);
+  padding: 27px 25px 20px;
+}
+.wp-rail-eyebrow { display: block; margin-bottom: 5px; color: var(--primary); font-size: 0.7rem; font-weight: 700; text-transform: uppercase; }
+.wp-rail-title { color: var(--accent-foreground); font-family: var(--font-heading); font-size: 1.25rem; font-weight: 600; line-height: 1; }
 
 .wp-tabs {
   display: grid;
-  grid-template-columns: repeat(var(--wp-count, 4), minmax(0, 1fr));
-  border: 1px solid var(--border);
-  background: rgba(255, 250, 240, 0.46);
+  grid-template-rows: repeat(var(--wp-count, 4), minmax(0, 1fr));
 }
 .wp-tab {
   position: relative;
-  min-height: 100px;
+  min-height: 110px;
   display: grid;
   align-content: center;
-  gap: 7px;
+  gap: 8px;
   border: 0;
-  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
   background: transparent;
-  padding: 22px 20px 18px;
+  padding: 22px 20px 20px 24px;
   text-align: left;
-  transition: color 180ms ease, background 180ms ease;
+  transition: color 180ms ease, background 220ms ease, padding-left 260ms ease;
 }
-.wp-tab:last-child { border-right: 0; }
+.wp-tab:last-child { border-bottom: 0; }
 .wp-tab::before {
   content: "";
   position: absolute;
-  top: -1px;
-  right: -1px;
-  left: 0;
-  height: 5px;
+  top: 0;
+  bottom: 0;
+  left: -1px;
+  width: 5px;
   background: var(--wp-tab-color);
-  opacity: 0.38;
-  transform: scaleX(0.25);
-  transform-origin: left;
+  opacity: 0;
+  transform: scaleY(0.28);
+  transform-origin: center;
   transition: opacity 220ms ease, transform 280ms ease;
 }
-.wp-tab span { color: var(--muted-foreground); font-size: 0.74rem; font-weight: 800; text-transform: uppercase; }
-.wp-tab strong { font-family: var(--font-heading); font-size: 1.1rem; font-weight: 400; line-height: 1.1; }
-.wp-tab:hover, .wp-tab[aria-selected="true"] { background: var(--background); color: var(--accent-foreground); }
-.wp-tab[aria-selected="true"]::before { opacity: 1; transform: scaleX(1); }
+.wp-tab-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.wp-tab-daypart { color: var(--muted-foreground); font-size: 0.68rem; font-weight: 700; text-transform: uppercase; }
+.wp-tab-look { color: rgba(74, 62, 52, 0.46); font-family: var(--font-script); font-size: 1rem; white-space: nowrap; }
+.wp-tab strong { font-family: var(--font-heading); font-size: 1.3rem; font-weight: 500; line-height: 1.05; }
+.wp-tab:hover { background: rgba(255, 250, 240, 0.52); padding-left: 29px; color: var(--accent-foreground); }
+.wp-tab[aria-selected="true"] { background: var(--background); padding-left: 32px; color: var(--accent-foreground); }
+.wp-tab[aria-selected="true"]::before { opacity: 1; transform: scaleY(1); }
+.wp-tab[aria-selected="true"] .wp-tab-look { color: var(--wp-tab-color); }
+.wp-tab:focus-visible { outline: 2px solid color-mix(in srgb, var(--wp-tab-color) 64%, transparent); outline-offset: -6px; }
 
 .wp-detail {
   position: relative;
   overflow: hidden;
-  border: 1px solid var(--border);
+  display: grid;
   background: var(--background);
-  box-shadow: 0 22px 55px rgba(85, 54, 42, 0.09);
   animation: wp-panel-in 420ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
 }
 @keyframes wp-panel-in { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
 
-.wp-panel-inner { display: grid; grid-template-columns: minmax(280px, 0.88fr) minmax(0, 1.12fr); align-items: stretch; }
+/* height: 100% (not just min-height) is load-bearing: .wp-detail is a
+   stretched grid item of .wp-explorer, so its resolved height can end up
+   taller than 620px whenever the rail's content (wrapped tab labels) is
+   the tallest column. Without height: 100% this box stayed pinned to
+   620px, leaving a gap below it where .wp-visual's tinted background
+   should have continued to the shared bottom border. */
+.wp-panel-inner {
+  display: grid;
+  grid-template-columns: minmax(280px, 0.94fr) minmax(0, 1.06fr);
+  align-items: stretch;
+  min-height: 620px;
+  height: 100%;
+}
 
-.wp-copy { grid-column: 2; display: grid; align-content: center; padding: 44px 48px; }
-.wp-copy h3 { margin-top: 10px; color: var(--accent-foreground); font-size: 2.2rem; line-height: 1.05; }
+.wp-copy { grid-column: 1; display: grid; align-content: center; gap: 0; padding: 48px; }
+.wp-copy h3 { margin-top: 10px; color: var(--accent-foreground); font-size: 2.6rem; line-height: 1; }
 .wp-time {
   width: max-content;
   margin-top: 14px;
@@ -65,6 +104,8 @@
   padding-bottom: 6px;
   color: var(--muted-foreground);
   font-weight: 700;
+  font-size: 0.85rem;
+  text-transform: uppercase;
 }
 .wp-copy > p:not(.gh-eyebrow):not(.wp-time) { margin-top: 20px; color: var(--muted-foreground); font-size: 1.05rem; line-height: 1.6; }
 .wp-note {
@@ -78,50 +119,52 @@
 .wp-note span { color: var(--muted-foreground); }
 
 .wp-visual {
-  grid-column: 1;
-  grid-row: 1;
+  grid-column: 2;
+  position: relative;
   display: grid;
-  align-content: center;
+  grid-template-rows: 1fr auto;
   justify-items: center;
-  gap: 20px;
-  border-right: 1px solid var(--border);
-  padding: 40px 32px;
+  gap: 24px;
+  border-left: 1px solid var(--border);
+  padding: 46px 40px 34px;
   background: color-mix(in oklch, var(--wp-wash, var(--accent)), white 78%);
   color: var(--accent-foreground);
 }
 .wp-sketch {
-  width: min(100%, 300px);
+  align-self: center;
+  width: min(100%, 420px);
+  height: auto;
   animation: wp-sketch-in 900ms cubic-bezier(0.2, 0.72, 0.2, 1) 100ms both;
 }
-.wp-sketch svg { width: 100%; height: auto; }
 @keyframes wp-sketch-in {
-  from {
-    opacity: 0;
-    filter: grayscale(1) contrast(0.94) blur(3px) drop-shadow(0 8px 12px rgba(91, 45, 36, 0.04));
-    transform: translateY(14px) scale(0.975);
-  }
-  to {
-    opacity: 1;
-    filter: grayscale(1) contrast(1.04) blur(0) drop-shadow(0 16px 20px rgba(91, 45, 36, 0.09));
-    transform: translateY(0) scale(1);
-  }
+  from { opacity: 0; transform: translateY(14px) scale(0.975); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
 }
 @media (prefers-reduced-motion: reduce) {
   .wp-sketch { animation: none; }
 }
+.wp-palette { width: 100%; border-top: 1px solid var(--border); padding-top: 18px; }
 .wp-palette-label { color: var(--muted-foreground); font-size: 0.74rem; font-weight: 800; text-transform: uppercase; text-align: center; }
-.wp-swatches { margin-top: 9px; display: flex; justify-content: center; gap: 10px; }
-.wp-swatch { width: 32px; height: 32px; border: 3px solid var(--background); border-radius: 50%; box-shadow: 0 0 0 1px rgba(51, 41, 34, 0.18), 0 6px 13px rgba(51, 41, 34, 0.1); }
+.wp-swatches { margin-top: 12px; display: flex; justify-content: center; gap: 14px; }
+.wp-swatch-item { display: grid; justify-items: center; gap: 7px; }
+.wp-swatch { width: 42px; height: 42px; border: 1px solid var(--border); border-radius: 6px; box-shadow: 0 6px 13px rgba(51, 41, 34, 0.1); }
+.wp-swatch-name { color: var(--muted-foreground); font-size: 0.68rem; text-align: center; }
 
 @media (max-width: 900px) {
-  .wp-panel-inner { grid-template-columns: 1fr; }
+  .wp-explorer { grid-template-columns: 1fr; }
+  .wp-rail { border-right: 0; border-bottom: 1px solid var(--border); }
+  .wp-tabs { grid-template-rows: none; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .wp-tab { border-bottom: 1px solid var(--border); border-right: 1px solid var(--border); }
+  .wp-tab:nth-child(2n) { border-right: 0; }
+  .wp-tab::before { top: -1px; bottom: auto; left: 0; right: -1px; width: auto; height: 5px; transform: scaleX(0.28); transform-origin: left; }
+  .wp-tab[aria-selected="true"]::before { transform: scaleX(1); }
+  .wp-tab[aria-selected="true"] { padding-left: 24px; }
+  .wp-panel-inner { grid-template-columns: 1fr; min-height: 0; }
   .wp-copy { grid-column: 1; padding: 36px 28px; }
-  .wp-visual { grid-column: 1; grid-row: 1; border-right: 0; border-bottom: 1px solid var(--border); }
+  .wp-visual { grid-column: 1; border-left: 0; border-top: 1px solid var(--border); }
 }
 
 @media (max-width: 700px) {
-  .wp-tabs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .wp-tab { border-bottom: 1px solid var(--border); min-height: 84px; padding: 16px; }
-  .wp-copy { padding: 28px 20px; }
-  .wp-copy h3 { font-size: 1.7rem; }
+  .wp-copy h3 { font-size: 1.9rem; }
+  .wp-sketch { width: min(100%, 320px); }
 }
