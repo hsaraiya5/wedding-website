@@ -1,0 +1,230 @@
+/* Ported from the design handoff's ".event-flip" paper-card interaction.
+   Class names are prefixed "ef-" (event-flip) instead of matching the
+   handoff verbatim, to stay consistent with this codebase's per-component
+   prefix convention (tl-, wh-, sh-, rv-, wp-, ...). */
+
+.ef-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 26px;
+}
+
+.ef-flip {
+  min-width: 0;
+  min-height: 530px;
+  perspective: 1900px;
+  perspective-origin: center;
+}
+
+@media (hover: hover) {
+  .ef-flip:not(.ef-flipped):hover { animation: ef-wiggle 460ms ease-in-out both; }
+  .ef-flip:not(.ef-flipped):not(.ef-peeling):hover .ef-inner { transform: rotateY(-4deg) translateZ(4px); }
+  .ef-flip:hover .ef-peel { opacity: 1; transform: scale(1); }
+  .ef-flip:hover .ef-face { box-shadow: 0 24px 52px rgba(72, 45, 31, 0.14); }
+}
+
+@keyframes ef-wiggle {
+  0%, 100% { transform: translateY(0) rotate(0); }
+  22% { transform: translateY(-3px) rotate(-0.45deg); }
+  48% { transform: translateY(-4px) rotate(0.38deg); }
+  72% { transform: translateY(-3px) rotate(-0.18deg); }
+}
+
+.ef-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 530px;
+  transform-style: preserve-3d;
+  transform-origin: center;
+  transition: transform 820ms cubic-bezier(0.18, 0.72, 0.18, 1), filter 240ms ease;
+}
+.ef-flip.ef-peeling .ef-inner { transform: rotateY(-12deg) translate3d(-4px, -2px, 8px); }
+.ef-flip.ef-peeling .ef-peel { opacity: 1; transform: translate(-4px, 4px) scale(1.18); }
+.ef-flip.ef-flipped .ef-inner { transform: rotateY(-180deg); }
+.ef-grid.ef-has-open .ef-flip:not(.ef-flipped) .ef-inner { filter: saturate(0.82) opacity(0.86); }
+
+.ef-face {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border: 1px solid rgba(113, 43, 49, 0.22);
+  border-radius: 6px;
+  box-shadow: 0 18px 44px rgba(72, 45, 31, 0.1);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+.ef-front { background: color-mix(in srgb, var(--ef-wash) 76%, #fffaf0); pointer-events: auto; }
+.ef-flip.ef-flipped .ef-front { pointer-events: none; }
+.ef-front::before,
+.ef-back::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--ef-floral-art) var(--ef-motif-position, right bottom) / auto 74% no-repeat;
+  opacity: 0.105;
+  pointer-events: none;
+}
+.ef-back::before { opacity: 0.055; background-position: right bottom; }
+.ef-front::after,
+.ef-back::after {
+  content: "";
+  position: absolute;
+  inset: 15px;
+  border: 1px solid color-mix(in srgb, var(--ef-color) 42%, transparent);
+  pointer-events: none;
+}
+
+.ef-trigger {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  min-height: 530px;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  color: var(--foreground);
+  cursor: pointer;
+  text-align: left;
+}
+.ef-trigger:focus-visible { outline: 3px solid color-mix(in srgb, var(--ef-color) 54%, transparent); outline-offset: -7px; }
+
+.ef-heading {
+  align-self: stretch;
+  display: grid;
+  align-content: center;
+  padding: 54px 48px 34px;
+}
+.ef-number {
+  display: block;
+  color: var(--ef-color);
+  font-family: var(--font-script);
+  font-size: 2.2rem;
+  line-height: 1;
+}
+.ef-front h3 { margin-top: 12px; color: var(--accent-foreground); font-size: 3.45rem; line-height: 0.96; }
+.ef-subtitle { display: block; margin-top: 10px; color: var(--ef-color); font-family: var(--font-display); font-size: 1.55rem; line-height: 1.1; }
+.ef-date { display: block; margin-top: 30px; color: var(--foreground); font-size: 1rem; font-weight: 600; }
+
+.ef-meta {
+  margin: 0 34px 32px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border-top: 1px solid rgba(113, 43, 49, 0.18);
+}
+.ef-meta-item { min-width: 0; padding: 18px 14px 8px; }
+.ef-meta-item + .ef-meta-item { border-left: 1px solid rgba(113, 43, 49, 0.15); }
+.ef-meta-label { display: block; color: var(--ef-color); font-size: 0.66rem; font-weight: 700; text-transform: uppercase; }
+.ef-meta-item strong { display: block; margin-top: 5px; color: var(--foreground); font-size: 0.88rem; line-height: 1.34; }
+
+.ef-peel {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  z-index: 3;
+  width: 68px;
+  height: 68px;
+  opacity: 0.62;
+  background: linear-gradient(225deg, color-mix(in srgb, var(--ef-color) 24%, #fffaf0) 0 47%, transparent 48%);
+  clip-path: polygon(0 0, 100% 0, 100% 100%);
+  filter: drop-shadow(-5px 6px 5px rgba(72, 45, 31, 0.16));
+  transform: scale(0.62);
+  transform-origin: top right;
+  transition: opacity 220ms ease, transform 360ms cubic-bezier(0.18, 0.72, 0.2, 1);
+  pointer-events: none;
+}
+.ef-peel::after {
+  content: "";
+  position: absolute;
+  top: 47%;
+  right: 0;
+  width: 95%;
+  height: 1px;
+  background: color-mix(in srgb, var(--ef-color) 48%, transparent);
+  transform: rotate(45deg);
+  transform-origin: right center;
+}
+
+.ef-back {
+  background: #fffaf0;
+  transform: rotateY(180deg);
+  pointer-events: none;
+  cursor: pointer;
+}
+.ef-flip.ef-flipped .ef-back { pointer-events: auto; }
+.ef-back:focus-visible { outline: 3px solid color-mix(in srgb, var(--ef-color) 54%, transparent); outline-offset: -7px; }
+
+.ef-back-content {
+  position: relative;
+  z-index: 1;
+  height: 100%;
+  min-height: 530px;
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr) auto auto;
+  padding: 34px 40px;
+}
+.ef-back-top { display: flex; align-items: center; justify-content: space-between; gap: 18px; }
+.ef-back-top .ef-number { font-size: 1.9rem; }
+.ef-back-heading { margin-top: 10px; }
+.ef-back h3 { margin-top: 4px; color: var(--accent-foreground); font-size: 2.55rem; line-height: 0.98; }
+.ef-cultural-heading { margin-top: 7px; color: var(--ef-color); font-family: var(--font-display); font-size: 1.28rem; line-height: 1.14; }
+
+.ef-tradition-copy { align-self: center; margin-top: 14px; }
+.ef-tradition-copy > p { color: var(--muted-foreground); font-size: 0.88rem; line-height: 1.52; }
+.ef-tradition-list { margin: 14px 0 0; padding: 0; display: grid; gap: 9px; list-style: none; }
+.ef-tradition-list li { border-left: 3px solid var(--ef-color); padding-left: 11px; color: var(--foreground); font-size: 0.82rem; line-height: 1.42; }
+.ef-tradition-list strong { color: var(--accent-foreground); }
+
+.ef-meal {
+  margin-top: 14px;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: baseline;
+  gap: 14px;
+  border-top: 1px solid rgba(113, 43, 49, 0.18);
+  padding-top: 14px;
+}
+.ef-meal span { color: var(--ef-color); font-size: 0.66rem; font-weight: 700; text-transform: uppercase; }
+.ef-meal strong { color: var(--foreground); font-size: 0.86rem; line-height: 1.35; }
+
+.ef-back-footer { display: flex; justify-content: flex-start; align-items: center; margin-top: 14px; }
+
+.ef-calendar-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  border: 1px solid rgba(113, 43, 49, 0.28);
+  border-radius: 999px;
+  background: #fffdf6;
+  padding: 10px 18px;
+  color: var(--accent-foreground);
+  font-size: 0.86rem;
+  font-weight: 700;
+  transition: box-shadow 200ms ease, transform 200ms ease, color 200ms ease;
+}
+.ef-calendar-button:hover { box-shadow: 0 9px 20px rgba(91, 45, 36, 0.12); transform: translateY(-2px); }
+.ef-calendar-icon { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+@media (max-width: 900px) {
+  .ef-heading { padding: 46px 38px 30px; }
+  .ef-meta { margin-right: 28px; margin-left: 28px; }
+  .ef-front h3 { font-size: 2.65rem; }
+  .ef-back h3 { font-size: 2.15rem; }
+}
+
+@media (max-width: 640px) {
+  .ef-grid { grid-template-columns: 1fr; }
+  .ef-flip, .ef-inner, .ef-trigger, .ef-back-content { min-height: 520px; }
+  .ef-trigger { padding: 0; }
+  .ef-heading { padding: 32px 28px 24px; }
+  .ef-meta { margin: 0 24px 26px; }
+  .ef-meta-item { padding: 14px 10px 6px; }
+  .ef-back-content { padding: 30px 26px; }
+  .ef-back-footer { align-items: stretch; }
+  .ef-front h3 { font-size: 2.55rem; }
+  .ef-back h3 { font-size: 2.05rem; }
+  .ef-calendar-button { width: 100%; justify-content: center; }
+}

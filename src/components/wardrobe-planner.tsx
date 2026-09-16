@@ -18,7 +18,7 @@ type Event = {
   extra_content: { wardrobe?: WardrobeContent } | Record<string, unknown>;
 };
 
-// Cycled by position, same reasoning as EventsTimeline's accentColors --
+// Cycled by position, same reasoning as EventFlipCards' accents --
 // generalizes regardless of what the admin actually calls each event.
 const accentColors = [
   "var(--color-event-haldi)",

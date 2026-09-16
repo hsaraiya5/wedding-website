@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { parsePalette, parseTraditionList } from "@/lib/parse-admin-lists";
 
 export type ActionState = { error: string | null };
 
@@ -253,23 +254,6 @@ export async function saveGuestInvitations(
   revalidatePath("/admin");
 }
 
-// Parses the wardrobe form's palette textarea -- one "Name: #hexcode" per
-// line -- into the array shape WardrobePlanner expects. A plain textarea
-// with a documented format is simpler than a repeating color-picker UI,
-// and gives admins full control (any number of swatches, easy to reorder)
-// without extra client-side plumbing.
-function parsePalette(raw: string): { name: string; hex: string }[] {
-  return raw
-    .split("\n")
-    .map((line) => line.trim())
-    .filter(Boolean)
-    .map((line) => {
-      const [name, hex] = line.split(":").map((part) => part.trim());
-      return { name: name || "Color", hex: hex || "#000000" };
-    })
-    .filter((color) => /^#[0-9a-fA-F]{3,8}$/.test(color.hex));
-}
-
 export async function saveEvent(_prevState: ActionState, formData: FormData): Promise<ActionState> {
   const eventId = String(formData.get("event_id") ?? "").trim();
   const name = String(formData.get("name") ?? "").trim();
@@ -285,6 +269,9 @@ export async function saveEvent(_prevState: ActionState, formData: FormData): Pr
   const wardrobeDescription = String(formData.get("wardrobe_description") ?? "").trim();
   const wardrobeGoodToKnow = String(formData.get("wardrobe_good_to_know") ?? "").trim();
   const wardrobePaletteRaw = String(formData.get("wardrobe_palette") ?? "");
+  const itinerarySubtitle = String(formData.get("itinerary_subtitle") ?? "").trim();
+  const itineraryTraditionIntro = String(formData.get("itinerary_tradition_intro") ?? "").trim();
+  const itineraryTraditionListRaw = String(formData.get("itinerary_tradition_list") ?? "");
 
   if (!name) {
     return { error: "Event name is required." };
@@ -311,6 +298,11 @@ export async function saveEvent(_prevState: ActionState, formData: FormData): Pr
         description: wardrobeDescription || undefined,
         good_to_know: wardrobeGoodToKnow || undefined,
         palette: parsePalette(wardrobePaletteRaw),
+      },
+      itinerary: {
+        subtitle: itinerarySubtitle || undefined,
+        tradition_intro: itineraryTraditionIntro || undefined,
+        tradition_list: parseTraditionList(itineraryTraditionListRaw),
       },
     },
   });

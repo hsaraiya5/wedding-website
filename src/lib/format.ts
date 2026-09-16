@@ -15,6 +15,17 @@ export function formatEventDayFull(eventDate: string | null): string {
   return date.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" });
 }
 
+// Renders a calendar-file (.ics) UTC timestamp from a local event date/time.
+// The wedding weekend is entirely in Pittsburgh in late May, so this
+// assumes a fixed EDT offset (UTC-4) rather than pulling in a timezone
+// library for one fixed location/season.
+export function formatIcsDateTime(eventDate: string, time: string): string {
+  const [hoursStr, minutesStr] = time.split(":");
+  const date = new Date(`${eventDate}T00:00:00Z`);
+  date.setUTCHours(Number(hoursStr) + 4, Number(minutesStr), 0, 0);
+  return date.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
+}
+
 export function formatEventTime(time: string | null): string {
   if (!time) return "";
   const [hoursStr, minutesStr] = time.split(":");
