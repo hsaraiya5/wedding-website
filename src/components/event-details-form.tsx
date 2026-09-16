@@ -40,7 +40,7 @@ type Event = {
 // deploy) and doubles as the Wardrobe planner's content editor, since that
 // content lives on the same row's extra_content column -- see the
 // 2026-09-12 "design integration plan" Decision Log entry.
-export function EventDetailsForm({ event }: { event: Event }) {
+export function EventDetailsForm({ event, eventIndex = 0 }: { event: Event; eventIndex?: number }) {
   const [state, formAction, pending] = useActionState(saveEvent, { error: null });
   const wardrobe = (event.extra_content as { wardrobe?: WardrobeContent })?.wardrobe;
   const paletteText = (wardrobe?.palette ?? [])
@@ -218,7 +218,7 @@ export function EventDetailsForm({ event }: { event: Event }) {
             <p className="av-section-hint">Updates live. Select the card to see the back.</p>
           </div>
           <div className="av-preview-grid">
-            <EventFlipCards events={[previewEvent]} />
+            <EventFlipCards events={[previewEvent]} startIndex={eventIndex} />
           </div>
         </div>
       </div>
