@@ -8,8 +8,10 @@ import { Section, SectionHeading } from "@/components/section";
 import { EventFlipCards } from "@/components/event-flip-cards";
 import { TravelSection } from "@/components/travel-section";
 import { WardrobePlanner } from "@/components/wardrobe-planner";
+import { GuestGuide } from "@/components/guest-guide";
 import { FaqSection } from "@/components/faq-section";
 import { RsvpForm } from "@/components/rsvp-form";
+import { OurStory } from "@/components/our-story";
 import { SiteFooter } from "@/components/site-footer";
 import "@/components/site-button.css";
 
@@ -146,6 +148,15 @@ export default async function HomePage({
         </Section>
       ) : null}
 
+      <Section id="guest-guide">
+        <SectionHeading
+          eyebrow="Guest guide"
+          title="A little more Pittsburgh, while you are here."
+          intro="A few favorite places for a walk, an afternoon out, or one very Pittsburgh meal."
+        />
+        <GuestGuide />
+      </Section>
+
       {faqs.length > 0 ? (
         <Section id="faq">
           <SectionHeading
@@ -167,6 +178,15 @@ export default async function HomePage({
         whatsappNumbers={whatsapp_numbers}
         justSubmitted={submitted === "1"}
       />
+
+      <Section id="story">
+        <SectionHeading
+          eyebrow="About us"
+          title="The story that brought us here."
+          intro="A few chapters from the life we have built, and the people and places that made it ours."
+        />
+        <OurStory />
+      </Section>
 
       <SiteFooter />
     </>
