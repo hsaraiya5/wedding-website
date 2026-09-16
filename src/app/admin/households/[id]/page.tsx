@@ -78,6 +78,33 @@ export default async function EditHouseholdPage({
           guestEvents={guestEvents ?? []}
         />
       </div>
+
+      {household.dietary_needs || household.accessibility_needs || household.household_note ? (
+        <div className="av-section">
+          <h2 className="av-section-title">RSVP notes</h2>
+          <p className="av-section-hint">Submitted by the household on their RSVP.</p>
+          <div className="flex flex-col gap-4">
+            {household.dietary_needs ? (
+              <div className="av-field">
+                <span className="av-section-hint font-medium">Dietary restrictions or allergies</span>
+                <p className="text-sm">{household.dietary_needs}</p>
+              </div>
+            ) : null}
+            {household.accessibility_needs ? (
+              <div className="av-field">
+                <span className="av-section-hint font-medium">Accessibility or mobility needs</span>
+                <p className="text-sm">{household.accessibility_needs}</p>
+              </div>
+            ) : null}
+            {household.household_note ? (
+              <div className="av-field">
+                <span className="av-section-hint font-medium">Household note</span>
+                <p className="text-sm">{household.household_note}</p>
+              </div>
+            ) : null}
+          </div>
+        </div>
+      ) : null}
     </main>
   );
 }

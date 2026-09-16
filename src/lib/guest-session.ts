@@ -6,6 +6,9 @@ export type GuestContext = {
     display_name: string;
     rsvp_submitted_at: string | null;
     song_request: string | null;
+    dietary_needs: string | null;
+    accessibility_needs: string | null;
+    household_note: string | null;
     rsvp_deadline: string | null;
     hotel_covered_by_host: boolean;
   };

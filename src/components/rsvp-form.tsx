@@ -16,6 +16,9 @@ type Household = {
   display_name: string;
   rsvp_submitted_at: string | null;
   song_request: string | null;
+  dietary_needs: string | null;
+  accessibility_needs: string | null;
+  household_note: string | null;
   rsvp_deadline: string | null;
   hotel_covered_by_host: boolean;
 };
@@ -111,6 +114,9 @@ export function RsvpForm({
 
   const [answers, setAnswers] = useState(initialAnswers);
   const [songRequest, setSongRequest] = useState(household.song_request ?? "");
+  const [dietaryNeeds, setDietaryNeeds] = useState(household.dietary_needs ?? "");
+  const [accessibilityNeeds, setAccessibilityNeeds] = useState(household.accessibility_needs ?? "");
+  const [householdNote, setHouseholdNote] = useState(household.household_note ?? "");
   const [phoneNumbers, setPhoneNumbers] = useState<{ phone_number: string }[]>(
     whatsappNumbers.length > 0
       ? whatsappNumbers.map((n) => ({ phone_number: n.phone_number }))
@@ -393,6 +399,55 @@ export function RsvpForm({
                   <button type="button" className="rv-edit-pill self-start" onClick={addPhoneNumber}>
                     Add another number
                   </button>
+                </div>
+              </div>
+
+              <div className="rv-needs">
+                <div className="rv-needs-copy">
+                  <p className="gh-eyebrow">Help us host you well</p>
+                  <h4>Meals, access, and anything else we should know.</h4>
+                  <p>
+                    These notes apply to your household. Please share only what will help us make
+                    the weekend comfortable.
+                  </p>
+                </div>
+                <div className="rv-needs-grid">
+                  <div className="rv-needs-field">
+                    <Label htmlFor="dietary_needs">
+                      Dietary restrictions or allergies <small>(optional)</small>
+                    </Label>
+                    <Textarea
+                      id="dietary_needs"
+                      name="dietary_needs"
+                      value={dietaryNeeds}
+                      onChange={(event) => setDietaryNeeds(event.target.value)}
+                      placeholder="Allergies, dietary restrictions, or meal considerations"
+                    />
+                  </div>
+                  <div className="rv-needs-field">
+                    <Label htmlFor="accessibility_needs">
+                      Accessibility or mobility needs <small>(optional)</small>
+                    </Label>
+                    <Textarea
+                      id="accessibility_needs"
+                      name="accessibility_needs"
+                      value={accessibilityNeeds}
+                      onChange={(event) => setAccessibilityNeeds(event.target.value)}
+                      placeholder="Mobility, seating, sensory, or other accommodations"
+                    />
+                  </div>
+                  <div className="rv-needs-field">
+                    <Label htmlFor="household_note">
+                      A note for us <small>(optional)</small>
+                    </Label>
+                    <Textarea
+                      id="household_note"
+                      name="household_note"
+                      value={householdNote}
+                      onChange={(event) => setHouseholdNote(event.target.value)}
+                      placeholder="Anything else you would like us to know"
+                    />
+                  </div>
                 </div>
               </div>
 

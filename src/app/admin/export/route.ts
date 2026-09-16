@@ -28,7 +28,7 @@ export async function GET(request: Request) {
     supabase
       .from("households")
       .select(
-        "id, display_name, code, group_tag, rsvp_submitted_at, household_whatsapp_numbers(phone_number), guests(id, first_name, last_name, guest_events(events(name)))"
+        "id, display_name, code, group_tag, rsvp_submitted_at, dietary_needs, accessibility_needs, household_note, household_whatsapp_numbers(phone_number), guests(id, first_name, last_name, guest_events(events(name)))"
       )
       .order("display_name"),
     supabase.from("rsvps").select("guest_id, event_id, attending"),
@@ -61,6 +61,9 @@ export async function GET(request: Request) {
       "Invited Events",
       "RSVP Status",
       "RSVP Submitted At",
+      "Dietary Needs",
+      "Accessibility Needs",
+      "Household Note",
     ],
   ];
 
@@ -91,6 +94,9 @@ export async function GET(request: Request) {
         invitedEventNames,
         rsvpStatus,
         household.rsvp_submitted_at ?? "",
+        household.dietary_needs ?? "",
+        household.accessibility_needs ?? "",
+        household.household_note ?? "",
       ]);
     }
   }
