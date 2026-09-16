@@ -157,16 +157,16 @@
   margin-top: 32px;
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
-  gap: 22px;
+  gap: 32px;
   align-items: end;
   border-top: 1px dashed rgba(113, 43, 49, 0.28);
-  padding-top: 30px;
+  padding-top: 40px;
 }
 .rv-end label { display: block; color: var(--foreground); font-family: var(--font-heading); font-size: 1rem; }
 .rv-end input[type="email"] {
   width: 100%;
   min-height: 50px;
-  margin-top: 8px;
+  margin-top: 12px;
   border: 1px solid rgba(113, 43, 49, 0.34);
   border-radius: 4px;
   background: #fffdf6;
@@ -188,26 +188,26 @@
   align-items: end;
   gap: 36px;
   border-bottom: 1px solid var(--border);
-  padding-bottom: 32px;
+  padding-bottom: 44px;
 }
-.rv-updates-copy .gh-eyebrow { margin-bottom: 6px; }
+.rv-updates-copy .gh-eyebrow { margin-bottom: 8px; }
 .rv-updates-copy h4 {
   color: var(--accent-foreground);
   font-family: var(--font-heading);
   font-size: 1.8rem;
   font-weight: 500;
-  line-height: 1.08;
+  line-height: 1.15;
 }
 .rv-updates-copy > p:last-child {
   max-width: 360px;
-  margin-top: 8px;
+  margin-top: 12px;
   color: var(--muted-foreground);
   font-size: 0.9rem;
-  line-height: 1.55;
+  line-height: 1.6;
 }
 
 .rv-consent {
-  margin-top: 12px;
+  margin-top: 18px;
   display: flex !important;
   align-items: flex-start;
   gap: 11px;
@@ -413,8 +413,8 @@
 }
 
 @media (max-width: 700px) {
-  .rv-end { grid-template-columns: 1fr; gap: 26px; }
-  .rv-updates { grid-template-columns: 1fr; gap: 22px; }
+  .rv-end { grid-template-columns: 1fr; gap: 30px; }
+  .rv-updates { grid-template-columns: 1fr; gap: 26px; }
   .rv-submit { flex-direction: column; }
   .rv-submit .gh-button { width: 100%; }
   .rv-ticket { padding: 34px 22px; }
