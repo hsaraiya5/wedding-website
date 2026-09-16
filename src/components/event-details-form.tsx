@@ -1,7 +1,9 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import { saveEvent } from "@/app/actions/admin";
+import { parseTraditionList } from "@/lib/parse-admin-lists";
+import { EventFlipCards } from "@/components/event-flip-cards";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -49,6 +51,34 @@ export function EventDetailsForm({ event }: { event: Event }) {
     .map((item) => `${item.label}: ${item.text}`)
     .join("\n");
 
+  // Mirrors the fields the itinerary flip-card actually renders, so the
+  // preview updates live as the admin types instead of only after saving.
+  const [name, setName] = useState(event.name);
+  const [eventDate, setEventDate] = useState(event.event_date ?? "");
+  const [startTime, setStartTime] = useState(event.start_time ?? "");
+  const [endTime, setEndTime] = useState(event.end_time ?? "");
+  const [mealInfo, setMealInfo] = useState(event.meal_info ?? "");
+  const [subtitle, setSubtitle] = useState(itinerary?.subtitle ?? "");
+  const [traditionIntro, setTraditionIntro] = useState(itinerary?.tradition_intro ?? "");
+  const [traditionListRaw, setTraditionListRaw] = useState(traditionListText);
+
+  const previewEvent = {
+    id: event.id,
+    name: name || "Untitled event",
+    event_date: eventDate || null,
+    start_time: startTime || null,
+    end_time: endTime || null,
+    meal_info: mealInfo || null,
+    description: event.description,
+    extra_content: {
+      itinerary: {
+        subtitle,
+        tradition_intro: traditionIntro,
+        tradition_list: parseTraditionList(traditionListRaw),
+      },
+    },
+  };
+
   return (
     <form action={formAction} className="flex flex-col gap-8">
       <input type="hidden" name="event_id" value={event.id} />
@@ -58,21 +88,45 @@ export function EventDetailsForm({ event }: { event: Event }) {
 
         <div className="av-field">
           <Label htmlFor="name">Name</Label>
-          <Input id="name" name="name" defaultValue={event.name} required />
+          <Input
+            id="name"
+            name="name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+          />
         </div>
 
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
           <div className="av-field">
             <Label htmlFor="event_date">Date</Label>
-            <Input id="event_date" name="event_date" type="date" defaultValue={event.event_date ?? ""} />
+            <Input
+              id="event_date"
+              name="event_date"
+              type="date"
+              value={eventDate}
+              onChange={(e) => setEventDate(e.target.value)}
+            />
           </div>
           <div className="av-field">
             <Label htmlFor="start_time">Start time</Label>
-            <Input id="start_time" name="start_time" type="time" defaultValue={event.start_time ?? ""} />
+            <Input
+              id="start_time"
+              name="start_time"
+              type="time"
+              value={startTime}
+              onChange={(e) => setStartTime(e.target.value)}
+            />
           </div>
           <div className="av-field">
             <Label htmlFor="end_time">End time</Label>
-            <Input id="end_time" name="end_time" type="time" defaultValue={event.end_time ?? ""} />
+            <Input
+              id="end_time"
+              name="end_time"
+              type="time"
+              value={endTime}
+              onChange={(e) => setEndTime(e.target.value)}
+            />
           </div>
         </div>
 
@@ -94,7 +148,12 @@ export function EventDetailsForm({ event }: { event: Event }) {
           </div>
           <div className="av-field">
             <Label htmlFor="meal_info">Meal</Label>
-            <Input id="meal_info" name="meal_info" defaultValue={event.meal_info ?? ""} />
+            <Input
+              id="meal_info"
+              name="meal_info"
+              value={mealInfo}
+              onChange={(e) => setMealInfo(e.target.value)}
+            />
           </div>
         </div>
 
@@ -110,42 +169,57 @@ export function EventDetailsForm({ event }: { event: Event }) {
         </div>
       </div>
 
-      <div className="flex flex-col gap-5 border-t border-border pt-6">
-        <div>
-          <h3 className="av-section-title">Itinerary card</h3>
-          <p className="av-section-hint">Shown on the flip-card in the Itinerary section.</p>
+      <div className="flex flex-col gap-8 border-t border-border pt-6 lg:flex-row">
+        <div className="flex flex-1 flex-col gap-5">
+          <div>
+            <h3 className="av-section-title">Itinerary card</h3>
+            <p className="av-section-hint">Shown on the flip-card in the Itinerary section.</p>
+          </div>
+
+          <div className="av-field">
+            <Label htmlFor="itinerary_subtitle">Subtitle</Label>
+            <Input
+              id="itinerary_subtitle"
+              name="itinerary_subtitle"
+              value={subtitle}
+              onChange={(e) => setSubtitle(e.target.value)}
+              placeholder="e.g. A bright beginning."
+            />
+          </div>
+
+          <div className="av-field">
+            <Label htmlFor="itinerary_tradition_intro">Tradition</Label>
+            <Textarea
+              id="itinerary_tradition_intro"
+              name="itinerary_tradition_intro"
+              value={traditionIntro}
+              onChange={(e) => setTraditionIntro(e.target.value)}
+              rows={3}
+            />
+          </div>
+
+          <div className="av-field">
+            <Label htmlFor="itinerary_tradition_list">What to expect</Label>
+            <Textarea
+              id="itinerary_tradition_list"
+              name="itinerary_tradition_list"
+              value={traditionListRaw}
+              onChange={(e) => setTraditionListRaw(e.target.value)}
+              rows={4}
+              placeholder={"One item per line, as Label: text\ne.g.\nThe atmosphere: Music, laughter, and plenty of yellow."}
+            />
+            <p className="av-section-hint">One item per line, as &quot;Label: text&quot;.</p>
+          </div>
         </div>
 
-        <div className="av-field">
-          <Label htmlFor="itinerary_subtitle">Subtitle</Label>
-          <Input
-            id="itinerary_subtitle"
-            name="itinerary_subtitle"
-            defaultValue={itinerary?.subtitle ?? ""}
-            placeholder="e.g. A bright beginning."
-          />
-        </div>
-
-        <div className="av-field">
-          <Label htmlFor="itinerary_tradition_intro">Tradition</Label>
-          <Textarea
-            id="itinerary_tradition_intro"
-            name="itinerary_tradition_intro"
-            defaultValue={itinerary?.tradition_intro ?? ""}
-            rows={3}
-          />
-        </div>
-
-        <div className="av-field">
-          <Label htmlFor="itinerary_tradition_list">What to expect</Label>
-          <Textarea
-            id="itinerary_tradition_list"
-            name="itinerary_tradition_list"
-            defaultValue={traditionListText}
-            rows={4}
-            placeholder={"One item per line, as Label: text\ne.g.\nThe atmosphere: Music, laughter, and plenty of yellow."}
-          />
-          <p className="av-section-hint">One item per line, as &quot;Label: text&quot;.</p>
+        <div className="flex flex-1 flex-col gap-3">
+          <div>
+            <h3 className="av-section-title">Preview</h3>
+            <p className="av-section-hint">Updates live. Select the card to see the back.</p>
+          </div>
+          <div className="av-preview-grid">
+            <EventFlipCards events={[previewEvent]} />
+          </div>
         </div>
       </div>
 

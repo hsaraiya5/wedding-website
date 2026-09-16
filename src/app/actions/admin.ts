@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { parsePalette, parseTraditionList } from "@/lib/parse-admin-lists";
 
 export type ActionState = { error: string | null };
 
@@ -251,37 +252,6 @@ export async function saveGuestInvitations(
 
   revalidatePath(`/admin/households/${householdId}`);
   revalidatePath("/admin");
-}
-
-// Parses the wardrobe form's palette textarea -- one "Name: #hexcode" per
-// line -- into the array shape WardrobePlanner expects. A plain textarea
-// with a documented format is simpler than a repeating color-picker UI,
-// and gives admins full control (any number of swatches, easy to reorder)
-// without extra client-side plumbing.
-function parsePalette(raw: string): { name: string; hex: string }[] {
-  return raw
-    .split("\n")
-    .map((line) => line.trim())
-    .filter(Boolean)
-    .map((line) => {
-      const [name, hex] = line.split(":").map((part) => part.trim());
-      return { name: name || "Color", hex: hex || "#000000" };
-    })
-    .filter((color) => /^#[0-9a-fA-F]{3,8}$/.test(color.hex));
-}
-
-// Parses the itinerary form's "what to expect" textarea -- one "Label:
-// text" per line -- same convention as parsePalette above.
-function parseTraditionList(raw: string): { label: string; text: string }[] {
-  return raw
-    .split("\n")
-    .map((line) => line.trim())
-    .filter(Boolean)
-    .map((line) => {
-      const [label, ...rest] = line.split(":");
-      return { label: label.trim(), text: rest.join(":").trim() };
-    })
-    .filter((item) => item.label && item.text);
 }
 
 export async function saveEvent(_prevState: ActionState, formData: FormData): Promise<ActionState> {

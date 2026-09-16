@@ -117,6 +117,11 @@
 .av-section-title { font-family: var(--font-heading); font-size: 1.25rem; }
 .av-section-hint { font-size: 0.8rem; color: var(--muted-foreground); }
 
+/* Constrains the (guest-site) itinerary flip-card grid to a single narrow
+   column when it's reused here as a live preview -- the grid otherwise
+   always reserves two columns, which looks lopsided with just one card. */
+.av-preview-grid .ef-grid { grid-template-columns: minmax(0, 1fr); max-width: 420px; }
+
 /* A single label+field block, consistent vertical rhythm across every
    admin form. */
 .av-field { display: flex; flex-direction: column; gap: 6px; }
