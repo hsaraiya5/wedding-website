@@ -180,7 +180,9 @@
   inset: 7%;
   z-index: 2;
   display: grid;
-  place-items: center;
+  justify-items: center;
+  align-content: start;
+  padding-top: 8%;
   overflow: hidden;
   background: #fffaf0 var(--ie-hero-art) center / 100% 100% no-repeat;
   border: 1px solid rgba(113, 43, 49, 0.15);
@@ -199,7 +201,6 @@
   z-index: 1;
   width: min(760px, 66%);
   min-width: 0;
-  container-type: inline-size;
   display: grid;
   justify-items: center;
   text-align: center;
@@ -222,14 +223,12 @@
   margin-top: 10px;
   color: #712b31;
   font-family: var(--font-script);
-  /* Scales down for longer names so "Welcome, <Household>" tends to fit
-     on one line regardless of length, instead of overflowing or getting
-     clipped -- --ie-welcome-chars is set inline from the actual text
-     length. cqi resolves against .ie-insert-copy's container width
-     (container-type: inline-size above), so this also adapts to the
-     card's own responsive size. white-space is still allowed to wrap
-     below as a fallback for names too long to shrink further. */
-  font-size: clamp(1.6rem, calc(190cqi / max(var(--ie-welcome-chars, 20), 14)), 3.9rem);
+  /* Default/SSR fallback before JS measures the real text width via
+     canvas and sets an inline font-size (see InviteEntrance) -- that
+     measurement is what actually makes "Welcome, <Household>" fill the
+     card regardless of name length; this clamp only covers the brief
+     window before that effect runs. */
+  font-size: clamp(1.6rem, 5vw, 3.9rem);
   line-height: 1.12;
   text-align: center;
   text-shadow: 0 2px 0 rgba(255, 255, 255, 0.72), 0 12px 30px rgba(113, 43, 49, 0.16);
