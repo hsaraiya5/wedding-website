@@ -42,7 +42,7 @@ export async function redeemInviteCode(
 
   if (error || !data || data.length === 0) {
     return {
-      error: "That code doesn't look right. Double-check it and try again.",
+      error: "That code did not work. Check the invitation and try again.",
       householdName: null,
     };
   }

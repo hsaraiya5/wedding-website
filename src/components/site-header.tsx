@@ -9,13 +9,19 @@ import "./site-header.css";
 const links = [
   { href: "#welcome", label: "Welcome" },
   { href: "#events", label: "Itinerary" },
-  { href: "#travel", label: "Travel" },
-  { href: "#wardrobe", label: "Wardrobe" },
-  { href: "#faq", label: "FAQ" },
+  { href: "#travel", label: "Travel & stay" },
+  { href: "#wardrobe", label: "Wardrobe planner" },
+  { href: "#faq", label: "Questions" },
   { href: "#rsvp", label: "RSVP" },
 ];
 
-export function SiteHeader({ weddingStartIso }: { weddingStartIso: string | null }) {
+export function SiteHeader({
+  weddingStartIso,
+  rsvpSubmitted,
+}: {
+  weddingStartIso: string | null;
+  rsvpSubmitted: boolean;
+}) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [activeId, setActiveId] = useState("welcome");
   const weddingStart = weddingStartIso ? new Date(weddingStartIso) : null;
@@ -100,7 +106,7 @@ export function SiteHeader({ weddingStartIso }: { weddingStartIso: string | null
           </a>
           <div className="sh-actions">
             <a href="#rsvp" className="sh-rsvp">
-              RSVP
+              {rsvpSubmitted ? "Your RSVP" : "RSVP"}
             </a>
             <button
               type="button"
@@ -163,7 +169,7 @@ export function SiteHeader({ weddingStartIso }: { weddingStartIso: string | null
                 tabIndex={menuOpen ? 0 : -1}
                 className={cn(activeId === link.href.slice(1) && "sh-active")}
               >
-                {link.label}
+                {link.href === "#rsvp" && rsvpSubmitted ? "Your RSVP" : link.label}
               </a>
             ))}
           </nav>
