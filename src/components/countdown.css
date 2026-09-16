@@ -1,11 +1,10 @@
 /*
   Ported from the design handoff's ".flip-unit"/".flip-value"/".flip-label"
-  -- individually boxed digit units with a card look. The handoff drives
-  these with a real 3D flip transition on digit change; that animation is
-  deliberately not built here yet (tracked as separate follow-up), but the
-  static box sizing/typography/spacing should still match so the countdown
-  doesn't read as a smaller, generic widget next to everything else that
-  has been ported. Classes prefixed cd- to avoid collisions.
+  -- individually boxed digit units with a card look and a real 3D flip
+  transition on digit change (".flip-static-top/bottom" stay put; the
+  ".flip-panel-top/bottom" pair rotates away/in on top, driven by the
+  cd-flipping class countdown.tsx toggles). Classes prefixed cd- to avoid
+  collisions.
 
   Two variants: the default (used in the header's menu overlay, matching
   the handoff's base ".flip-unit" size) and "cd-main" (used on the Home
@@ -43,10 +42,11 @@
   text-align: center;
 }
 .cd-value {
+  display: block;
+  position: relative;
+  overflow: hidden;
+  width: 100%;
   min-height: 55px;
-  display: grid;
-  place-items: center;
-  background: linear-gradient(to bottom, #fffdf6 0 49.5%, #eadfd5 49.5% 50.5%, #fffaf0 50.5% 100%);
   color: var(--accent-foreground);
   font-family: var(--font-heading);
   /* Same reasoning as the cd-main rule below: "00" measures about 1.43x the
@@ -55,6 +55,82 @@
   font-size: min(2rem, 55cqw);
   line-height: 1;
   font-variant-numeric: tabular-nums;
+}
+.cd-value::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: 50%;
+  left: 0;
+  z-index: 5;
+  height: 1px;
+  background: rgba(113, 43, 49, 0.16);
+  pointer-events: none;
+}
+
+/* Each half-height layer clips a "cd-layer-inner" sized to the full
+   (200%-of-layer) value box, positioned so it sits exactly where the digit
+   would render if centered in that full box -- only the layer's own half
+   ends up visible, i.e. a clean top/bottom split of one centered glyph. */
+.cd-layer {
+  position: absolute;
+  right: 0;
+  left: 0;
+  height: 50%;
+  overflow: hidden;
+  color: inherit;
+  font: inherit;
+  line-height: inherit;
+  backface-visibility: hidden;
+}
+.cd-layer-inner {
+  position: absolute;
+  right: 0;
+  left: 0;
+  height: 200%;
+  display: grid;
+  place-items: center;
+}
+.cd-static-top,
+.cd-panel-top { top: 0; transform-origin: center bottom; }
+.cd-static-bottom,
+.cd-panel-bottom { bottom: 0; transform-origin: center top; }
+.cd-static-top .cd-layer-inner,
+.cd-panel-top .cd-layer-inner { top: 0; }
+.cd-static-bottom .cd-layer-inner,
+.cd-panel-bottom .cd-layer-inner { bottom: 0; }
+.cd-static-top { z-index: 1; background: #fffdf6; }
+.cd-static-bottom { z-index: 1; background: #eadfd5; }
+.cd-panel-top {
+  z-index: 4;
+  opacity: 0;
+  background: #fffdf6;
+  transform: perspective(320px) rotateX(0);
+}
+.cd-panel-bottom {
+  z-index: 3;
+  opacity: 0;
+  background: #eadfd5;
+  transform: perspective(320px) rotateX(90deg);
+}
+.cd-value.cd-flipping .cd-panel-top {
+  animation: cd-flip-top-panel 280ms cubic-bezier(0.55, 0.06, 0.68, 0.19) both;
+}
+.cd-value.cd-flipping .cd-panel-bottom {
+  animation: cd-flip-bottom-panel 300ms cubic-bezier(0.22, 0.61, 0.36, 1) 280ms both;
+}
+@keyframes cd-flip-top-panel {
+  0% { opacity: 1; transform: perspective(320px) rotateX(0); }
+  99% { opacity: 1; }
+  100% { opacity: 0; transform: perspective(320px) rotateX(-90deg); }
+}
+@keyframes cd-flip-bottom-panel {
+  0% { opacity: 1; transform: perspective(320px) rotateX(90deg); }
+  100% { opacity: 1; transform: perspective(320px) rotateX(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cd-value.cd-flipping .cd-panel-top,
+  .cd-value.cd-flipping .cd-panel-bottom { animation: none; opacity: 0; }
 }
 .cd-label {
   display: block;
