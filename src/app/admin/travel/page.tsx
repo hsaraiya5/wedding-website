@@ -26,7 +26,7 @@ export default async function AdminTravelPage() {
   const { data: travelOptions } = await supabase
     .from("travel_options")
     .select("*")
-    .order("type")
+    .order("sort_order")
     .order("name");
 
   return (

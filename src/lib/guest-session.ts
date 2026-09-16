@@ -36,6 +36,7 @@ export type GuestContext = {
     address: string | null;
     booking_details: string | null;
     booking_link: string | null;
+    sort_order: number;
   }[];
   faqs: { id: string; question: string; answer: string; order_index: number }[];
   whatsapp_numbers: { id: string; phone_number: string }[];

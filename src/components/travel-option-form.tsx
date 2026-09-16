@@ -17,6 +17,7 @@ type TravelOption = {
   address: string | null;
   booking_details: string | null;
   booking_link: string | null;
+  sort_order: number;
 } | null;
 
 export function TravelOptionForm({ travelOption }: { travelOption: TravelOption }) {
@@ -86,6 +87,17 @@ export function TravelOptionForm({ travelOption }: { travelOption: TravelOption 
       <div className="av-field">
         <Label htmlFor="description">Description</Label>
         <Textarea id="description" name="description" defaultValue={travelOption?.description ?? ""} rows={3} />
+      </div>
+
+      <div className="av-field">
+        <Label htmlFor="sort_order">Order</Label>
+        <Input
+          id="sort_order"
+          name="sort_order"
+          type="number"
+          defaultValue={travelOption?.sort_order ?? 0}
+        />
+        <p className="av-section-hint">Lower numbers show first. Hotels with the same order fall back to name.</p>
       </div>
 
       {state.error ? <p className="text-sm text-destructive">{state.error}</p> : null}

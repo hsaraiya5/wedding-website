@@ -330,6 +330,8 @@ export async function saveTravelOption(
   const address = String(formData.get("address") ?? "").trim() || null;
   const bookingDetails = String(formData.get("booking_details") ?? "").trim() || null;
   const bookingLink = String(formData.get("booking_link") ?? "").trim() || null;
+  const sortOrderRaw = String(formData.get("sort_order") ?? "").trim();
+  const sortOrder = sortOrderRaw ? Number.parseInt(sortOrderRaw, 10) : 0;
 
   if (!name) {
     return { error: "Name is required." };
@@ -349,6 +351,7 @@ export async function saveTravelOption(
     p_address: address,
     p_booking_details: bookingDetails,
     p_booking_link: bookingLink,
+    p_sort_order: Number.isNaN(sortOrder) ? 0 : sortOrder,
   });
 
   if (error) {
