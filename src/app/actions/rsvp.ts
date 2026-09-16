@@ -29,7 +29,7 @@ export async function submitRsvp(
   const songRequest = String(formData.get("song_request") ?? "").trim() || null;
   const whatsappNumbersRaw = String(formData.get("whatsapp_numbers") ?? "");
 
-  let whatsappNumbers: { phone_number: string; label: string }[] = [];
+  let whatsappNumbers: { phone_number: string }[] = [];
   try {
     whatsappNumbers = JSON.parse(whatsappNumbersRaw || "[]");
   } catch {

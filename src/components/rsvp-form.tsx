@@ -20,7 +20,7 @@ type Household = {
   hotel_covered_by_host: boolean;
 };
 
-type WhatsappNumber = { id: string; phone_number: string; label: string | null };
+type WhatsappNumber = { id: string; phone_number: string };
 
 type Guest = { id: string; first_name: string; last_name: string };
 
@@ -111,19 +111,18 @@ export function RsvpForm({
 
   const [answers, setAnswers] = useState(initialAnswers);
   const [songRequest, setSongRequest] = useState(household.song_request ?? "");
-  const [phoneNumbers, setPhoneNumbers] = useState<{ phone_number: string; label: string }[]>(
+  const [phoneNumbers, setPhoneNumbers] = useState<{ phone_number: string }[]>(
     whatsappNumbers.length > 0
-      ? whatsappNumbers.map((n) => ({ phone_number: n.phone_number, label: n.label ?? "" }))
-      : [{ phone_number: "", label: "" }]
+      ? whatsappNumbers.map((n) => ({ phone_number: n.phone_number }))
+      : [{ phone_number: "" }]
   );
 
-  const updatePhoneNumber = (index: number, field: "phone_number" | "label", value: string) => {
+  const updatePhoneNumber = (index: number, value: string) => {
     setPhoneNumbers((prev) =>
-      prev.map((entry, i) => (i === index ? { ...entry, [field]: value } : entry))
+      prev.map((entry, i) => (i === index ? { ...entry, phone_number: value } : entry))
     );
   };
-  const addPhoneNumber = () =>
-    setPhoneNumbers((prev) => [...prev, { phone_number: "", label: "" }]);
+  const addPhoneNumber = () => setPhoneNumbers((prev) => [...prev, { phone_number: "" }]);
   const removePhoneNumber = (index: number) =>
     setPhoneNumbers((prev) => prev.filter((_, i) => i !== index));
 
@@ -155,7 +154,7 @@ export function RsvpForm({
 
   const whatsappNumbersArray = phoneNumbers
     .filter((entry) => entry.phone_number.trim())
-    .map((entry) => ({ phone_number: entry.phone_number.trim(), label: entry.label.trim() }));
+    .map((entry) => ({ phone_number: entry.phone_number.trim() }));
 
   return (
     <Section id="rsvp" className="rv-section">
@@ -377,17 +376,7 @@ export function RsvpForm({
                           autoComplete="tel"
                           placeholder="(555) 123-4567"
                           value={entry.phone_number}
-                          onChange={(event) => updatePhoneNumber(index, "phone_number", event.target.value)}
-                        />
-                      </div>
-                      <div className="flex-1">
-                        <Label htmlFor={`phone_label_${index}`}>Whose number? (optional)</Label>
-                        <input
-                          id={`phone_label_${index}`}
-                          type="text"
-                          placeholder="e.g. Mom"
-                          value={entry.label}
-                          onChange={(event) => updatePhoneNumber(index, "label", event.target.value)}
+                          onChange={(event) => updatePhoneNumber(index, event.target.value)}
                         />
                       </div>
                       {phoneNumbers.length > 1 ? (

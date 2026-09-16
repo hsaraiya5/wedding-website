@@ -17,7 +17,7 @@ type Guest = {
   rsvps: { event_id: string; attending: "yes" | "no" | null }[];
 };
 
-type WhatsappNumber = { phone_number: string; label: string | null };
+type WhatsappNumber = { phone_number: string };
 
 type Household = {
   id: string;
@@ -155,9 +155,7 @@ export function HouseholdsTable({ households }: { households: Household[] }) {
                 {household.household_whatsapp_numbers.length > 0 ? (
                   <p className="text-xs text-muted-foreground">
                     WhatsApp:{" "}
-                    {household.household_whatsapp_numbers
-                      .map((n) => (n.label ? `${n.phone_number} (${n.label})` : n.phone_number))
-                      .join(", ")}
+                    {household.household_whatsapp_numbers.map((n) => n.phone_number).join(", ")}
                   </p>
                 ) : null}
 
