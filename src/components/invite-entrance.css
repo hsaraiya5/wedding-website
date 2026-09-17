@@ -379,16 +379,27 @@
   .ie-access { padding: 16px; }
   .ie-card-shell {
     width: min(420px, 92vw);
-    height: min(640px, 88svh);
+    /* Shorter than the earlier 640px/88svh: that height, combined with
+       the now-narrow width, made the card read as an oddly tall,
+       dominating slab instead of an invitation card. */
+    height: min(560px, 78svh);
     aspect-ratio: auto;
   }
   .ie-front,
   .ie-back { overflow-y: auto; }
   .ie-copy { width: min(420px, 92%); padding: 28px 20px; }
   .ie-copy .ie-code-form { margin-top: 20px; }
+  /* The floral art's background-size: 100% 100% on the desktop card is
+     deliberate -- the card's aspect-ratio is authored to match the
+     art's own, so it fills edge-to-edge with no crop. Once the card
+     drops that aspect-ratio for a taller mobile box, the same stretch
+     distorts the floral pattern noticeably; cover crops instead of
+     warping it. */
+  .ie-front::before,
+  .ie-insert { background-size: cover; }
 }
 
 @media (max-width: 400px) {
-  .ie-card-shell { height: min(600px, 90svh); }
+  .ie-card-shell { height: min(560px, 80svh); }
   .ie-copy h1 { font-size: 2.1rem; }
 }

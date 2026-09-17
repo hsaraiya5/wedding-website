@@ -296,4 +296,9 @@
   .sh-overlay-panel { padding: 66px 26px 26px; }
   .sh-overlay-panel::after { width: 220px; height: 250px; background-size: auto 250px; }
   .sh-overlay-nav a { font-size: 2rem; padding: 8px 0; }
+  /* The nav list itself is the point of this menu on a phone -- the
+     countdown is already front and center on the page underneath, so
+     repeating it here just adds scroll length to a menu that should
+     be a quick jump-to-section list. */
+  .sh-overlay-countdown { display: none; }
 }
