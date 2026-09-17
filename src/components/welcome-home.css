@@ -31,6 +31,14 @@
   min-height: 280px;
   background: var(--background);
   container-type: inline-size;
+  /* Below the 781px two-column tier this stacks single-column, and
+     "Welcome, <household>" reading before the date/venue placard makes
+     more sense scrolling down a phone than the reverse (the handoff's
+     own DOM order, tuned for a side-by-side desktop layout where
+     "before/after" isn't really felt the same way). Reset once the
+     two-column layout kicks in, where DOM order should drive which
+     column each lands in as normal. */
+  order: 2;
 }
 .wh-art::before {
   content: "";
@@ -106,6 +114,7 @@
   display: grid;
   place-items: center;
   min-width: 0;
+  order: 1;
   padding: 52px 22px 64px;
 }
 .wh-panel::after {
@@ -239,8 +248,8 @@
     min-height: calc(100svh - 79px);
     grid-template-columns: minmax(330px, 0.72fr) minmax(0, 1.28fr);
   }
-  .wh-art { min-height: 0; }
-  .wh-panel { padding: 42px 5%; }
+  .wh-art { min-height: 0; order: initial; }
+  .wh-panel { padding: 42px 5%; order: initial; }
   .wh-title { font-size: 3.15rem; }
   .wh-message { margin-top: 14px; font-size: 1rem; }
   .wh-home .cd-root.cd-main { margin-top: 20px; }
