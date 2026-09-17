@@ -365,7 +365,30 @@
 @keyframes ie-write-welcome { to { clip-path: inset(0 0 0 0); } }
 @keyframes ie-draw-flourish { to { transform: scaleX(1); } }
 
+/* Below 640px the desktop card's fixed 1672:941 landscape aspect-ratio
+   stops working: width shrinks to fit the viewport but height shrinks
+   proportionally with it, and .ie-front's overflow: hidden silently
+   clips the copy -- on a narrow phone the code form (the whole point of
+   this screen) renders completely off the visible card, unreachable.
+   Below this width the card switches to an explicit, generous height
+   instead of an aspect-ratio, sized to comfortably fit the front face's
+   content; overflow-y: auto is a safety net for anything that still
+   doesn't fit (a long error message, an unusually tall system font)
+   rather than silently clipping again. */
 @media (max-width: 640px) {
-  .ie-copy { width: min(660px, 90%); padding: 20px; }
   .ie-access { padding: 16px; }
+  .ie-card-shell {
+    width: min(420px, 92vw);
+    height: min(640px, 88svh);
+    aspect-ratio: auto;
+  }
+  .ie-front,
+  .ie-back { overflow-y: auto; }
+  .ie-copy { width: min(420px, 92%); padding: 28px 20px; }
+  .ie-copy .ie-code-form { margin-top: 20px; }
+}
+
+@media (max-width: 400px) {
+  .ie-card-shell { height: min(600px, 90svh); }
+  .ie-copy h1 { font-size: 2.1rem; }
 }
