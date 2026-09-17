@@ -28,6 +28,15 @@
    shrink-wraps to that floor and the whole row collapses to a few px --
    the same failure mode as the cd-main grid earlier in this file. */
 .cd-units { margin-top: 10px; display: flex; flex-wrap: nowrap; justify-content: center; width: 100%; gap: 10px; }
+/* Shrinking degrades smoothly down to a point, but below it the label
+   text itself (fixed-size, no floor) just gets clipped -- "Minutes"
+   needed more width than a 5-unit row had left on a narrow phone, and
+   the box shrank right past the label instead of wrapping. Below 480px,
+   wrap into rows of up to 3 (doubling each box's width) instead. */
+@media (max-width: 480px) {
+  .cd-units { flex-wrap: wrap; row-gap: 12px; }
+  .cd-unit { flex: 0 1 calc(33.333% - 7px); }
+}
 .cd-unit {
   flex: 1 1 96px;
   min-width: 0;
@@ -161,6 +170,16 @@
 @media (max-width: 780px) {
   .cd-root.cd-main .cd-units { gap: 8px; }
   .cd-root.cd-main .cd-value { min-height: 76px; }
+}
+
+/* Six units (five without Seconds) in one row stops working below
+   ~480px: each box's own font-size already shrinks to fit its digits
+   (min(<size>, 55cqw)), but the label below it is a fixed size and just
+   gets clipped -- "SECONDS" needed 66px of text in a 46px box on a
+   375-390px phone. Two rows of up to 3 doubles each unit's width instead
+   of shrinking the label further, so the label stays fully readable. */
+@media (max-width: 480px) {
+  .cd-root.cd-main .cd-units { grid-template-columns: repeat(3, minmax(0, 1fr)); row-gap: 14px; }
 }
 
 /* Home page's main countdown reveals with the rest of WelcomeHome's
