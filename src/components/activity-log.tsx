@@ -67,10 +67,17 @@ export function ActivityLog({
       ) : (
         <div className="flex flex-col gap-3">
           {filtered.map(({ row, category: entryCategory, verb, label, actorLabel }) => (
-            <div key={row.id} className="av-household-card">
+            <div
+              key={row.id}
+              className="av-household-card av-log-row"
+              data-actor-type={row.actor_type}
+            >
               <div className="av-household-header">
                 <div>
-                  <p className="av-section-hint">
+                  <p className="av-section-hint flex items-center gap-2">
+                    <span className={`av-actor-badge av-actor-${row.actor_type}`}>
+                      {row.actor_type === "admin" ? "Admin" : row.actor_type === "guest" ? "Guest" : "System"}
+                    </span>
                     {entryCategory} &middot;{" "}
                     {new Date(row.created_at).toLocaleString("en-US", {
                       dateStyle: "medium",

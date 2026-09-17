@@ -200,6 +200,28 @@
 }
 .av-household-card:hover { box-shadow: var(--av-shadow-md); }
 
+/* Activity log: who took the action is the first thing to scan, so it
+   gets both a left border accent and its own badge rather than blending
+   into the rest of the row's text. */
+.av-log-row { border-left-width: 4px; }
+.av-log-row[data-actor-type="admin"] { border-left-color: var(--primary); }
+.av-log-row[data-actor-type="guest"] { border-left-color: var(--muted-foreground); }
+.av-log-row[data-actor-type="system"] { border-left-color: var(--border); }
+
+.av-actor-badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 1px 9px;
+  font-size: 0.68rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+.av-actor-admin { background: var(--primary); color: var(--primary-foreground); }
+.av-actor-guest { background: var(--muted); color: var(--muted-foreground); border: 1px solid var(--border); }
+.av-actor-system { background: transparent; color: var(--muted-foreground); border: 1px solid var(--border); }
+
 .av-household-header {
   display: flex;
   flex-wrap: wrap;
