@@ -8,7 +8,7 @@ import "./site-header.css";
 
 const links = [
   { href: "#welcome", label: "Welcome" },
-  { href: "#events", label: "Itinerary" },
+  { href: "#events", label: "Events" },
   { href: "#travel", label: "Travel & stay" },
   { href: "#wardrobe", label: "Wardrobe planner" },
   { href: "#guest-guide", label: "Guest guide" },

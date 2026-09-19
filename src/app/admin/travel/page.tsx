@@ -4,6 +4,7 @@ import { requireAdminUser } from "@/lib/admin-guard";
 import { NotAuthorized } from "@/components/not-authorized";
 import { DeleteItemButton } from "@/components/delete-item-button";
 import { deleteTravelOption } from "@/app/actions/admin";
+import { TravelCopyForm } from "@/components/travel-copy-form";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -23,11 +24,14 @@ export default async function AdminTravelPage() {
     return <NotAuthorized email={user.email} />;
   }
 
-  const { data: travelOptions } = await supabase
-    .from("travel_options")
-    .select("*")
-    .order("sort_order")
-    .order("name");
+  const [{ data: travelOptions }, { data: siteSettings }] = await Promise.all([
+    supabase.from("travel_options").select("*").order("sort_order").order("name"),
+    supabase
+      .from("site_settings")
+      .select("travel_getting_here_title, travel_getting_here_body, travel_notice_title, travel_notice_body")
+      .eq("id", true)
+      .single(),
+  ]);
 
   return (
     <main className="av-page">
@@ -35,14 +39,23 @@ export default async function AdminTravelPage() {
         &larr; Dashboard
       </Link>
 
+      <div>
+        <p className="text-xs font-bold uppercase tracking-wide text-primary">Travel & stay</p>
+        <h1 className="font-heading text-3xl">Section copy</h1>
+        <p className="av-section-hint">
+          The "getting here" and "book ahead" notices shown above the hotel cards on the wedding
+          site.
+        </p>
+      </div>
+
+      <div className="av-section">
+        <TravelCopyForm copy={siteSettings ?? null} />
+      </div>
+
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <p className="text-xs font-bold uppercase tracking-wide text-primary">Travel & stay</p>
           <h1 className="font-heading text-3xl">Hotels</h1>
-          <p className="av-section-hint">
-            The shuttle note underneath the hotels on the wedding site is fixed copy, not editable
-            here.
-          </p>
         </div>
         <Link href="/admin/travel/new" className={buttonVariants()}>
           New hotel

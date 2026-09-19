@@ -97,7 +97,7 @@ export default async function HomePage({
       <Section id="events">
         <SectionHeading
           eyebrow="Events"
-          title="We are excited for you to celebrate with us for the following events!"
+          title="We are excited for you to join us for the following events!"
           intro="Flip each card to see all the details!"
         />
         {events.length > 0 ? (
@@ -109,22 +109,13 @@ export default async function HomePage({
 
       {travel_options.length > 0 || household.hotel_covered_by_host ? (
         <Section id="travel">
-          <SectionHeading
-            eyebrow="Travel & stay"
-            title={
-              household.hotel_covered_by_host
-                ? "Your stay is already taken care of."
-                : "Two downtown homes for the weekend."
-            }
-            intro={
-              household.hotel_covered_by_host
-                ? "Your room is booked and the cost is covered. We will contact your family personally with every hotel detail, so there is nothing you need to reserve."
-                : "We have reserved two hotel blocks near every celebration. Booking links, rates, and deadlines will be added as soon as the blocks open."
-            }
-          />
           <TravelSection
             travelOptions={travel_options}
             hotelCoveredByHost={household.hotel_covered_by_host}
+            gettingHereTitle={site_settings?.travel_getting_here_title}
+            gettingHereBody={site_settings?.travel_getting_here_body}
+            noticeTitle={site_settings?.travel_notice_title}
+            noticeBody={site_settings?.travel_notice_body}
           />
         </Section>
       ) : null}

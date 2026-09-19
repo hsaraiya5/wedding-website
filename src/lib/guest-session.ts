@@ -28,17 +28,28 @@ export type GuestContext = {
   }[];
   guest_events: { guest_id: string; event_id: string }[];
   rsvps: { guest_id: string; event_id: string; attending: "yes" | "no" | null }[];
-  site_settings: { rsvp_deadline: string | null; late_edits_enabled: boolean } | null;
+  site_settings: {
+    rsvp_deadline: string | null;
+    late_edits_enabled: boolean;
+    travel_getting_here_title: string | null;
+    travel_getting_here_body: string | null;
+    travel_notice_title: string | null;
+    travel_notice_body: string | null;
+  } | null;
   travel_options: {
     id: string;
     type: "hotel-block" | "other-hotel" | "transport";
     name: string;
     label: string | null;
     description: string | null;
-    room_block: string | null;
+    room_types: string | null;
     address: string | null;
-    booking_details: string | null;
+    map_link: string | null;
     booking_link: string | null;
+    parking_info: string | null;
+    distance_from_venue: string | null;
+    checkin_time: string | null;
+    checkout_time: string | null;
     sort_order: number;
   }[];
   faqs: { id: string; question: string; answer: string; order_index: number }[];
