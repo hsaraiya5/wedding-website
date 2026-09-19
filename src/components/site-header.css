@@ -197,9 +197,11 @@
 .sh-overlay.sh-open .sh-overlay-art-inner p { animation: sh-copy-in 520ms ease 620ms both; }
 .sh-overlay-panel {
   position: relative;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
   display: grid;
-  align-content: center;
+  align-content: safe center;
   padding: 72px 12%;
 }
 .sh-overlay-panel::after {
