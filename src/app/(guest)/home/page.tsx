@@ -96,17 +96,9 @@ export default async function HomePage({
 
       <Section id="events">
         <SectionHeading
-          eyebrow="Your itinerary"
-          title={
-            events.length === 4
-              ? "Four celebrations, each with a story."
-              : "Your wedding day, at a glance."
-          }
-          intro={
-            events.length === 4
-              ? "Four celebrations, two joyful days, and every detail gathered in one place."
-              : "Your invitation includes the wedding ceremony and reception, with every detail gathered in one place."
-          }
+          eyebrow="Events"
+          title="We are excited for you to celebrate with us for the following events!"
+          intro="Flip each card to see all the details!"
         />
         {events.length > 0 ? (
           <EventFlipCards events={events} />

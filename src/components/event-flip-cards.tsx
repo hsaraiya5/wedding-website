@@ -188,7 +188,6 @@ export function EventFlipCards({ events, startIndex = 0 }: { events: Event[]; st
                   onClick={() => openCard(event.id)}
                 >
                   <span className="ef-heading">
-                    <span className="ef-number">Event {position + 1}</span>
                     <h3 className="font-heading">{event.name}</h3>
                     {itinerary?.subtitle ? <span className="ef-subtitle">{itinerary.subtitle}</span> : null}
                     <span className="ef-date">{formatEventDayFull(event.event_date)}</span>
@@ -232,7 +231,6 @@ export function EventFlipCards({ events, startIndex = 0 }: { events: Event[]; st
                     <p className="gh-eyebrow" style={{ color: "var(--ef-color)" } as CSSProperties}>
                       What to expect
                     </p>
-                    <span className="ef-number">Event {position + 1}</span>
                   </div>
                   <div className="ef-back-heading">
                     <h3 className="font-heading">{event.name}</h3>
