@@ -5,6 +5,9 @@ import { NotAuthorized } from "@/components/not-authorized";
 import { DeleteItemButton } from "@/components/delete-item-button";
 import { RsvpDeadlineForm } from "@/components/rsvp-deadline-form";
 import { deleteRsvpDeadline } from "@/app/actions/admin";
+import { buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { formatRsvpDeadlineDate } from "@/lib/format";
 
 export const dynamic = "force-dynamic";
 
@@ -50,15 +53,23 @@ export default async function AdminRsvpDatesPage() {
             <div className="av-household-header">
               <div>
                 <p className="av-section-hint">
-                  {rd.deadline ? new Date(rd.deadline).toLocaleDateString() : "No date set"}
+                  {rd.deadline ? formatRsvpDeadlineDate(rd.deadline) : "No date set"}
                 </p>
                 <h2 className="font-heading text-xl">{rd.label}</h2>
               </div>
-              <DeleteItemButton
-                deleteAction={deleteRsvpDeadline}
-                id={rd.id}
-                confirmMessage={`Delete "${rd.label}"? This can't be undone.`}
-              />
+              <div className="flex items-center gap-2">
+                <Link
+                  href={`/admin/rsvp-dates/${rd.id}`}
+                  className={cn(buttonVariants({ variant: "outline", size: "sm" }))}
+                >
+                  Edit
+                </Link>
+                <DeleteItemButton
+                  deleteAction={deleteRsvpDeadline}
+                  id={rd.id}
+                  confirmMessage={`Delete "${rd.label}"? This can't be undone.`}
+                />
+              </div>
             </div>
           </div>
         ))}
