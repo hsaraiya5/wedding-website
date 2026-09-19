@@ -134,8 +134,8 @@ export default async function HomePage({
       <Section id="guest-guide">
         <SectionHeading
           eyebrow="Guest guide"
-          title="A little more Pittsburgh, while you are here."
-          intro="A few favorite places for a walk, an afternoon out, or one very Pittsburgh meal."
+          title="Take some time to explore our favorite spots."
+          intro="Gayathri and Hrishikesh's picks for making the most of your trip."
         />
         <GuestGuide />
       </Section>
