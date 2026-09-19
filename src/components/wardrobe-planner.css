@@ -130,18 +130,53 @@
   background: color-mix(in oklch, var(--wp-wash, var(--accent)), white 78%);
   color: var(--accent-foreground);
 }
-.wp-sketch {
+.wp-garment-stage {
+  position: relative;
   align-self: center;
   width: min(100%, 420px);
-  height: auto;
+  aspect-ratio: 3 / 2;
+  isolation: isolate;
+}
+.wp-watercolor-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
   animation: wp-sketch-in 900ms cubic-bezier(0.2, 0.72, 0.2, 1) 100ms both;
 }
+.wp-watercolor-circle {
+  opacity: 0;
+  transform: scale(0.001);
+  transform-box: fill-box;
+  transform-origin: center;
+  will-change: opacity, transform;
+}
+.sc-section.sc-in-view .wp-watercolor-circle {
+  animation: wp-watercolor-bloom 1750ms cubic-bezier(0.18, 0.76, 0.2, 1) both;
+}
+.sc-section.sc-in-view .wp-watercolor-circle:nth-child(1) { animation-delay: 250ms; }
+.sc-section.sc-in-view .wp-watercolor-circle:nth-child(2) { animation-delay: 1270ms; }
+.sc-section.sc-in-view .wp-watercolor-circle:nth-child(3) { animation-delay: 2290ms; }
+.sc-section.sc-in-view .wp-watercolor-circle:nth-child(4) { animation-delay: 3310ms; }
 @keyframes wp-sketch-in {
   from { opacity: 0; transform: translateY(14px) scale(0.975); }
   to { opacity: 1; transform: translateY(0) scale(1); }
 }
+@keyframes wp-watercolor-bloom {
+  0% { opacity: 0; transform: scale(0.001); }
+  10% { opacity: 0.96; transform: scale(0.08); }
+  72% { opacity: 1; }
+  100% { opacity: 1; transform: scale(1); }
+}
 @media (prefers-reduced-motion: reduce) {
-  .wp-sketch { animation: none; }
+  .wp-watercolor-layer { animation: none; }
+  .wp-watercolor-circle {
+    opacity: 1;
+    transform: scale(1);
+    animation: none !important;
+  }
 }
 .wp-palette { width: 100%; border-top: 1px solid var(--border); padding-top: 18px; }
 .wp-palette-label { color: var(--muted-foreground); font-size: 0.74rem; font-weight: 800; text-transform: uppercase; text-align: center; }
@@ -166,5 +201,5 @@
 
 @media (max-width: 700px) {
   .wp-copy h3 { font-size: 1.9rem; }
-  .wp-sketch { width: min(100%, 320px); }
+  .wp-garment-stage { width: min(100%, 320px); }
 }
