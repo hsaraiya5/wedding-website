@@ -133,6 +133,95 @@
   animation: wh-corner-grow 1300ms cubic-bezier(0.18, 0.78, 0.2, 1) 600ms both;
 }
 
+.wh-bird-flight {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  overflow: hidden;
+  pointer-events: none;
+}
+.wh-flying-bird {
+  position: absolute;
+  top: var(--wh-bird-top);
+  right: var(--wh-bird-entry);
+  width: var(--wh-bird-size);
+  aspect-ratio: 1;
+  opacity: 0;
+  mix-blend-mode: multiply;
+  will-change: opacity, transform;
+}
+.wh-home.wh-ready .wh-flying-bird {
+  animation: wh-bird-cross var(--wh-bird-duration) linear var(--wh-bird-delay) infinite both;
+}
+.wh-bird-sprite {
+  position: absolute;
+  inset: 0;
+  background: url("/pencil-bird-flight-sprite.png") 0 center / 300% 100% no-repeat;
+  animation: wh-bird-flap var(--wh-flap-speed) steps(1, end) var(--wh-flap-delay) infinite;
+  will-change: background-position;
+}
+.wh-flying-bird:nth-child(1) {
+  --wh-bird-top: 7%;
+  --wh-bird-entry: -12%;
+  --wh-bird-size: clamp(84px, 7.6vw, 122px);
+  --wh-bird-duration: 19.5s;
+  --wh-bird-delay: 500ms;
+  --wh-flap-speed: 680ms;
+  --wh-flap-delay: -180ms;
+  --wh-bird-y1: -10px;
+  --wh-bird-y2: 8px;
+  --wh-bird-y3: -5px;
+}
+.wh-flying-bird:nth-child(2) {
+  --wh-bird-top: 29%;
+  --wh-bird-entry: -8%;
+  --wh-bird-size: clamp(66px, 6vw, 96px);
+  --wh-bird-duration: 19.5s;
+  --wh-bird-delay: 1050ms;
+  --wh-flap-speed: 790ms;
+  --wh-flap-delay: -620ms;
+  --wh-bird-y1: 9px;
+  --wh-bird-y2: -13px;
+  --wh-bird-y3: 7px;
+}
+.wh-flying-bird:nth-child(3) {
+  --wh-bird-top: 54%;
+  --wh-bird-entry: -16%;
+  --wh-bird-size: clamp(74px, 6.8vw, 108px);
+  --wh-bird-duration: 19.5s;
+  --wh-bird-delay: 1700ms;
+  --wh-flap-speed: 620ms;
+  --wh-flap-delay: -360ms;
+  --wh-bird-y1: -7px;
+  --wh-bird-y2: 12px;
+  --wh-bird-y3: -9px;
+}
+.wh-flying-bird:nth-child(4) {
+  --wh-bird-top: 72%;
+  --wh-bird-entry: -6%;
+  --wh-bird-size: clamp(58px, 5.4vw, 86px);
+  --wh-bird-duration: 19.5s;
+  --wh-bird-delay: 2450ms;
+  --wh-flap-speed: 860ms;
+  --wh-flap-delay: -140ms;
+  --wh-bird-y1: 12px;
+  --wh-bird-y2: -9px;
+  --wh-bird-y3: 5px;
+}
+@keyframes wh-bird-flap {
+  0%, 32% { background-position: 0 center; }
+  33%, 65% { background-position: 50% center; }
+  66%, 100% { background-position: 100% center; }
+}
+@keyframes wh-bird-cross {
+  0% { opacity: 0; transform: translate3d(0, 0, 0) rotate(0.5deg); }
+  9% { opacity: 0.38; }
+  30% { transform: translate3d(-34vw, var(--wh-bird-y1), 0) rotate(-0.7deg); }
+  61% { opacity: 0.35; transform: translate3d(-76vw, var(--wh-bird-y2), 0) rotate(0.6deg); }
+  86% { opacity: 0.28; transform: translate3d(-112vw, var(--wh-bird-y3), 0) rotate(-0.4deg); }
+  100% { opacity: 0; transform: translate3d(-136vw, 3px, 0) rotate(0.3deg); }
+}
+
 .wh-content { position: relative; z-index: 1; width: min(700px, 100%); text-align: center; }
 .wh-content > .wh-eyebrow,
 .wh-content > .wh-message,
@@ -270,6 +359,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .wh-bird-flight { display: none; }
   .wh-home .wh-art::before,
   .wh-home .wh-panel::after { opacity: 1; clip-path: inset(0); transform: none; animation: none; }
   .wh-home .wh-panel::after { opacity: 0.1; }
