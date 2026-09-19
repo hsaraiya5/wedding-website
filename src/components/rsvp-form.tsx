@@ -368,7 +368,8 @@ export function RsvpForm({
                   <h4>Stay in the loop.</h4>
                   <p>
                     Add one or more phone numbers to join the WhatsApp group for hotel, schedule,
-                    and weekend announcements.
+                    and weekend announcements. Group invites go out closer to the date, so don&apos;t
+                    worry if you don&apos;t see anything right away.
                   </p>
                 </div>
                 <div className="flex flex-col gap-2">
@@ -378,7 +379,8 @@ export function RsvpForm({
                         <Label htmlFor={`phone_number_${index}`}>Phone number</Label>
                         <input
                           id={`phone_number_${index}`}
-                          type="tel"
+                          type="text"
+                          inputMode="tel"
                           autoComplete="tel"
                           placeholder="(555) 123-4567"
                           value={entry.phone_number}
@@ -438,14 +440,14 @@ export function RsvpForm({
                   </div>
                   <div className="rv-needs-field">
                     <Label htmlFor="household_note">
-                      A note for us <small>(optional)</small>
+                      Please leave a note for the couple! <small>(optional)</small>
                     </Label>
                     <Textarea
                       id="household_note"
                       name="household_note"
                       value={householdNote}
                       onChange={(event) => setHouseholdNote(event.target.value)}
-                      placeholder="Anything else you would like us to know"
+                      placeholder="Well wishes, excitement, or anything you'd like to share with us"
                     />
                   </div>
                 </div>
