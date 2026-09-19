@@ -121,6 +121,17 @@
    column when it's reused here as a live preview -- the grid otherwise
    always reserves two columns, which looks lopsided with just one card. */
 .av-preview-grid .ef-grid { grid-template-columns: minmax(0, 1fr); max-width: 420px; }
+.av-preview-grid .ef-grid > .ef-flip:nth-child(odd):nth-last-child(1) { width: auto; justify-self: stretch; }
+.av-preview-grid .hf-grid { grid-template-columns: minmax(0, 1fr); max-width: 420px; }
+.av-preview-grid .hf-grid > .hf-flip:nth-child(odd):nth-last-child(1) { width: auto; justify-self: stretch; }
+
+/* SectionHeading's divider bar and typed intro line only animate in once
+   their ancestor Section scrolls into view on the guest site -- outside
+   that context (this admin preview), they'd otherwise stay permanently
+   invisible/frozen. Force them visible here instead. */
+.av-preview-grid .sc-heading::after { transform: scaleX(1); }
+.av-preview-grid .sc-heading { text-align: left; margin: 0 0 16px; max-width: none; }
+.av-preview-grid .sc-heading::after { margin-left: 0; }
 
 /* A single label+field block, consistent vertical rhythm across every
    admin form. */

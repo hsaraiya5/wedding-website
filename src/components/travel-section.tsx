@@ -1,72 +1,30 @@
+import { SectionHeading } from "@/components/section";
+import { HotelFlipCards, type HotelOption } from "@/components/hotel-flip-cards";
 import "./travel-section.css";
 
-type TravelOption = {
-  id: string;
-  type: "hotel-block" | "other-hotel" | "transport";
-  name: string;
-  label: string | null;
-  description: string | null;
-  room_block: string | null;
-  address: string | null;
-  booking_details: string | null;
-  booking_link: string | null;
-};
+const VENUE_ADDRESS = "Wyndham Grand Pittsburgh Downtown, 600 Commonwealth Place, Pittsburgh, PA 15222";
 
-// Ported from the handoff's ".travel-card.hotel" -- an eyebrow label, name,
-// description, a facts list (room block / address / booking details), and
-// a link out to the hotel's own site.
-function HotelCard({ option }: { option: TravelOption }) {
+// Google's no-API-key "share > embed a map" URL format -- centers on the
+// address and drops its own pin there. No custom pin overlay: a decorative
+// one drawn on top drifts out of place as soon as a guest drags the map,
+// since it isn't wired to the iframe's internal pan/zoom state.
+export function VenueMap() {
+  const mapSrc = `https://www.google.com/maps?q=${encodeURIComponent(VENUE_ADDRESS)}&z=16&output=embed`;
+
   return (
-    <article className="tv-card tv-hotel">
-      <div className="tv-hotel-copy">
-        {option.label ? <p className="gh-eyebrow">{option.label}</p> : null}
-        <h3 className="font-heading">{option.name}</h3>
-        {option.description ? <p>{option.description}</p> : null}
-        {option.booking_link ? (
-          <a className="tv-text-link" href={option.booking_link} target="_blank" rel="noopener noreferrer">
-            View the {option.name} &#8594;
-          </a>
-        ) : null}
-      </div>
-      <ul className="tv-hotel-facts">
-        <li>
-          <span>Room block</span>
-          <strong>{option.room_block || "Coming soon"}</strong>
-        </li>
-        <li>
-          <span>Address</span>
-          <strong>{option.address || "Coming soon"}</strong>
-        </li>
-        <li>
-          <span>Booking details</span>
-          <strong>{option.booking_details || "Coming soon"}</strong>
-        </li>
-      </ul>
-    </article>
+    <div className="tv-map">
+      <iframe
+        src={mapSrc}
+        title="Map to the Wyndham Grand Pittsburgh Downtown"
+        loading="lazy"
+        referrerPolicy="no-referrer-when-downgrade"
+      />
+    </div>
   );
 }
 
-// Ported from the handoff's ".transport-note.shuttle-note" -- always shown
-// (not admin content), with copy that swaps for hosted-stay households,
-// same treatment as other fixed site chrome elsewhere in the app.
-function ShuttleNote({ hotelCoveredByHost }: { hotelCoveredByHost: boolean }) {
-  return (
-    <article className="tv-card tv-shuttle">
-      <div>
-        <p className="gh-eyebrow">During the weekend</p>
-        <h3 className="font-heading">
-          {hotelCoveredByHost
-            ? "Your complete stay plan is coming directly to you."
-            : "Hotel shuttles are provided."}
-        </h3>
-      </div>
-      <p>
-        {hotelCoveredByHost
-          ? "We will include your hotel assignment, check-in instructions, and any shuttle timing in your personal stay details. You do not need to contact either hotel or arrange transportation between our room-block hotels and the wedding events."
-          : "Guests staying at the EVEN Hotel can use our scheduled shuttles to and from the wedding events at the Wyndham. Guests staying at the Wyndham will already be onsite. The full shuttle timetable and pickup location will be posted here closer to the weekend."}
-      </p>
-    </article>
-  );
+export function TravelCopy({ children }: { children: string }) {
+  return <p className="tv-copy">{children}</p>;
 }
 
 // Shown instead of hotel cards when the host is covering the household's
@@ -101,25 +59,60 @@ function HostedStayCard() {
   );
 }
 
+export const DEFAULT_GETTING_HERE_TITLE = "However you're arriving, here's what to know.";
+export const DEFAULT_GETTING_HERE_BODY =
+  "The Wyndham Grand sits right in downtown Pittsburgh, so if you're driving in, please plan for extra time on the road -- Memorial Day weekend traffic downtown can get heavy. If you're flying in, the Wyndham Grand is about 30 minutes from Pittsburgh International Airport; we recommend arranging your own rideshare, taxi, or rental car for the trip into the city.";
+export const DEFAULT_NOTICE_TITLE = "Two hotel blocks, held just for our guests.";
+export const DEFAULT_NOTICE_BODY =
+  "We're so excited to share two hotel blocks for our guests! Downtown Pittsburgh will be busy over Memorial Day weekend, so we've made booking as easy as possible -- just use the link on each hotel card below to reserve your room. A shuttle will run between the EVEN Hotel and the Wyndham Grand to and from every event, and the full schedule will be posted here closer to the weekend. Parking and other hotel details are on the back of each card. Our hotel blocks close on April 27, 2027 -- one month before the wedding -- so please book well ahead of time!";
+
 export function TravelSection({
   travelOptions,
   hotelCoveredByHost = false,
+  gettingHereTitle,
+  gettingHereBody,
+  noticeTitle,
+  noticeBody,
 }: {
-  travelOptions: TravelOption[];
+  travelOptions: HotelOption[];
   hotelCoveredByHost?: boolean;
+  gettingHereTitle?: string | null;
+  gettingHereBody?: string | null;
+  noticeTitle?: string | null;
+  noticeBody?: string | null;
 }) {
   const hotels = travelOptions.filter((t) => t.type === "hotel-block" || t.type === "other-hotel");
 
   if (hotels.length === 0 && !hotelCoveredByHost) return null;
 
   return (
-    <div className="tv-grid">
+    <div className="tv-sections">
+      <div className="tv-subsection">
+        <SectionHeading
+          eyebrow="Getting here"
+          title="Getting to the venue"
+          intro={gettingHereTitle || DEFAULT_GETTING_HERE_TITLE}
+        />
+        <TravelCopy>{gettingHereBody || DEFAULT_GETTING_HERE_BODY}</TravelCopy>
+        <VenueMap />
+      </div>
+
       {hotelCoveredByHost ? (
-        <HostedStayCard />
+        <div className="tv-subsection">
+          <SectionHeading eyebrow="Your stay" title="Your stay is already taken care of." />
+          <TravelCopy>
+            Your room is booked and the cost is covered. We will contact your family personally
+            with every hotel detail, so there is nothing you need to reserve.
+          </TravelCopy>
+          <HostedStayCard />
+        </div>
       ) : (
-        hotels.map((option) => <HotelCard key={option.id} option={option} />)
+        <div className="tv-subsection">
+          <SectionHeading eyebrow="Where to stay" title="Hotels" intro={noticeTitle || DEFAULT_NOTICE_TITLE} />
+          <TravelCopy>{noticeBody || DEFAULT_NOTICE_BODY}</TravelCopy>
+          <HotelFlipCards options={hotels} />
+        </div>
       )}
-      <ShuttleNote hotelCoveredByHost={hotelCoveredByHost} />
     </div>
   );
 }

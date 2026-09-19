@@ -326,10 +326,14 @@ export async function saveTravelOption(
   const name = String(formData.get("name") ?? "").trim();
   const label = String(formData.get("label") ?? "").trim() || null;
   const description = String(formData.get("description") ?? "").trim() || null;
-  const roomBlock = String(formData.get("room_block") ?? "").trim() || null;
+  const roomTypes = String(formData.get("room_types") ?? "").trim() || null;
   const address = String(formData.get("address") ?? "").trim() || null;
-  const bookingDetails = String(formData.get("booking_details") ?? "").trim() || null;
+  const mapLink = String(formData.get("map_link") ?? "").trim() || null;
   const bookingLink = String(formData.get("booking_link") ?? "").trim() || null;
+  const parkingInfo = String(formData.get("parking_info") ?? "").trim() || null;
+  const distanceFromVenue = String(formData.get("distance_from_venue") ?? "").trim() || null;
+  const checkinTime = String(formData.get("checkin_time") ?? "").trim() || null;
+  const checkoutTime = String(formData.get("checkout_time") ?? "").trim() || null;
   const sortOrderRaw = String(formData.get("sort_order") ?? "").trim();
   const sortOrder = sortOrderRaw ? Number.parseInt(sortOrderRaw, 10) : 0;
 
@@ -347,10 +351,14 @@ export async function saveTravelOption(
     p_name: name,
     p_label: label,
     p_description: description,
-    p_room_block: roomBlock,
+    p_room_types: roomTypes,
     p_address: address,
-    p_booking_details: bookingDetails,
+    p_map_link: mapLink,
     p_booking_link: bookingLink,
+    p_parking_info: parkingInfo,
+    p_distance_from_venue: distanceFromVenue,
+    p_checkin_time: checkinTime,
+    p_checkout_time: checkoutTime,
     p_sort_order: Number.isNaN(sortOrder) ? 0 : sortOrder,
   });
 
@@ -375,6 +383,32 @@ export async function deleteTravelOption(travelOptionId: string) {
 
   revalidatePath("/admin/travel");
   revalidatePath("/home");
+}
+
+export async function saveTravelCopy(
+  _prevState: ActionState,
+  formData: FormData
+): Promise<ActionState> {
+  const gettingHereTitle = String(formData.get("getting_here_title") ?? "").trim() || null;
+  const gettingHereBody = String(formData.get("getting_here_body") ?? "").trim() || null;
+  const noticeTitle = String(formData.get("notice_title") ?? "").trim() || null;
+  const noticeBody = String(formData.get("notice_body") ?? "").trim() || null;
+
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("admin_update_travel_copy", {
+    p_getting_here_title: gettingHereTitle,
+    p_getting_here_body: gettingHereBody,
+    p_notice_title: noticeTitle,
+    p_notice_body: noticeBody,
+  });
+
+  if (error) {
+    return { error: "Something went wrong saving this. Please try again." };
+  }
+
+  revalidatePath("/admin/travel");
+  revalidatePath("/home");
+  return { error: null };
 }
 
 export async function saveFaq(_prevState: ActionState, formData: FormData): Promise<ActionState> {
