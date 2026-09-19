@@ -7,7 +7,7 @@ import { Section } from "@/components/section";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
-import { formatEventDay, formatEventTime } from "@/lib/format";
+import { formatEventDay, formatEventTime, formatRsvpDeadlineDate } from "@/lib/format";
 import "./rsvp-section.css";
 import "./site-button.css";
 
@@ -176,8 +176,8 @@ export function RsvpForm({
         <div className="rv-deadline">
           <span>
             Please reply by{" "}
-            {deadline
-              ? deadline.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })
+            {household.rsvp_deadline
+              ? formatRsvpDeadlineDate(household.rsvp_deadline)
               : "date to be announced"}
           </span>
           <span>

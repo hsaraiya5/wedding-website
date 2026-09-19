@@ -3,6 +3,7 @@
 import { useActionState, useState } from "react";
 import { saveHousehold } from "@/app/actions/admin";
 import { GROUP_TAGS } from "@/lib/group-tags";
+import { formatRsvpDeadlineDate } from "@/lib/format";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -106,7 +107,7 @@ export function HouseholdDetailsForm({
               {(value: string | null) => {
                 const rd = rsvpDeadlines.find((d) => d.id === value);
                 if (!rd) return "Select an RSVP date";
-                return rd.deadline ? `${rd.label} (${new Date(rd.deadline).toLocaleDateString()})` : rd.label;
+                return rd.deadline ? `${rd.label} (${formatRsvpDeadlineDate(rd.deadline)})` : rd.label;
               }}
             </SelectValue>
           </SelectTrigger>
@@ -114,7 +115,7 @@ export function HouseholdDetailsForm({
             {rsvpDeadlines.map((rd) => (
               <SelectItem key={rd.id} value={rd.id}>
                 {rd.label}
-                {rd.deadline ? ` (${new Date(rd.deadline).toLocaleDateString()})` : ""}
+                {rd.deadline ? ` (${formatRsvpDeadlineDate(rd.deadline)})` : ""}
               </SelectItem>
             ))}
           </SelectContent>

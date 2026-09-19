@@ -26,6 +26,32 @@ export function formatIcsDateTime(eventDate: string, time: string): string {
   return date.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
 }
 
+// rsvp_deadlines.deadline is a timestamptz stored as UTC midnight for a
+// bare calendar date (the admin picks "Oct 15", Postgres stores
+// 2026-10-15T00:00:00Z). Formatting it with local-timezone getters shifts
+// the displayed day for anyone west of UTC, so every reader of this column
+// -- admin list, admin edit form, household assignment picker, and the
+// guest RSVP page -- must go through these UTC-based helpers instead.
+export function formatRsvpDeadlineDate(deadline: string | null): string {
+  if (!deadline) return "";
+  const date = new Date(deadline);
+  if (Number.isNaN(date.getTime())) return deadline;
+  return date.toLocaleDateString("en-US", {
+    timeZone: "UTC",
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  });
+}
+
+export function toRsvpDeadlineInputValue(deadline: string): string {
+  const date = new Date(deadline);
+  const year = date.getUTCFullYear();
+  const month = String(date.getUTCMonth() + 1).padStart(2, "0");
+  const day = String(date.getUTCDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
 export function formatEventTime(time: string | null): string {
   if (!time) return "";
   const [hoursStr, minutesStr] = time.split(":");
