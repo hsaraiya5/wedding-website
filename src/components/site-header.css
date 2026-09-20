@@ -324,7 +324,16 @@
 @media (max-width: 700px) {
   .sh-overlay { grid-template-columns: 1fr; }
   .sh-overlay-art { display: none; }
-  .sh-overlay-panel { padding: 66px 22px 32px; }
+  .sh-overlay-panel {
+    padding: 66px 22px 32px;
+    /* The numbered-row mobile nav is much shorter than the plain
+       heading-sized links this "safe center" vertical centering was
+       written for -- centering it left a large dead gap between the
+       close/share buttons (pinned near the real top) and the header
+       block below. Top-aligning starts content right where the padding
+       already clears those buttons. */
+    align-content: start;
+  }
   .sh-overlay-panel::after { width: 220px; height: 250px; background-size: auto 250px; }
 
   .sh-overlay-share { display: flex; }

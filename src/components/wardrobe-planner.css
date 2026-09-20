@@ -203,6 +203,13 @@
   .wp-copy h3 { font-size: 1.9rem; }
   .wp-garment-stage { width: min(100%, 320px); }
 
+  /* The section's own SectionHeading ("Wardrobe planner" / "Plan each
+     look...") already sits directly above this component -- repeating
+     "Wardrobe planner" / "The weekend edit" here (this rail heading was
+     built for the desktop sidebar, where it's the only heading visible)
+     just duplicates it once the tabs move to the top on mobile. */
+  .wp-rail-heading { display: none; }
+
   /* Flatten the 2x2 grid of boxed tab cells (900px tier) into a lighter
      pill/tab-bar look: drop the filled-box active state and the left/top
      accent bar, mark the active tab with an underline instead, and drop

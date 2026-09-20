@@ -59,6 +59,13 @@
   box-shadow: 0 18px 44px rgba(72, 45, 31, 0.1);
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
+  /* iOS Safari has a long-standing bug where backface-visibility: hidden
+     doesn't actually hide the face during the rotateY transform when the
+     same element also has overflow: hidden -- both faces render on top
+     of each other, one mirrored. Forcing this onto its own compositing
+     layer works around it. */
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
 }
 .ef-front { background: color-mix(in srgb, var(--ef-wash) 76%, #fffaf0); pointer-events: auto; }
 .ef-flip.ef-flipped .ef-front { pointer-events: none; }

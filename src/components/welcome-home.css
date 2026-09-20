@@ -124,11 +124,15 @@
 .wh-panel::after {
   content: "";
   position: absolute;
-  right: -38px;
-  bottom: -55px;
-  width: 300px;
-  height: 340px;
-  background: var(--wh-floral-art) right bottom / auto 340px no-repeat;
+  /* Sized small on mobile, where the panel is much narrower than the
+     desktop two-column layout this was tuned for -- at the original
+     300x340 this corner flourish overlapped the countdown grid instead
+     of staying a subtle corner bleed. Grows back at the 701px tier below. */
+  right: -22px;
+  bottom: -30px;
+  width: 160px;
+  height: 180px;
+  background: var(--wh-floral-art) right bottom / auto 180px no-repeat;
   opacity: 0;
   clip-path: inset(100% 0 0);
   pointer-events: none;
@@ -378,6 +382,7 @@
   .wh-art { display: grid; min-height: 340px; }
   .wh-venue-row { display: none; }
   .wh-panel { padding: 64px 32px 72px; }
+  .wh-panel::after { right: -38px; bottom: -55px; width: 300px; height: 340px; background-size: auto 340px; }
   .wh-title { font-size: 3.2rem; }
   .wh-actions { display: flex; }
 }
