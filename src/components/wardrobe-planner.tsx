@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, type CSSProperties, type KeyboardEvent } from "react";
+import { useId, useRef, useState, type CSSProperties, type KeyboardEvent } from "react";
 import { formatEventDayPart, formatEventTime, formatEventWeekday } from "@/lib/format";
 import { designAssets } from "@/lib/design-assets";
 import "./wardrobe-planner.css";
@@ -39,6 +39,70 @@ const garmentSketches = [
   { src: designAssets.wardrobeWedding, alt: "Pencil fashion illustration of a South Indian silk saree and sherwani for the wedding ceremony" },
   { src: designAssets.wardrobeReception, alt: "Pencil fashion illustration of formal Indian eveningwear for the reception" },
 ];
+
+const watercolorSeeds = [7, 11, 17, 23];
+
+function WatercolorSketch({ src, alt, index }: { src: string; alt: string; index: number }) {
+  const baseId = useId().replace(/:/g, "");
+  const titleId = `${baseId}-title`;
+  const pencilFilterId = `${baseId}-pencil-tone`;
+  const edgeFilterId = `${baseId}-watercolor-edge`;
+  const maskId = `${baseId}-watercolor-mask`;
+
+  return (
+    <div className="wp-garment-stage">
+      <svg className="wp-watercolor-layer" viewBox="0 0 1152 768" role="img" aria-labelledby={titleId}>
+        <title id={titleId}>{alt}</title>
+        <defs>
+          <filter id={pencilFilterId} colorInterpolationFilters="sRGB">
+            <feColorMatrix type="saturate" values="0" />
+          </filter>
+          <filter id={edgeFilterId} x="-20%" y="-20%" width="140%" height="140%">
+            <feTurbulence
+              type="fractalNoise"
+              baseFrequency="0.012"
+              numOctaves={2}
+              seed={watercolorSeeds[index % watercolorSeeds.length]}
+              result="noise"
+            />
+            <feDisplacementMap
+              in="SourceGraphic"
+              in2="noise"
+              scale={18}
+              xChannelSelector="R"
+              yChannelSelector="G"
+              result="distorted"
+            />
+            <feGaussianBlur in="distorted" stdDeviation={7} />
+          </filter>
+          <mask id={maskId} maskUnits="userSpaceOnUse" x="0" y="0" width="1152" height="768">
+            <rect width="1152" height="768" fill="#000" />
+            <g fill="#fff" filter={`url(#${edgeFilterId})`}>
+              <circle className="wp-watercolor-circle" cx="330" cy="250" r="270" />
+              <circle className="wp-watercolor-circle" cx="820" cy="570" r="330" />
+              <circle className="wp-watercolor-circle" cx="820" cy="235" r="285" />
+              <circle className="wp-watercolor-circle" cx="350" cy="560" r="1050" />
+            </g>
+          </mask>
+        </defs>
+        <image
+          href={src}
+          width="1152"
+          height="768"
+          preserveAspectRatio="xMidYMid meet"
+          filter={`url(#${pencilFilterId})`}
+        />
+        <image
+          href={src}
+          width="1152"
+          height="768"
+          preserveAspectRatio="xMidYMid meet"
+          mask={`url(#${maskId})`}
+        />
+      </svg>
+    </div>
+  );
+}
 
 export function WardrobePlanner({ events }: { events: Event[] }) {
   const [activeIndex, setActiveIndex] = useState(0);
@@ -130,11 +194,10 @@ export function WardrobePlanner({ events }: { events: Event[] }) {
             className="wp-visual"
             style={{ "--wp-wash": accentColors[activeIndex % accentColors.length] } as CSSProperties}
           >
-            {/* eslint-disable-next-line @next/next/no-img-element -- decorative art on an external Supabase Storage host, not worth Next/Image's config surface for four static files */}
-            <img
-              className="wp-sketch"
+            <WatercolorSketch
               src={garmentSketches[activeIndex % garmentSketches.length].src}
               alt={garmentSketches[activeIndex % garmentSketches.length].alt}
+              index={activeIndex}
             />
             {wardrobe?.palette && wardrobe.palette.length > 0 ? (
               <div className="wp-palette">
