@@ -129,7 +129,7 @@ export function OurStory({
                 style={style}
                 aria-hidden={!active}
               >
-                <figcaption className="os-slide-label">{slide.caption}</figcaption>
+                {slide.caption ? <figcaption className="os-slide-label">{slide.caption}</figcaption> : null}
               </figure>
             );
           })}
