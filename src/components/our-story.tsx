@@ -7,10 +7,8 @@ import "./our-story.css";
 // Placeholder slides using the same botanical/hero art as the rest of the
 // site -- the design handoff's own dev note calls these "polished
 // placeholders" to be swapped for the couple's final 4-5 photographs.
-// Swapping a slide later is a one-line change to `image` (and `size`/
-// `position` if the new photo needs different framing); everything else
-// (captions, carousel behavior) stays put.
-const slides = [
+// Used whenever the admin hasn't uploaded any photos yet (see `photos` prop).
+const DEFAULT_SLIDES = [
   { image: designAssets.hero, size: "cover", position: "center", caption: "From the first hello" },
   { image: designAssets.hero, size: "cover", position: "center", caption: "The adventures in between" },
   { image: designAssets.hero, size: "cover", position: "center", caption: "Our favorite kind of ordinary" },
@@ -18,10 +16,50 @@ const slides = [
   { image: designAssets.hero, size: "auto 118%", position: "right center", caption: "Pittsburgh is next" },
 ];
 
+export const DEFAULT_BODY_1 =
+  "Somewhere between long conversations, shared ambitions, and a growing collection of " +
+  "inside jokes, we found the person who made everyday life feel expansive. We have built a " +
+  "life around curiosity, family, and the kind of laughter that starts before the story is " +
+  "finished.";
+
+export const DEFAULT_BODY_2 =
+  "This weekend is our chance to bring all those worlds together. We cannot wait to welcome " +
+  "the people who have shaped us, celebrate the traditions that hold us, and begin our next " +
+  "chapter surrounded by the people we love most.";
+
 const ADVANCE_MS = 6500;
 
-export function OurStory() {
+export type StoryPhoto = { url: string; caption: string | null };
+
+export function OurStory({
+  bodyOne,
+  bodyTwo,
+  photos,
+}: {
+  bodyOne?: string | null;
+  bodyTwo?: string | null;
+  photos?: StoryPhoto[] | null;
+} = {}) {
+  // Admin-uploaded photos always use the standard centered crop -- the
+  // placeholder set's two asymmetric crops (slides 4/5 above) were framed
+  // for that specific botanical image and don't generalize to arbitrary
+  // uploads.
+  const slides =
+    photos && photos.length > 0
+      ? photos.map((photo) => ({
+          image: photo.url,
+          size: "cover",
+          position: "center",
+          caption: photo.caption ?? "",
+        }))
+      : DEFAULT_SLIDES;
+
   const [activeIndex, setActiveIndex] = useState(0);
+  // Guards against a stale index when `slides` shrinks out from under it --
+  // only reachable in the admin preview, where `photos` can change live as
+  // the admin adds/removes rows (the public site's slide count is fixed per
+  // page load).
+  const safeIndex = activeIndex < slides.length ? activeIndex : 0;
   const carouselRef = useRef<HTMLDivElement>(null);
   const dotRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const timerRef = useRef<number | undefined>(undefined);
@@ -78,7 +116,7 @@ export function OurStory() {
       >
         <div className="os-viewport" aria-live="polite">
           {slides.map((slide, index) => {
-            const active = index === activeIndex;
+            const active = index === safeIndex;
             const style = {
               "--os-image": `url(${slide.image})`,
               "--os-size": slide.size,
@@ -91,7 +129,7 @@ export function OurStory() {
                 style={style}
                 aria-hidden={!active}
               >
-                <figcaption className="os-slide-label">{slide.caption}</figcaption>
+                {slide.caption ? <figcaption className="os-slide-label">{slide.caption}</figcaption> : null}
               </figure>
             );
           })}
@@ -103,7 +141,7 @@ export function OurStory() {
             className="os-arrow"
             aria-label="Previous story photo"
             title="Previous photo"
-            onClick={() => select(activeIndex - 1, false)}
+            onClick={() => select(safeIndex - 1, false)}
           >
             &#8592;
           </button>
@@ -115,8 +153,8 @@ export function OurStory() {
                 role="tab"
                 className="os-dot"
                 aria-label={`Photo ${index + 1} of ${slides.length}`}
-                aria-selected={index === activeIndex}
-                tabIndex={index === activeIndex ? 0 : -1}
+                aria-selected={index === safeIndex}
+                tabIndex={index === safeIndex ? 0 : -1}
                 ref={(node) => {
                   dotRefs.current[index] = node;
                 }}
@@ -130,24 +168,15 @@ export function OurStory() {
             className="os-arrow"
             aria-label="Next story photo"
             title="Next photo"
-            onClick={() => select(activeIndex + 1, false)}
+            onClick={() => select(safeIndex + 1, false)}
           >
             &#8594;
           </button>
         </div>
       </div>
       <div className="os-copy">
-        <p>
-          Somewhere between long conversations, shared ambitions, and a growing collection of
-          inside jokes, we found the person who made everyday life feel expansive. We have built a
-          life around curiosity, family, and the kind of laughter that starts before the story is
-          finished.
-        </p>
-        <p>
-          This weekend is our chance to bring all those worlds together. We cannot wait to welcome
-          the people who have shaped us, celebrate the traditions that hold us, and begin our next
-          chapter surrounded by the people we love most.
-        </p>
+        <p>{bodyOne || DEFAULT_BODY_1}</p>
+        <p>{bodyTwo || DEFAULT_BODY_2}</p>
       </div>
     </>
   );

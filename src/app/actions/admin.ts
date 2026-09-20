@@ -264,6 +264,7 @@ export async function saveEvent(_prevState: ActionState, formData: FormData): Pr
   const address = String(formData.get("address") ?? "").trim() || null;
   const dressCode = String(formData.get("dress_code") ?? "").trim() || null;
   const mealInfo = String(formData.get("meal_info") ?? "").trim() || null;
+  const room = String(formData.get("room") ?? "").trim() || null;
   const description = String(formData.get("description") ?? "").trim() || null;
   const wardrobeTitle = String(formData.get("wardrobe_title") ?? "").trim();
   const wardrobeDescription = String(formData.get("wardrobe_description") ?? "").trim();
@@ -291,6 +292,7 @@ export async function saveEvent(_prevState: ActionState, formData: FormData): Pr
     p_address: address,
     p_dress_code: dressCode,
     p_meal_info: mealInfo,
+    p_room: room,
     p_description: description,
     p_extra_content: {
       wardrobe: {
@@ -449,6 +451,68 @@ export async function deleteFaq(faqId: string) {
 
   revalidatePath("/admin/faq");
   revalidatePath("/home");
+}
+
+const ALLOWED_PHOTO_TYPES = ["image/png", "image/jpeg", "image/webp", "image/gif"];
+const MAX_PHOTO_BYTES = 8 * 1024 * 1024;
+
+export async function saveAboutUs(_prevState: ActionState, formData: FormData): Promise<ActionState> {
+  const bodyOne = String(formData.get("body_one") ?? "").trim() || null;
+  const bodyTwo = String(formData.get("body_two") ?? "").trim() || null;
+  const photoKeys = String(formData.get("photo_keys") ?? "")
+    .split(",")
+    .map((key) => key.trim())
+    .filter(Boolean);
+
+  const supabase = await createClient();
+  const photos: { url: string; caption: string | null }[] = [];
+
+  for (const key of photoKeys) {
+    const file = formData.get(`photo_${key}_file`);
+    const existingUrl = String(formData.get(`photo_${key}_existing_url`) ?? "").trim();
+    const caption = String(formData.get(`photo_${key}_caption`) ?? "").trim() || null;
+
+    let url = existingUrl || null;
+
+    if (file instanceof File && file.size > 0) {
+      if (!ALLOWED_PHOTO_TYPES.includes(file.type)) {
+        return { error: "Photos must be PNG, JPEG, WebP, or GIF images." };
+      }
+      if (file.size > MAX_PHOTO_BYTES) {
+        return { error: "Each photo must be under 8MB." };
+      }
+
+      const extension = file.name.split(".").pop()?.toLowerCase() || "jpg";
+      const path = `about-us/${crypto.randomUUID()}.${extension}`;
+      const { error: uploadError } = await supabase.storage
+        .from("design-assets")
+        .upload(path, file, { contentType: file.type });
+
+      if (uploadError) {
+        return { error: "Something went wrong uploading a photo. Please try again." };
+      }
+
+      url = supabase.storage.from("design-assets").getPublicUrl(path).data.publicUrl;
+    }
+
+    if (url) {
+      photos.push({ url, caption });
+    }
+  }
+
+  const { error } = await supabase.rpc("admin_update_about_us", {
+    p_body_1: bodyOne,
+    p_body_2: bodyTwo,
+    p_photos: photos,
+  });
+
+  if (error) {
+    return { error: "Something went wrong saving this. Please try again." };
+  }
+
+  revalidatePath("/admin/about");
+  revalidatePath("/home");
+  return { error: null };
 }
 
 export async function signOutAdmin() {

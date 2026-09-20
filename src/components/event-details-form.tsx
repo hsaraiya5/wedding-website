@@ -32,6 +32,7 @@ type Event = {
   address: string | null;
   dress_code: string | null;
   meal_info: string | null;
+  room: string | null;
   description: string | null;
   extra_content: { wardrobe?: WardrobeContent; itinerary?: ItineraryContent } | Record<string, unknown>;
 };
@@ -58,6 +59,7 @@ export function EventDetailsForm({ event, eventIndex = 0 }: { event: Event; even
   const [startTime, setStartTime] = useState(event.start_time ?? "");
   const [endTime, setEndTime] = useState(event.end_time ?? "");
   const [mealInfo, setMealInfo] = useState(event.meal_info ?? "");
+  const [room, setRoom] = useState(event.room ?? "");
   const [subtitle, setSubtitle] = useState(itinerary?.subtitle ?? "");
   const [traditionIntro, setTraditionIntro] = useState(itinerary?.tradition_intro ?? "");
   const [traditionListRaw, setTraditionListRaw] = useState(traditionListText);
@@ -69,6 +71,7 @@ export function EventDetailsForm({ event, eventIndex = 0 }: { event: Event; even
     start_time: startTime || null,
     end_time: endTime || null,
     meal_info: mealInfo || null,
+    room: room || null,
     description: event.description,
     extra_content: {
       itinerary: {
@@ -174,6 +177,18 @@ export function EventDetailsForm({ event, eventIndex = 0 }: { event: Event; even
           <div>
             <h3 className="av-section-title">Itinerary card</h3>
             <p className="av-section-hint">Shown on the flip-card in the Itinerary section.</p>
+          </div>
+
+          <div className="av-field">
+            <Label htmlFor="room">Room</Label>
+            <Input
+              id="room"
+              name="room"
+              value={room}
+              onChange={(e) => setRoom(e.target.value)}
+              placeholder="Coming soon"
+            />
+            <p className="av-section-hint">Shown next to Time on the card front. Blank shows &quot;Coming soon&quot;.</p>
           </div>
 
           <div className="av-field">

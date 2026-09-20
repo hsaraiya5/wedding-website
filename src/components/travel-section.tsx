@@ -93,8 +93,10 @@ export function TravelSection({
           title="Getting to the venue"
           intro={gettingHereTitle || DEFAULT_GETTING_HERE_TITLE}
         />
-        <TravelCopy>{gettingHereBody || DEFAULT_GETTING_HERE_BODY}</TravelCopy>
-        <VenueMap />
+        <div className="tv-getting-here-grid">
+          <TravelCopy>{gettingHereBody || DEFAULT_GETTING_HERE_BODY}</TravelCopy>
+          <VenueMap />
+        </div>
       </div>
 
       {hotelCoveredByHost ? (

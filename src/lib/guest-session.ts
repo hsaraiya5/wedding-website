@@ -23,6 +23,7 @@ export type GuestContext = {
     address: string | null;
     dress_code: string | null;
     meal_info: string | null;
+    room: string | null;
     description: string | null;
     extra_content: Record<string, unknown>;
   }[];
@@ -35,6 +36,9 @@ export type GuestContext = {
     travel_getting_here_body: string | null;
     travel_notice_title: string | null;
     travel_notice_body: string | null;
+    about_body_1: string | null;
+    about_body_2: string | null;
+    about_photos: { url: string; caption: string | null }[];
   } | null;
   travel_options: {
     id: string;
