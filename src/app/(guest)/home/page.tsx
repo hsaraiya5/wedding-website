@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getGuestContext } from "@/lib/guest-session";
 import { getWeddingStart } from "@/lib/countdown";
-import { WelcomeHome, WelcomeArt, WelcomePanel, WelcomeMessage } from "@/components/welcome-home";
+import { WelcomeHome, WelcomeArt, WelcomePanel, WelcomeMessage, WelcomeVenueLine } from "@/components/welcome-home";
 import { Countdown } from "@/components/countdown";
 import { Section, SectionHeading } from "@/components/section";
 import { EventFlipCards } from "@/components/event-flip-cards";
@@ -73,6 +73,14 @@ export default async function HomePage({
           <p className="wh-eyebrow gh-eyebrow">Gayathri &amp; Hrishikesh</p>
           <h1 className="wh-title">Welcome, {household.display_name}</h1>
           <WelcomeMessage text="We are so happy you will be celebrating this joyful weekend with us in Pittsburgh." />
+
+          <WelcomeVenueLine
+            mapUrl="https://www.google.com/maps/search/?api=1&query=Wyndham+Grand+Pittsburgh+Downtown"
+            month="May"
+            days="29–30"
+            year="2027"
+            venueName="Wyndham Grand Pittsburgh Downtown"
+          />
 
           {weddingStart ? (
             <Countdown

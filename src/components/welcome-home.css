@@ -24,9 +24,13 @@
 }
 
 .wh-art {
+  /* Below 701px, WelcomeVenueLine (.wh-venue-row) stands in for this --
+     a full-bleed background image plus its own floating placard card
+     read as a second, disconnected block on a phone. Restored at the
+     701px tier below, where it becomes the two-column layout's art side. */
+  display: none;
   position: relative;
   overflow: hidden;
-  display: grid;
   place-items: center;
   min-height: 280px;
   background: var(--background);
@@ -120,11 +124,15 @@
 .wh-panel::after {
   content: "";
   position: absolute;
-  right: -38px;
-  bottom: -55px;
-  width: 300px;
-  height: 340px;
-  background: var(--wh-floral-art) right bottom / auto 340px no-repeat;
+  /* Sized small on mobile, where the panel is much narrower than the
+     desktop two-column layout this was tuned for -- at the original
+     300x340 this corner flourish overlapped the countdown grid instead
+     of staying a subtle corner bleed. Grows back at the 701px tier below. */
+  right: -22px;
+  bottom: -30px;
+  width: 160px;
+  height: 180px;
+  background: var(--wh-floral-art) right bottom / auto 180px no-repeat;
   opacity: 0;
   clip-path: inset(100% 0 0);
   pointer-events: none;
@@ -225,9 +233,11 @@
 .wh-content { position: relative; z-index: 1; width: min(700px, 100%); text-align: center; }
 .wh-content > .wh-eyebrow,
 .wh-content > .wh-message,
+.wh-content > .wh-venue-row,
 .wh-content > .wh-actions { opacity: 0; transform: translateY(14px); }
 .wh-home.wh-ready .wh-content > .wh-eyebrow { animation: wh-copy-in 520ms ease 140ms both; }
 .wh-home.wh-ready .wh-content > .wh-message { animation: wh-copy-in 520ms ease 640ms both; }
+.wh-home.wh-ready .wh-content > .wh-venue-row { animation: wh-copy-in 520ms ease 820ms both; }
 .wh-home.wh-ready .wh-content > .wh-actions { animation: wh-copy-in 520ms ease 1100ms both; }
 
 .wh-title {
@@ -278,7 +288,54 @@
 }
 .wh-home .cd-root.cd-main .cd-units { margin-top: 12px; }
 
-.wh-actions { margin-top: 26px; display: grid; justify-content: center; gap: 12px; }
+.wh-actions { margin-top: 26px; display: flex; justify-content: center; gap: 12px; }
+.wh-actions .gh-button { flex: 1; }
+
+/* Mobile-only stand-in for WelcomeArt's date/venue placard -- see .wh-art
+   above. Hidden from 701px up, where WelcomeArt takes over instead. */
+.wh-venue-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 22px;
+  border-top: 1px solid var(--border);
+  padding-top: 18px;
+  text-align: left;
+}
+.wh-venue-date {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: none;
+  color: var(--accent-foreground);
+}
+.wh-venue-month { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted-foreground); }
+.wh-venue-days { margin-top: 1px; font-family: var(--font-heading); font-size: 1.4rem; line-height: 1.1; }
+.wh-venue-year { margin-top: 1px; font-size: 0.72rem; color: var(--muted-foreground); }
+.wh-venue-divider { flex: none; width: 1px; align-self: stretch; background: var(--border); }
+.wh-venue-info { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.wh-venue-label { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--primary); }
+.wh-venue-name {
+  margin-top: 2px;
+  color: var(--accent-foreground);
+  font-family: var(--font-heading);
+  font-size: 1.05rem;
+  line-height: 1.25;
+}
+.wh-venue-arrow {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  color: var(--primary);
+  transition: background 180ms ease, color 180ms ease;
+}
+.wh-venue-arrow svg { width: 18px; height: 18px; }
+.wh-venue-arrow:hover,
+.wh-venue-arrow:focus-visible { background: var(--primary); color: #fffaf0; }
 
 /* Cues that there is more below instead of letting the next section's top
    peek into view as an unexplained sliver. */
@@ -322,8 +379,10 @@
 
 @media (min-width: 701px) {
   .wh-home { min-height: auto; }
-  .wh-art { min-height: 340px; }
+  .wh-art { display: grid; min-height: 340px; }
+  .wh-venue-row { display: none; }
   .wh-panel { padding: 64px 32px 72px; }
+  .wh-panel::after { right: -38px; bottom: -55px; width: 300px; height: 340px; background-size: auto 340px; }
   .wh-title { font-size: 3.2rem; }
   .wh-actions { display: flex; }
 }
@@ -366,6 +425,7 @@
   .wh-home .wh-art-copy,
   .wh-home .wh-content > .wh-eyebrow,
   .wh-home .wh-content > .wh-message,
+  .wh-home .wh-content > .wh-venue-row,
   .wh-home .wh-content > .wh-actions,
   .wh-scroll-cue { opacity: 1; transform: none; animation: none; }
   .wh-home .wh-title { clip-path: inset(0); animation: none; }

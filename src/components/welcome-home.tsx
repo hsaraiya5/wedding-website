@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, type CSSProperties, type ReactNode } from "react";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, ArrowUpRight } from "lucide-react";
 import { designAssets } from "@/lib/design-assets";
 import { useTypedText } from "@/lib/use-typed-text";
 import "./welcome-home.css";
@@ -54,6 +54,49 @@ export function WelcomeArt({ mapUrl, caption }: { mapUrl: string; caption: React
           Open in maps
         </a>
       </div>
+    </div>
+  );
+}
+
+// Mobile-only compact stand-in for WelcomeArt's date/venue placard --
+// CSS-hidden above 700px (see .wh-venue-row in welcome-home.css), where
+// WelcomeArt's own full-bleed treatment takes over instead. Keeping both
+// in the DOM and toggling via CSS avoids reshuffling WelcomeArt/WelcomePanel
+// (siblings, desktop's two-column split) just for a mobile-only reflow.
+export function WelcomeVenueLine({
+  mapUrl,
+  month,
+  days,
+  year,
+  venueName,
+}: {
+  mapUrl: string;
+  month: string;
+  days: string;
+  year: string;
+  venueName: string;
+}) {
+  return (
+    <div className="wh-venue-row">
+      <div className="wh-venue-date">
+        <span className="wh-venue-month">{month}</span>
+        <span className="wh-venue-days">{days}</span>
+        <span className="wh-venue-year">{year}</span>
+      </div>
+      <span className="wh-venue-divider" aria-hidden="true" />
+      <div className="wh-venue-info">
+        <span className="wh-venue-label">Wedding weekend</span>
+        <span className="wh-venue-name">{venueName}</span>
+      </div>
+      <a
+        className="wh-venue-arrow"
+        href={mapUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Open venue in maps"
+      >
+        <ArrowUpRight aria-hidden="true" />
+      </a>
     </div>
   );
 }

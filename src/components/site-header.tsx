@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, type CSSProperties } from "react";
+import { Share2 } from "lucide-react";
 import { Countdown } from "@/components/countdown";
 import { designAssets } from "@/lib/design-assets";
 import { cn } from "@/lib/utils";
@@ -26,6 +27,7 @@ export function SiteHeader({
 }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [activeId, setActiveId] = useState("welcome");
+  const [shared, setShared] = useState(false);
   const weddingStart = weddingStartIso ? new Date(weddingStartIso) : null;
 
   // Scroll-spy for the nav's active state. The design marks the section
@@ -91,6 +93,25 @@ export function SiteHeader({
       target.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "start" });
       window.history.replaceState(null, "", href);
     }, 260);
+  };
+
+  // Web Share API where it's available (mobile Safari/Chrome); everywhere
+  // else, copy the link and flip the button's label briefly -- same
+  // micro-pattern as CalendarButton's "downloaded" state in
+  // event-flip-cards.tsx.
+  const handleShare = async () => {
+    const shareData = { title: "Gayathri & Hrishikesh's Wedding", url: window.location.href };
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData);
+      } catch {
+        // Cancelled share sheet -- nothing to do.
+      }
+      return;
+    }
+    await navigator.clipboard.writeText(window.location.href);
+    setShared(true);
+    window.setTimeout(() => setShared(false), 1800);
   };
 
   const artStyle = { "--sh-hero-art": `url(${designAssets.hero})` } as CSSProperties;
@@ -160,10 +181,34 @@ export function SiteHeader({
             &times;
           </button>
 
-          <p className="sh-overlay-eyebrow">Wedding weekend</p>
+          <button
+            type="button"
+            onClick={handleShare}
+            aria-label="Share this site"
+            className="sh-overlay-share"
+            tabIndex={menuOpen ? 0 : -1}
+          >
+            <Share2 aria-hidden="true" />
+            <span className="sr-only">{shared ? "Copied" : "Share"}</span>
+          </button>
+
+          {/* Mobile-only mini-header -- desktop keeps the plain eyebrow
+              below plus the art pane's own date/venue placard. */}
+          <div className="sh-overlay-mobile-header">
+            <span className="sh-monogram" aria-hidden="true">
+              G&nbsp;H
+            </span>
+            <div>
+              <p className="sh-overlay-eyebrow">Wedding weekend</p>
+              <p className="sh-overlay-mobile-title">Plan your weekend</p>
+              <p className="sh-overlay-mobile-subline">May 29-30, 2027 &middot; Pittsburgh</p>
+            </div>
+          </div>
+
+          <p className="sh-overlay-eyebrow sh-overlay-eyebrow-desktop">Wedding weekend</p>
 
           <nav aria-label="Wedding website sections" className="sh-overlay-nav">
-            {links.map((link) => (
+            {links.map((link, index) => (
               <a
                 key={link.href}
                 href={link.href}
@@ -171,7 +216,15 @@ export function SiteHeader({
                 tabIndex={menuOpen ? 0 : -1}
                 className={cn(activeId === link.href.slice(1) && "sh-active")}
               >
-                {link.href === "#rsvp" && rsvpSubmitted ? "Your RSVP" : link.label}
+                <span className="sh-overlay-nav-index" aria-hidden="true">
+                  {String(index + 1).padStart(2, "0")}
+                </span>
+                <span className="sh-overlay-nav-label">
+                  {link.href === "#rsvp" && rsvpSubmitted ? "Your RSVP" : link.label}
+                </span>
+                <span className="sh-overlay-nav-arrow" aria-hidden="true">
+                  &#8594;
+                </span>
               </a>
             ))}
           </nav>
