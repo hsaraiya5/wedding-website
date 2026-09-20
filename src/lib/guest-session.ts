@@ -23,6 +23,7 @@ export type GuestContext = {
     address: string | null;
     dress_code: string | null;
     meal_info: string | null;
+    room: string | null;
     description: string | null;
     extra_content: Record<string, unknown>;
   }[];

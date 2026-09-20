@@ -264,6 +264,7 @@ export async function saveEvent(_prevState: ActionState, formData: FormData): Pr
   const address = String(formData.get("address") ?? "").trim() || null;
   const dressCode = String(formData.get("dress_code") ?? "").trim() || null;
   const mealInfo = String(formData.get("meal_info") ?? "").trim() || null;
+  const room = String(formData.get("room") ?? "").trim() || null;
   const description = String(formData.get("description") ?? "").trim() || null;
   const wardrobeTitle = String(formData.get("wardrobe_title") ?? "").trim();
   const wardrobeDescription = String(formData.get("wardrobe_description") ?? "").trim();
@@ -291,6 +292,7 @@ export async function saveEvent(_prevState: ActionState, formData: FormData): Pr
     p_address: address,
     p_dress_code: dressCode,
     p_meal_info: mealInfo,
+    p_room: room,
     p_description: description,
     p_extra_content: {
       wardrobe: {

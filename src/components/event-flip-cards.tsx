@@ -20,6 +20,7 @@ type Event = {
   start_time: string | null;
   end_time: string | null;
   meal_info: string | null;
+  room: string | null;
   description: string | null;
   extra_content: { itinerary?: ItineraryContent } | Record<string, unknown>;
 };
@@ -202,7 +203,7 @@ export function EventFlipCards({ events, startIndex = 0 }: { events: Event[]; st
                     </span>
                     <span className="ef-meta-item">
                       <span className="ef-meta-label">Room</span>
-                      <strong>Coming soon</strong>
+                      <strong>{event.room || "Coming soon"}</strong>
                     </span>
                   </span>
                   <span className="ef-peel" aria-hidden="true" />

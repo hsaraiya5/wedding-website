@@ -32,6 +32,23 @@
   text-align: center;
 }
 
+/*
+  Side by side on desktop: the "getting here" note reads shorter than the
+  map is tall, so the two are vertically centered against each other
+  instead of top-aligned.
+*/
+.tv-getting-here-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 1fr);
+  align-items: center;
+  gap: 32px;
+  width: 100%;
+  max-width: 1100px;
+  margin: 8px auto 0;
+}
+.tv-getting-here-grid .tv-copy { width: 100%; max-width: none; margin: 0; text-align: left; }
+.tv-getting-here-grid .tv-map { width: 100%; max-width: none; margin: 0; }
+
 .tv-map {
   position: relative;
   width: 100%;
@@ -93,4 +110,6 @@
   .tv-map { height: 280px; }
   .tv-card { padding: 28px; }
   .tv-hosted { grid-template-columns: 1fr; gap: 20px; }
+  .tv-getting-here-grid { grid-template-columns: 1fr; gap: 20px; }
+  .tv-getting-here-grid .tv-copy { text-align: center; }
 }
