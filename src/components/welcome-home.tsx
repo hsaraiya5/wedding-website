@@ -30,6 +30,13 @@ export function WelcomeHome({ children }: { children: ReactNode }) {
       className={`wh-home ${ready ? "wh-ready" : ""}`.trim()}
       style={{ ...heroStyle, ...floralStyle }}
     >
+      <div className="wh-bird-flight" aria-hidden="true">
+        {Array.from({ length: 4 }, (_, index) => (
+          <span className="wh-flying-bird" key={index}>
+            <span className="wh-bird-sprite" />
+          </span>
+        ))}
+      </div>
       {children}
       <a href="#events" className="wh-scroll-cue" aria-label="Scroll to your itinerary">
         <ChevronDown aria-hidden="true" />
