@@ -237,6 +237,27 @@
   line-height: 1;
 }
 .sh-overlay-eyebrow { color: var(--primary); font-size: 0.9rem; font-weight: 800; letter-spacing: 0; text-transform: uppercase; }
+
+/* Mobile-only mini-header and share button -- hidden by default so
+   desktop's existing plain-eyebrow overlay is unaffected; see the
+   max-width: 700px block below for the mobile presentation. */
+.sh-overlay-mobile-header { display: none; }
+.sh-overlay-share {
+  display: none;
+  position: absolute;
+  top: 72px;
+  right: 18px;
+  width: 40px;
+  height: 40px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: #fffdf6;
+  color: var(--primary);
+}
+.sh-overlay-share svg { width: 17px; height: 17px; }
+
 .sh-overlay-nav { margin-top: 14px; display: grid; }
 .sh-overlay-nav a {
   border-bottom: 1px solid var(--border);
@@ -250,15 +271,21 @@
 }
 .sh-overlay-nav a:hover,
 .sh-overlay-nav a.sh-active { color: var(--primary); padding-left: 10px; }
+.sh-overlay-nav-index { display: none; }
+.sh-overlay-nav-arrow { display: none; }
 .sh-overlay-venue { margin-top: 26px; color: var(--muted-foreground); font-size: 1rem; }
 .sh-overlay-countdown { max-width: 460px; margin-top: 22px; border-top: 1px solid var(--border); padding-top: 18px; }
 
 /* Staggered enter reveals, matching the handoff's delays. */
 .sh-overlay-eyebrow,
+.sh-overlay-mobile-header,
+.sh-overlay-share,
 .sh-overlay-nav a,
 .sh-overlay-venue,
 .sh-overlay-countdown { opacity: 0; transform: translateY(12px); }
-.sh-overlay.sh-open .sh-overlay-eyebrow { animation: sh-copy-in 420ms ease 80ms both; }
+.sh-overlay.sh-open .sh-overlay-eyebrow,
+.sh-overlay.sh-open .sh-overlay-mobile-header { animation: sh-copy-in 420ms ease 80ms both; }
+.sh-overlay.sh-open .sh-overlay-share { animation: sh-copy-in 420ms ease 130ms both; }
 .sh-overlay.sh-open .sh-overlay-nav a { animation: sh-copy-in 460ms ease both; }
 .sh-overlay.sh-open .sh-overlay-nav a:nth-child(1) { animation-delay: 130ms; }
 .sh-overlay.sh-open .sh-overlay-nav a:nth-child(2) { animation-delay: 180ms; }
@@ -287,6 +314,8 @@
   .sh-overlay,
   .sh-overlay * { animation: none !important; transition: none !important; }
   .sh-overlay-eyebrow,
+  .sh-overlay-mobile-header,
+  .sh-overlay-share,
   .sh-overlay-nav a,
   .sh-overlay-venue,
   .sh-overlay-countdown { opacity: 1; transform: none; }
@@ -295,9 +324,70 @@
 @media (max-width: 700px) {
   .sh-overlay { grid-template-columns: 1fr; }
   .sh-overlay-art { display: none; }
-  .sh-overlay-panel { padding: 66px 26px 26px; }
+  .sh-overlay-panel { padding: 66px 22px 32px; }
   .sh-overlay-panel::after { width: 220px; height: 250px; background-size: auto 250px; }
-  .sh-overlay-nav a { font-size: 2rem; padding: 8px 0; }
+
+  .sh-overlay-share { display: flex; }
+
+  .sh-overlay-eyebrow-desktop { display: none; }
+  .sh-overlay-mobile-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+  }
+  .sh-overlay-mobile-header .sh-monogram {
+    flex: none;
+    width: 40px;
+    height: 40px;
+    font-size: 0.8rem;
+  }
+  .sh-overlay-mobile-header .sh-overlay-eyebrow { font-size: 0.72rem; }
+  .sh-overlay-mobile-title {
+    margin-top: 2px;
+    color: var(--accent-foreground);
+    font-family: var(--font-heading);
+    font-size: 1.5rem;
+    line-height: 1.15;
+  }
+  .sh-overlay-mobile-subline { margin-top: 2px; color: var(--muted-foreground); font-size: 0.85rem; }
+
+  .sh-overlay-nav { margin-top: 16px; gap: 2px; }
+  .sh-overlay-nav a {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    padding: 12px 10px;
+    font-size: 1.15rem;
+  }
+  .sh-overlay-nav a.sh-active {
+    border-color: var(--border);
+    background: rgba(161, 63, 61, 0.07);
+    padding-left: 10px;
+  }
+  .sh-overlay-nav-index {
+    display: inline-block;
+    flex: none;
+    color: var(--muted-foreground);
+    font-family: var(--font-sans);
+    font-size: 0.78rem;
+    font-weight: 700;
+  }
+  .sh-overlay-nav-label { flex: 1; }
+  .sh-overlay-nav-arrow { display: inline-block; flex: none; color: var(--muted-foreground); }
+  .sh-overlay-nav a.sh-active .sh-overlay-nav-index,
+  .sh-overlay-nav a.sh-active .sh-overlay-nav-arrow { color: var(--primary); }
+
+  .sh-overlay-venue {
+    margin-top: 22px;
+    border-top: 1px solid var(--border);
+    padding-top: 16px;
+    text-align: center;
+    font-size: 0.85rem;
+  }
+
   /* The nav list itself is the point of this menu on a phone -- the
      countdown is already front and center on the page underneath, so
      repeating it here just adds scroll length to a menu that should

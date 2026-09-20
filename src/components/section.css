@@ -103,4 +103,8 @@
 @media (max-width: 720px) {
   .sc-container { width: min(560px, calc(100% - 32px)); }
   .sc-rail { display: none; }
+  /* At the fixed 2.3rem/1.1 line-height above, this heading font wraps to
+     one or two words per line on a phone -- shared by every section, so
+     this single fix reaches all of them. */
+  .sc-heading h2 { font-size: 1.7rem; }
 }

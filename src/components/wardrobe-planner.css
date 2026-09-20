@@ -202,4 +202,28 @@
 @media (max-width: 700px) {
   .wp-copy h3 { font-size: 1.9rem; }
   .wp-garment-stage { width: min(100%, 320px); }
+
+  /* Flatten the 2x2 grid of boxed tab cells (900px tier) into a lighter
+     pill/tab-bar look: drop the filled-box active state and the left/top
+     accent bar, mark the active tab with an underline instead, and drop
+     the script "Look 0N" label -- day-part + event name is enough at
+     this size. */
+  .wp-tab {
+    min-height: 0;
+    gap: 2px;
+    border-bottom: 2px solid transparent;
+    padding: 12px 14px;
+  }
+  .wp-tab:last-child { border-bottom: 2px solid transparent; }
+  .wp-tab::before { display: none; }
+  .wp-tab:hover { padding-left: 14px; background: transparent; }
+  .wp-tab[aria-selected="true"] {
+    padding-left: 14px;
+    background: transparent;
+    border-bottom-color: var(--wp-tab-color);
+  }
+  .wp-tab-look { display: none; }
+  .wp-tab-head { justify-content: flex-start; }
+  .wp-tab-daypart { font-size: 0.62rem; }
+  .wp-tab strong { font-size: 0.95rem; }
 }
