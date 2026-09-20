@@ -35,6 +35,9 @@ export type GuestContext = {
     travel_getting_here_body: string | null;
     travel_notice_title: string | null;
     travel_notice_body: string | null;
+    about_body_1: string | null;
+    about_body_2: string | null;
+    about_photos: { url: string; caption: string | null }[];
   } | null;
   travel_options: {
     id: string;

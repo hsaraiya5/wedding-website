@@ -168,7 +168,11 @@ export default async function HomePage({
           title="The story that brought us here."
           intro="A few chapters from the life we have built, and the people and places that made it ours."
         />
-        <OurStory />
+        <OurStory
+          bodyOne={site_settings?.about_body_1}
+          bodyTwo={site_settings?.about_body_2}
+          photos={site_settings?.about_photos}
+        />
       </Section>
 
       <SiteFooter />
