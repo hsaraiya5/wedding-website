@@ -17,9 +17,10 @@
   background: #fbf6eb;
   padding: 40px;
   perspective: 1800px;
-  transition: background 700ms ease, opacity 700ms ease, visibility 0s linear 700ms;
+  transition: background 520ms ease, opacity 480ms ease, visibility 0s linear 480ms;
 }
 .ie-access.ie-turning { background: #963940; }
+.ie-access.ie-launching { background: #fffaf0; }
 .ie-access.ie-leaving { opacity: 0; visibility: hidden; pointer-events: none; }
 
 /* Subtle, always-discoverable admin entry point -- otherwise finding the
@@ -61,7 +62,7 @@
   filter: blur(22px);
   opacity: 0.72;
   transform: scaleX(0.94);
-  transition: opacity 700ms ease, transform 900ms ease;
+  transition: opacity 520ms ease, transform 680ms ease;
 }
 .ie-access.ie-turning .ie-card-shell::after { opacity: 0.9; transform: scaleX(0.82) translateY(8px); }
 .ie-access.ie-lifting .ie-card-shell::after { opacity: 0.5; transform: scaleX(0.7) translateY(88px); }
@@ -71,11 +72,12 @@
   width: 100%;
   height: 100%;
   transform-style: preserve-3d;
-  transition: transform 950ms cubic-bezier(0.2, 0.72, 0.2, 1);
+  transition: transform 680ms cubic-bezier(0.2, 0.72, 0.2, 1);
 }
 .ie-access.ie-turning .ie-card { transform: rotateY(180deg) translateZ(20px); }
-.ie-access.ie-opening .ie-card { transform: translateY(135px) scale(0.75) rotateY(180deg) translateZ(30px); }
-.ie-access.ie-lifting .ie-card { transform: translateY(135px) scale(0.75) rotateY(180deg) translateZ(44px); }
+.ie-access.ie-opening .ie-card { transform: translateY(96px) scale(0.78) rotateY(180deg) translateZ(30px); }
+.ie-access.ie-lifting .ie-card { transform: translateY(96px) scale(0.78) rotateY(180deg) translateZ(44px); }
+.ie-access.ie-launching .ie-card { transform: rotateY(180deg) translateZ(44px); }
 
 .ie-face {
   position: absolute;
@@ -142,6 +144,7 @@
   border: 1px solid rgba(255, 244, 220, 0.18);
   box-shadow: inset 0 0 42px rgba(70, 17, 28, 0.15);
   pointer-events: none;
+  transition: opacity 520ms ease;
 }
 
 .ie-monogram {
@@ -187,14 +190,23 @@
   background: #fffaf0 var(--ie-hero-art) center / 100% 100% no-repeat;
   border: 1px solid rgba(113, 43, 49, 0.15);
   box-shadow: 0 10px 26px rgba(71, 24, 31, 0.18);
+  opacity: 0;
   transform: translateY(8%) scale(0.88) rotateX(-3deg);
   transform-origin: center center;
-  transition: transform 1300ms cubic-bezier(0.16, 0.82, 0.2, 1), box-shadow 900ms ease;
+  transition: opacity 180ms ease 360ms, transform 850ms cubic-bezier(0.16, 0.82, 0.2, 1), box-shadow 620ms ease, z-index 0s linear 620ms;
   border-radius: 4px;
 }
+.ie-access.ie-opening .ie-insert { opacity: 1; }
 .ie-access.ie-lifting .ie-insert {
+  z-index: 8;
   box-shadow: 0 30px 72px rgba(71, 24, 31, 0.3);
-  transform: translateY(-52%) scale(0.9) rotateX(0);
+  transform: translateY(-30%) scale(0.92) rotateX(0);
+}
+.ie-access.ie-launching .ie-insert {
+  z-index: 10;
+  box-shadow: 0 20px 70px rgba(71, 24, 31, 0.14);
+  transform: translateY(0) scale(1.12) rotateX(0);
+  transition: transform 820ms cubic-bezier(0.16, 0.82, 0.2, 1), box-shadow 620ms ease, z-index 0s;
 }
 .ie-insert-copy {
   position: relative;
@@ -211,9 +223,9 @@
   opacity: 0;
   transform: translateY(12px);
 }
-.ie-access.ie-welcoming .ie-insert-copy > .ie-monogram { animation: ie-copy-arrive 520ms ease both; }
-.ie-access.ie-welcoming .ie-insert-copy > .ie-eyebrow { animation: ie-copy-arrive 520ms ease 120ms both; }
-.ie-access.ie-welcoming .ie-insert-copy > .ie-access-date { animation: ie-copy-arrive 520ms ease 1750ms both; }
+.ie-access.ie-welcoming .ie-insert-copy > .ie-monogram { animation: ie-copy-arrive 420ms ease both; }
+.ie-access.ie-welcoming .ie-insert-copy > .ie-eyebrow { animation: ie-copy-arrive 420ms ease 90ms both; }
+.ie-access.ie-welcoming .ie-insert-copy > .ie-access-date { animation: ie-copy-arrive 420ms ease 980ms both; }
 
 .ie-script {
   position: relative;
@@ -250,8 +262,8 @@
   transform: scaleX(0);
   transform-origin: left;
 }
-.ie-access.ie-welcoming .ie-script span { animation: ie-write-welcome 1900ms cubic-bezier(0.18, 0.7, 0.2, 1) forwards; }
-.ie-access.ie-welcoming .ie-script::after { animation: ie-draw-flourish 700ms ease 1550ms forwards; }
+.ie-access.ie-welcoming .ie-script span { animation: ie-write-welcome 1100ms cubic-bezier(0.18, 0.7, 0.2, 1) forwards; }
+.ie-access.ie-welcoming .ie-script::after { animation: ie-draw-flourish 450ms ease 850ms forwards; }
 
 .ie-env-pocket {
   right: 0;
@@ -262,9 +274,9 @@
   clip-path: polygon(0 0, 50% 48%, 100% 0, 100% 100%, 0 100%);
   background: #993a44;
   box-shadow: inset 0 16px 34px rgba(79, 25, 35, 0.2), 0 -2px 0 rgba(255, 245, 221, 0.1);
-  transition: transform 950ms cubic-bezier(0.18, 0.78, 0.2, 1);
+  transition: opacity 380ms ease, transform 700ms cubic-bezier(0.18, 0.78, 0.2, 1);
 }
-.ie-env-side { bottom: 0; z-index: 3; width: 51%; height: 67%; background: #bd5c63; transition: transform 950ms cubic-bezier(0.18, 0.78, 0.2, 1); }
+.ie-env-side { bottom: 0; z-index: 3; width: 51%; height: 67%; background: #bd5c63; transition: opacity 380ms ease, transform 700ms cubic-bezier(0.18, 0.78, 0.2, 1); }
 .ie-env-side.ie-left { left: 0; clip-path: polygon(0 0, 100% 55%, 0 100%); }
 .ie-env-side.ie-right { right: 0; clip-path: polygon(100% 0, 0 55%, 100% 100%); }
 .ie-env-flap {
@@ -275,7 +287,7 @@
   clip-path: polygon(0 0, 100% 0, 50% 100%);
   background: #d17a76;
   box-shadow: 0 12px 26px rgba(65, 17, 27, 0.18);
-  transition: transform 950ms cubic-bezier(0.2, 0.78, 0.2, 1) 420ms, z-index 0s linear 1050ms;
+  transition: opacity 380ms ease, transform 680ms cubic-bezier(0.2, 0.78, 0.2, 1) 160ms, z-index 0s linear 760ms;
 }
 .ie-env-flap::after {
   content: "";
@@ -304,6 +316,15 @@
 }
 .ie-access.ie-opening .ie-env-flap { z-index: 1; transform: rotateX(180deg); }
 .ie-access.ie-opening .ie-seal { opacity: 0; transform: translate(-50%, -20%) scale(0.68); }
+.ie-access.ie-lifting:not(.ie-launching) .ie-env-pocket { transform: translateY(40%); }
+.ie-access.ie-lifting:not(.ie-launching) .ie-env-side.ie-left { transform: translate(-7%, 32%); }
+.ie-access.ie-lifting:not(.ie-launching) .ie-env-side.ie-right { transform: translate(7%, 32%); }
+.ie-access.ie-launching .ie-back::before { opacity: 0; }
+.ie-access.ie-launching .ie-env-pocket { opacity: 0; transform: translateY(56%) scale(0.96); }
+.ie-access.ie-launching .ie-env-side.ie-left { opacity: 0; transform: translate(-18%, 42%) rotate(-2deg); }
+.ie-access.ie-launching .ie-env-side.ie-right { opacity: 0; transform: translate(18%, 42%) rotate(2deg); }
+.ie-access.ie-launching .ie-env-flap { opacity: 0; transform: rotateX(180deg) translateY(-26%); }
+.ie-access.ie-launching .ie-card-shell::after { opacity: 0; transform: scaleX(0.48) translateY(120px); }
 
 .ie-code-form {
   width: 100%;
@@ -387,6 +408,31 @@
   }
   .ie-front,
   .ie-back { overflow-y: auto; }
+  .ie-access.ie-turning,
+  .ie-access.ie-opening,
+  .ie-access.ie-lifting { background: #fbf6eb; }
+  .ie-back {
+    overflow: hidden;
+    background: #a8444c;
+    opacity: 0;
+    transform: none;
+    transition: opacity 420ms ease, background-color 520ms ease;
+  }
+  .ie-front { opacity: 1; transition: opacity 420ms ease; }
+  .ie-access.ie-turning .ie-front { opacity: 0; }
+  .ie-access.ie-turning .ie-back { opacity: 1; }
+  .ie-access.ie-turning .ie-card,
+  .ie-access.ie-opening .ie-card,
+  .ie-access.ie-lifting .ie-card { transform: translateY(10px) scale(0.98); }
+  .ie-access.ie-launching .ie-card { transform: translateY(0) scale(1); }
+  .ie-access.ie-lifting .ie-back,
+  .ie-access.ie-launching .ie-back { overflow: visible; background: transparent; }
+  .ie-back::before {
+    inset: 13px;
+    border-color: rgba(255, 244, 220, 0.22);
+    background: transparent;
+    box-shadow: inset 0 0 34px rgba(70, 17, 28, 0.18);
+  }
   .ie-copy { width: min(420px, 92%); padding: 28px 20px; }
   .ie-copy .ie-code-form { margin-top: 20px; }
   /* The floral art's background-size: 100% 100% on the desktop card is
@@ -397,9 +443,52 @@
      warping it. */
   .ie-front::before,
   .ie-insert { background-size: cover; }
+  .ie-seal { width: 58px; height: 58px; font-size: 0.9rem; }
+  .ie-access.ie-lifting .ie-insert { transform: translateY(-8%) scale(0.96) rotateX(0); }
+  .ie-access.ie-launching .ie-insert { transform: translateY(0) scale(1.02) rotateX(0); }
+  .ie-insert-copy { width: 80%; }
+  .ie-script {
+    width: 96%;
+    margin-top: 8px;
+    font-size: clamp(1.75rem, 8.2vw, 2.15rem);
+    line-height: 1.05;
+  }
+  .ie-insert-copy > .ie-access-date {
+    max-width: 255px;
+    margin-top: 14px;
+    font-size: 0.84rem;
+    line-height: 1.35;
+    text-wrap: balance;
+  }
+  .ie-script span {
+    max-width: 100%;
+    overflow: visible;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
 }
 
 @media (max-width: 400px) {
   .ie-card-shell { height: min(560px, 80svh); }
   .ie-copy h1 { font-size: 2.1rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ie-access,
+  .ie-card-shell::after,
+  .ie-card,
+  .ie-front,
+  .ie-back,
+  .ie-back::before,
+  .ie-insert,
+  .ie-env-pocket,
+  .ie-env-side,
+  .ie-env-flap,
+  .ie-seal { transition-duration: 1ms !important; transition-delay: 0ms !important; }
+  .ie-card-shell,
+  .ie-front::before,
+  .ie-copy > *,
+  .ie-insert-copy > *,
+  .ie-script span,
+  .ie-script::after { animation-duration: 1ms !important; animation-delay: 0ms !important; }
 }
