@@ -2,6 +2,7 @@
 
 import { useActionState, useEffect, useRef, useState } from "react";
 import { saveAboutUs } from "@/app/actions/admin";
+import { createClient } from "@/lib/supabase/client";
 import { OurStory, DEFAULT_BODY_1, DEFAULT_BODY_2 } from "@/components/our-story";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,10 +17,30 @@ type PhotoRow = {
   caption: string;
   file: File | null;
   previewUrl: string;
+  uploadStatus: "idle" | "uploading" | "error";
+  uploadError: string | null;
 };
 
 function makeKey() {
   return crypto.randomUUID();
+}
+
+const ALLOWED_PHOTO_TYPES = ["image/png", "image/jpeg", "image/webp", "image/gif"];
+const MAX_PHOTO_BYTES = 8 * 1024 * 1024;
+
+// Uploads straight from the browser to Supabase Storage instead of sending
+// the file through saveAboutUs -- Vercel's serverless function body-size
+// cap sits below what several photos in one submission need, regardless of
+// Next's own bodySizeLimit config, so routing the bytes through our Server
+// Action isn't reliable. The admin's browser session already carries the
+// same auth used by the "admin can manage design-assets" storage policy.
+async function uploadAboutUsPhoto(file: File): Promise<string> {
+  const supabase = createClient();
+  const extension = file.name.split(".").pop()?.toLowerCase() || "jpg";
+  const path = `about-us/${crypto.randomUUID()}.${extension}`;
+  const { error } = await supabase.storage.from("design-assets").upload(path, file, { contentType: file.type });
+  if (error) throw error;
+  return supabase.storage.from("design-assets").getPublicUrl(path).data.publicUrl;
 }
 
 export function AboutUsForm({ bodyOne, bodyTwo, photos }: { bodyOne: string | null; bodyTwo: string | null; photos: Photo[] }) {
@@ -39,6 +60,8 @@ export function AboutUsForm({ bodyOne, bodyTwo, photos }: { bodyOne: string | nu
       caption: photo.caption ?? "",
       file: null,
       previewUrl: photo.url,
+      uploadStatus: "idle" as const,
+      uploadError: null,
     }))
   );
 
@@ -66,18 +89,39 @@ export function AboutUsForm({ bodyOne, bodyTwo, photos }: { bodyOne: string | nu
   const handleFileChange = (key: string, fileList: FileList | null) => {
     const file = fileList?.[0] ?? null;
     if (!file) return;
+
+    if (!ALLOWED_PHOTO_TYPES.includes(file.type)) {
+      updateRow(key, { uploadStatus: "error", uploadError: "Must be a PNG, JPEG, WebP, or GIF image." });
+      return;
+    }
+    if (file.size > MAX_PHOTO_BYTES) {
+      updateRow(key, { uploadStatus: "error", uploadError: "Photo must be under 8MB." });
+      return;
+    }
+
     const previewUrl = URL.createObjectURL(file);
     setRows((prev) => {
       const existing = prev.find((row) => row.key === key);
       if (existing?.file) URL.revokeObjectURL(existing.previewUrl);
-      return prev.map((row) => (row.key === key ? { ...row, file, previewUrl } : row));
+      return prev.map((row) =>
+        row.key === key ? { ...row, file, previewUrl, uploadStatus: "uploading", uploadError: null } : row
+      );
     });
+
+    uploadAboutUsPhoto(file)
+      .then((url) => updateRow(key, { existingUrl: url, uploadStatus: "idle", uploadError: null }))
+      .catch(() =>
+        updateRow(key, {
+          uploadStatus: "error",
+          uploadError: "Couldn't upload this photo -- the previous one (if any) was kept. Try again or use a smaller image.",
+        })
+      );
   };
 
   const addRow = () =>
     setRows((prev) => [
       ...prev,
-      { key: makeKey(), existingUrl: "", caption: "", file: null, previewUrl: "" },
+      { key: makeKey(), existingUrl: "", caption: "", file: null, previewUrl: "", uploadStatus: "idle", uploadError: null },
     ]);
 
   const removeRow = (key: string) =>
@@ -160,7 +204,11 @@ export function AboutUsForm({ bodyOne, bodyTwo, photos }: { bodyOne: string | nu
                     <div className="h-20 w-20 flex-none rounded-md border border-dashed border-border" />
                   )}
                   <div className="flex flex-1 flex-col gap-3">
-                    <PhotoFileInput rowKey={row.key} onChange={(files) => handleFileChange(row.key, files)} />
+                    <PhotoFileInput onChange={(files) => handleFileChange(row.key, files)} />
+                    {row.uploadStatus === "uploading" ? (
+                      <p className="text-xs text-muted-foreground">Uploading...</p>
+                    ) : null}
+                    {row.uploadError ? <p className="text-xs text-destructive">{row.uploadError}</p> : null}
                     <div className="av-field">
                       <Label htmlFor={`caption_${row.key}`}>Caption</Label>
                       <Input
@@ -183,8 +231,12 @@ export function AboutUsForm({ bodyOne, bodyTwo, photos }: { bodyOne: string | nu
 
           {state.error ? <p className="text-sm text-destructive">{state.error}</p> : null}
 
-          <Button type="submit" disabled={pending} className="self-start">
-            {pending ? "Saving..." : "Save"}
+          <Button
+            type="submit"
+            disabled={pending || rows.some((row) => row.uploadStatus === "uploading")}
+            className="self-start"
+          >
+            {pending ? "Saving..." : rows.some((row) => row.uploadStatus === "uploading") ? "Uploading photos..." : "Save"}
           </Button>
         </div>
 
@@ -202,11 +254,14 @@ export function AboutUsForm({ bodyOne, bodyTwo, photos }: { bodyOne: string | nu
   );
 }
 
-function PhotoFileInput({ rowKey, onChange }: { rowKey: string; onChange: (files: FileList | null) => void }) {
+function PhotoFileInput({ onChange }: { onChange: (files: FileList | null) => void }) {
   return (
     <Input
       type="file"
-      name={`photo_${rowKey}_file`}
+      // No `name` -- the file is uploaded straight to storage on selection
+      // (see uploadAboutUsPhoto), so it's never part of the form's own
+      // submission. Only the resulting URL (the hidden existing_url input)
+      // travels through the Server Action.
       accept="image/png,image/jpeg,image/webp,image/gif"
       onChange={(e) => onChange(e.target.files)}
     />
