@@ -87,12 +87,29 @@ export function InviteEntrance() {
     const reducedMotion =
       typeof window !== "undefined" &&
       window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const timing = reducedMotion
-      ? [10, 30, 50, 80, 120, 180, 240]
-      : [50, 600, 1150, 1600, 2400, 4200, 4650];
 
     document.body.style.overflow = "hidden";
 
+    if (reducedMotion) {
+      // Stepping through each phase individually -- even compressed into
+      // a couple hundred ms -- still paints every intermediate layout
+      // separately, which reads as a rapid flicker through 5-6 frames.
+      // That's worse for motion sensitivity than the full animation, not
+      // better. Jump straight to the finished "welcome" card in one
+      // step instead, hold it long enough to actually read, then go.
+      const showTimer = setTimeout(() => setPhaseIndex(5), 0);
+      const navTimer = setTimeout(() => {
+        document.body.style.overflow = "";
+        router.push("/home");
+      }, 1400);
+      return () => {
+        clearTimeout(showTimer);
+        clearTimeout(navTimer);
+        document.body.style.overflow = "";
+      };
+    }
+
+    const timing = [50, 600, 1150, 1600, 2400, 4200, 4650];
     const timers = [
       setTimeout(() => setPhaseIndex(1), timing[0]),
       setTimeout(() => setPhaseIndex(2), timing[1]),
