@@ -521,23 +521,6 @@
   .ie-copy h1 { font-size: 2.1rem; }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .ie-access,
-  .ie-card-shell::after,
-  .ie-card,
-  .ie-front,
-  .ie-back,
-  .ie-back::before,
-  .ie-insert,
-  .ie-env-pocket,
-  .ie-env-side,
-  .ie-env-flap,
-  .ie-seal { transition-duration: 1ms !important; transition-delay: 0ms !important; }
-  .ie-card-shell,
-  .ie-front::before,
-  .ie-copy > *,
-  .ie-insert-copy > *,
-  .ie-insert-footer,
-  .ie-script span,
-  .ie-script::after { animation-duration: 1ms !important; animation-delay: 0ms !important; }
-}
+/* Deliberately no @media (prefers-reduced-motion: reduce) override here --
+   this sequence always plays in full regardless of that OS setting (see
+   the comment in invite-entrance.tsx for why). */
