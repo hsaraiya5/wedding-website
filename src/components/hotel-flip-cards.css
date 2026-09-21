@@ -171,5 +171,11 @@
      here (as this rule previously did) collapsed the whole card to ~0px.
      Single-column cards are wider than their two-column siblings, so if
      anything they need more room for wrapped text, not less. */
-  .hf-flip, .hf-inner { min-height: 500px; }
+  .hf-flip, .hf-inner { min-height: 440px; }
+  /* The front face only has 3 short blocks (title/description, room
+     types, book link) -- space-between over a tall card stretched huge
+     gaps between them. Pack them together instead; the card is sized to
+     fit the back face's longer fact list, so there's still natural
+     breathing room below the button without an awkward mid-card void. */
+  .hf-front-content { justify-content: flex-start; }
 }
