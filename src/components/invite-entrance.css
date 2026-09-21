@@ -183,9 +183,9 @@
   inset: 7%;
   z-index: 2;
   display: grid;
+  grid-template-rows: 1fr auto;
   justify-items: center;
-  align-content: start;
-  padding-top: 8%;
+  padding: 6% 8% 5%;
   overflow: hidden;
   background: #fffaf0 var(--ie-hero-art) center / 100% 100% no-repeat;
   border: 1px solid rgba(113, 43, 49, 0.15);
@@ -211,6 +211,7 @@
 .ie-insert-copy {
   position: relative;
   z-index: 1;
+  align-self: center;
   width: min(760px, 66%);
   min-width: 0;
   display: grid;
@@ -218,14 +219,51 @@
   text-align: center;
 }
 .ie-insert-copy > .ie-monogram,
-.ie-insert-copy > .ie-eyebrow,
-.ie-insert-copy > .ie-access-date {
+.ie-insert-copy > .ie-eyebrow {
   opacity: 0;
   transform: translateY(12px);
 }
 .ie-access.ie-welcoming .ie-insert-copy > .ie-monogram { animation: ie-copy-arrive 420ms ease both; }
 .ie-access.ie-welcoming .ie-insert-copy > .ie-eyebrow { animation: ie-copy-arrive 420ms ease 90ms both; }
-.ie-access.ie-welcoming .ie-insert-copy > .ie-access-date { animation: ie-copy-arrive 420ms ease 980ms both; }
+
+/* A quieter "signature line" anchored at the card's bottom edge, separate
+   from the centered welcome message above -- previously this sat inside
+   .ie-insert-copy at a small size, crowding the top of the card and
+   leaving the rest empty. */
+.ie-insert-footer {
+  position: relative;
+  z-index: 1;
+  align-self: end;
+  width: 100%;
+  padding-top: 18px;
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  text-align: center;
+  opacity: 0;
+  transform: translateY(12px);
+}
+.ie-insert-footer::before {
+  content: "";
+  display: block;
+  width: 30%;
+  height: 1px;
+  margin-bottom: 10px;
+  background: #712b31;
+  opacity: 0.3;
+}
+.ie-insert-footer-label {
+  color: #a13f3d;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.ie-insert-footer .ie-access-date {
+  margin-top: 0;
+  font-size: 1.4rem;
+}
+.ie-access.ie-welcoming .ie-insert-footer { animation: ie-copy-arrive 420ms ease 980ms both; }
 
 .ie-script {
   position: relative;
@@ -241,7 +279,10 @@
      card regardless of name length; this clamp only covers the brief
      window before that effect runs. */
   font-size: clamp(1.6rem, 5vw, 3.9rem);
-  line-height: 1.12;
+  /* 1.12 clipped descenders (e.g. the "y" in a household name) against
+     .ie-insert's overflow: hidden -- this script font's descenders need
+     more room than that line-height reserves. */
+  line-height: 1.32;
   text-align: center;
   text-shadow: 0 2px 0 rgba(255, 255, 255, 0.72), 0 12px 30px rgba(113, 43, 49, 0.16);
 }
@@ -451,12 +492,13 @@
     width: 96%;
     margin-top: 8px;
     font-size: clamp(1.75rem, 8.2vw, 2.15rem);
-    line-height: 1.05;
+    line-height: 1.28;
   }
-  .ie-insert-copy > .ie-access-date {
+  .ie-insert-footer { padding-top: 10px; }
+  .ie-insert-footer-label { font-size: 0.68rem; }
+  .ie-insert-footer .ie-access-date {
     max-width: 255px;
-    margin-top: 14px;
-    font-size: 0.84rem;
+    font-size: 1.05rem;
     line-height: 1.35;
     text-wrap: balance;
   }
@@ -489,6 +531,7 @@
   .ie-front::before,
   .ie-copy > *,
   .ie-insert-copy > *,
+  .ie-insert-footer,
   .ie-script span,
   .ie-script::after { animation-duration: 1ms !important; animation-delay: 0ms !important; }
 }

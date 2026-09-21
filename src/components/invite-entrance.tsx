@@ -176,6 +176,9 @@ export function InviteEntrance() {
                 >
                   <span>Welcome, {state.householdName}</span>
                 </p>
+              </div>
+              <div className="ie-insert-footer">
+                <p className="ie-insert-footer-label">Wedding weekend</p>
                 <p className="ie-access-date">May 29-30, 2027 &middot; Wyndham Grand, Pittsburgh Downtown</p>
               </div>
             </div>
