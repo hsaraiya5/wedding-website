@@ -11,10 +11,11 @@ import "./invite-entrance.css";
 // card that turns to reveal an envelope, which opens to lift out a
 // "Welcome, <household>" card before handing off to the real site.
 // Phases are cumulative (matching the original's classList.add sequence --
-// each stage's CSS relies on earlier stages' classes still being present,
-// e.g. the red "turning" background must persist through "leaving").
-const PHASES = ["turning", "opening", "lifting", "welcoming", "leaving"] as const;
-type PhaseIndex = 0 | 1 | 2 | 3 | 4 | 5;
+// each stage's CSS relies on earlier stages' classes still being present.
+// The launch phase then overrides the envelope state to hand the revealed
+// card cleanly into the home page.
+const PHASES = ["turning", "opening", "lifting", "welcoming", "launching", "leaving"] as const;
+type PhaseIndex = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 
 const initialState: RedeemCodeState = { error: null, householdName: null };
 
@@ -83,23 +84,24 @@ export function InviteEntrance() {
     if (!state.householdName || startedRef.current) return;
     startedRef.current = true;
 
-    const reducedMotion =
-      typeof window !== "undefined" &&
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const timing = reducedMotion ? [10, 30, 50, 80, 180, 240] : [70, 980, 1900, 3000, 5200, 5900];
-
+    // Deliberately always plays the full envelope sequence, ignoring
+    // prefers-reduced-motion -- this is a one-time, few-second delight
+    // moment for a small trusted guest list, not general site UI, and the
+    // couple chose showing it in full over an abbreviated fallback.
     document.body.style.overflow = "hidden";
 
+    const timing = [50, 600, 1150, 1600, 2400, 4200, 4650];
     const timers = [
       setTimeout(() => setPhaseIndex(1), timing[0]),
       setTimeout(() => setPhaseIndex(2), timing[1]),
       setTimeout(() => setPhaseIndex(3), timing[2]),
       setTimeout(() => setPhaseIndex(4), timing[3]),
       setTimeout(() => setPhaseIndex(5), timing[4]),
+      setTimeout(() => setPhaseIndex(6), timing[5]),
       setTimeout(() => {
         document.body.style.overflow = "";
         router.push("/home");
-      }, timing[5]),
+      }, timing[6]),
     ];
 
     return () => {
@@ -119,7 +121,7 @@ export function InviteEntrance() {
     <div
       className={`ie-access ${activeClasses}`.trim()}
       style={heroArtStyle}
-      aria-busy={phaseIndex > 0 && phaseIndex < 5 ? "true" : undefined}
+      aria-busy={phaseIndex > 0 && phaseIndex < 6 ? "true" : undefined}
       aria-labelledby="ie-access-title"
     >
       <div className="ie-card-shell">
@@ -172,7 +174,14 @@ export function InviteEntrance() {
                 >
                   <span>Welcome, {state.householdName}</span>
                 </p>
-                <p className="ie-access-date">May 29-30, 2027 &middot; Wyndham Grand, Pittsburgh Downtown</p>
+              </div>
+              <div className="ie-insert-footer">
+                <p className="ie-insert-footer-label">Wedding weekend</p>
+                <p className="ie-access-date">
+                  May 29-30, 2027
+                  <br />
+                  Wyndham Grand, Pittsburgh Downtown
+                </p>
               </div>
             </div>
             <div className="ie-env-side ie-left" />
