@@ -234,7 +234,12 @@
   position: relative;
   z-index: 1;
   align-self: end;
-  width: 100%;
+  /* Narrower than the full card width -- at 100% the date/venue line ran
+     under the corner floral art on both sides. Stacking the date and
+     venue onto their own lines (see the <br /> in the component) instead
+     of one long line is what actually needed the narrower box; this just
+     keeps it centered within that. */
+  width: min(420px, 78%);
   padding-top: 18px;
   display: grid;
   justify-items: center;
@@ -262,6 +267,7 @@
 .ie-insert-footer .ie-access-date {
   margin-top: 0;
   font-size: 1.4rem;
+  line-height: 1.35;
 }
 .ie-access.ie-welcoming .ie-insert-footer { animation: ie-copy-arrive 420ms ease 980ms both; }
 
