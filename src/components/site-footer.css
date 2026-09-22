@@ -26,6 +26,9 @@
   background-image: var(--sf-floral-art);
   background-size: auto 330px;
   background-repeat: no-repeat;
+  /* Match every other section's --sc-rail-opacity (section.css) so the
+     footer's botanical art isn't the only one at full saturation. */
+  opacity: 0.55;
   pointer-events: none;
 }
 .sf-footer::before {
