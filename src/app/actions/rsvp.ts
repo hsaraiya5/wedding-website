@@ -26,7 +26,6 @@ export async function submitRsvp(
     return { error: "Please answer for at least one event before submitting." };
   }
 
-  const songRequest = String(formData.get("song_request") ?? "").trim() || null;
   const dietaryNeeds = String(formData.get("dietary_needs") ?? "").trim() || null;
   const accessibilityNeeds = String(formData.get("accessibility_needs") ?? "").trim() || null;
   const householdNote = String(formData.get("household_note") ?? "").trim() || null;
@@ -42,7 +41,6 @@ export async function submitRsvp(
   const supabase = await createClient();
   const { error } = await supabase.rpc("submit_rsvp", {
     p_answers: answers,
-    p_song_request: songRequest,
     p_whatsapp_numbers: whatsappNumbers,
     p_dietary_needs: dietaryNeeds,
     p_accessibility_needs: accessibilityNeeds,
@@ -53,6 +51,11 @@ export async function submitRsvp(
     if (error.message.includes("rsvp_closed")) {
       return {
         error: "The RSVP deadline has passed and edits are no longer accepted.",
+      };
+    }
+    if (error.message.includes("too_many_whatsapp_numbers")) {
+      return {
+        error: "You can't add more WhatsApp numbers than guests on your invitation.",
       };
     }
     return { error: "Something went wrong submitting your RSVP. Please try again." };

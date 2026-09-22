@@ -250,6 +250,13 @@ export function EventFlipCards({ events, startIndex = 0 }: { events: Event[]; st
                     ) : null}
                   </div>
                   <div className="ef-meal">
+                    <span>Time</span>
+                    <strong>
+                      {formatEventTime(event.start_time)}
+                      {event.end_time ? ` to ${formatEventTime(event.end_time)}` : ""}
+                    </strong>
+                  </div>
+                  <div className="ef-meal">
                     <span>Meal</span>
                     <strong>{event.meal_info || "Coming soon"}</strong>
                   </div>

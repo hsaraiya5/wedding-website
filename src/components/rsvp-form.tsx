@@ -15,7 +15,6 @@ type Household = {
   id: string;
   display_name: string;
   rsvp_submitted_at: string | null;
-  song_request: string | null;
   dietary_needs: string | null;
   accessibility_needs: string | null;
   household_note: string | null;
@@ -113,7 +112,6 @@ export function RsvpForm({
   }, [existingRsvps]);
 
   const [answers, setAnswers] = useState(initialAnswers);
-  const [songRequest, setSongRequest] = useState(household.song_request ?? "");
   const [dietaryNeeds, setDietaryNeeds] = useState(household.dietary_needs ?? "");
   const [accessibilityNeeds, setAccessibilityNeeds] = useState(household.accessibility_needs ?? "");
   const [householdNote, setHouseholdNote] = useState(household.household_note ?? "");
@@ -128,7 +126,8 @@ export function RsvpForm({
       prev.map((entry, i) => (i === index ? { ...entry, phone_number: value } : entry))
     );
   };
-  const addPhoneNumber = () => setPhoneNumbers((prev) => [...prev, { phone_number: "" }]);
+  const addPhoneNumber = () =>
+    setPhoneNumbers((prev) => (prev.length >= guests.length ? prev : [...prev, { phone_number: "" }]));
   const removePhoneNumber = (index: number) =>
     setPhoneNumbers((prev) => prev.filter((_, i) => i !== index));
 
@@ -248,12 +247,6 @@ export function RsvpForm({
                 </div>
               ))}
             </div>
-
-            {household.song_request ? (
-              <p className="mt-4 text-sm text-muted-foreground">
-                Song request: {household.song_request}
-              </p>
-            ) : null}
 
             {canEdit ? (
               <button type="button" className="rv-edit-pill" onClick={() => setMode("edit")}>
@@ -398,9 +391,15 @@ export function RsvpForm({
                       ) : null}
                     </div>
                   ))}
-                  <button type="button" className="rv-edit-pill self-start" onClick={addPhoneNumber}>
-                    Add another number
-                  </button>
+                  {phoneNumbers.length < guests.length ? (
+                    <button type="button" className="rv-edit-pill self-start" onClick={addPhoneNumber}>
+                      Add another number
+                    </button>
+                  ) : (
+                    <p className="text-sm text-muted-foreground">
+                      You&apos;ve added a number for every guest on your invitation.
+                    </p>
+                  )}
                 </div>
               </div>
 
@@ -451,19 +450,6 @@ export function RsvpForm({
                     />
                   </div>
                 </div>
-              </div>
-
-              <div className="rv-song-field">
-                <Label htmlFor="song_request">
-                  Song request <small>(optional)</small>
-                </Label>
-                <Textarea
-                  id="song_request"
-                  name="song_request"
-                  value={songRequest}
-                  onChange={(event) => setSongRequest(event.target.value)}
-                  placeholder="Song title and artist"
-                />
               </div>
 
               <div className="rv-submit">

@@ -150,15 +150,13 @@
 .rv-nav:disabled { opacity: 0; pointer-events: none; }
 
 /* Handoff's ".rsvp-end": the household-updates block spans the full width,
-   then song request (left, flexible) and the submit button (right, auto)
-   sit on one row aligned to their bottoms -- which is what puts "Stamp our
-   RSVP" in the bottom-right corner of the ticket. */
+   then the submit button sits alone on the final row, pushed to the right
+   edge -- which is what puts "Stamp our RSVP" in the bottom-right corner
+   of the ticket. */
 .rv-end {
   margin-top: 32px;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
   gap: 32px;
-  align-items: end;
   border-top: 1px dashed rgba(113, 43, 49, 0.28);
   padding-top: 40px;
 }
@@ -237,8 +235,7 @@
 .rv-needs-field:last-child { grid-column: 1 / -1; }
 .rv-needs-field label small { color: var(--muted-foreground); font-size: 0.8rem; }
 
-.rv-needs-field textarea,
-.rv-song-field textarea {
+.rv-needs-field textarea {
   min-height: 96px;
   border: 1px solid rgba(113, 43, 49, 0.34);
   border-radius: 4px;
@@ -249,14 +246,12 @@
   font-size: 1rem;
   line-height: 1.5;
 }
-.rv-needs-field textarea:focus-visible,
-.rv-song-field textarea:focus-visible {
+.rv-needs-field textarea:focus-visible {
   border-color: var(--primary);
   outline: 3px solid rgba(161, 63, 61, 0.12);
   box-shadow: none;
 }
-.rv-needs-field textarea::placeholder,
-.rv-song-field textarea::placeholder { color: #9a8c80; }
+.rv-needs-field textarea::placeholder { color: #9a8c80; }
 
 .rv-consent {
   margin-top: 18px;
@@ -280,9 +275,7 @@
 .rv-consent strong { color: var(--foreground); font-size: 0.92rem; }
 .rv-consent small { margin-top: 3px; color: var(--muted-foreground); font-size: 0.78rem; line-height: 1.45; }
 
-.rv-song-field { min-width: 0; }
-.rv-song-field label small { color: var(--muted-foreground); font-size: 0.8rem; }
-.rv-submit { display: flex; gap: 12px; }
+.rv-submit { display: flex; justify-self: end; gap: 12px; }
 .rv-error { grid-column: 1 / -1; margin: 0; color: var(--destructive); font-size: 0.9rem; }
 
 .rv-confirmation { max-width: 820px; min-height: 650px; margin: 0 auto; display: grid; align-content: center; justify-items: center; padding: 18px 0; text-align: center; }
