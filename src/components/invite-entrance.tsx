@@ -135,11 +135,11 @@ export function InviteEntrance() {
               <h1 id="ie-access-title">Gayathri &amp; Hrishikesh</h1>
               <p className="ie-access-date">May 29-30, 2027 &middot; Wyndham Grand, Pittsburgh Downtown</p>
               <form action={formAction} className="ie-code-form">
-                <label htmlFor="invite-code">Invitation code</label>
+                <label htmlFor="invite-code">Invite code</label>
                 <input
                   id="invite-code"
                   name="code"
-                  placeholder="Enter your code"
+                  placeholder="Enter your invite code"
                   autoComplete="off"
                   disabled={pending || phaseIndex > 0}
                   aria-describedby="ie-code-error"
