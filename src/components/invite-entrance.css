@@ -1,10 +1,14 @@
 /*
-  Ported from the design handoff (developer-handoff/index.html, ".access"
-  section) -- the invite-code entrance: a 3D-flipping card that turns to
-  reveal an envelope, which opens to lift out a "Welcome, <household>" card.
-  Class names prefixed ie- (invite-entrance) to avoid colliding with
-  anything else in the app; values are the designer's literal colors for
-  this one illustration, not general theme tokens.
+  The invite-code entrance. A sealed envelope arrives, the guest writes their
+  code onto its address lines, and a valid code parts the wax so both flaps can
+  unfold and reveal the invitation card that was underneath all along.
+
+  Staging is full-bleed rather than a fixed-aspect card, which is what lets one
+  set of rules serve both orientations: only the envelope's own proportions and
+  the floral rail widths change between desktop and phone, never the mechanic.
+
+  Class names prefixed ie- (invite-entrance). Colors here are the designer's
+  literal values for this one illustration, not general theme tokens.
 */
 
 .ie-access {
@@ -16,22 +20,22 @@
   overflow: hidden;
   background: #fbf6eb;
   padding: 40px;
-  perspective: 1800px;
-  transition: background 520ms ease, opacity 480ms ease, visibility 0s linear 480ms;
+  perspective: 1600px;
+  transition: background 620ms ease, opacity 520ms ease, visibility 0s linear 520ms;
 }
-.ie-access.ie-turning { background: #963940; }
-.ie-access.ie-launching { background: #fffaf0; }
-.ie-access.ie-leaving { opacity: 0; visibility: hidden; pointer-events: none; }
+.ie-access[data-stage="opening"],
+.ie-access[data-stage="welcoming"] { background: #f4e6d8; }
+.ie-access[data-stage="launching"],
+.ie-access[data-stage="done"] { background: #fffaf0; }
 
-/* Subtle, always-discoverable admin entry point -- otherwise finding the
-   admin login means knowing to type /admin/login by hand. Only shown
-   before a code submission starts (phaseIndex === 0 in the component), so
-   it doesn't linger over the card-flip/envelope animation. */
+/* Subtle, always-discoverable admin entry point -- otherwise finding the admin
+   login means knowing to type /admin/login by hand. Hidden once the envelope
+   starts opening so it doesn't linger over the reveal. */
 .ie-admin-link {
   position: absolute;
   right: 20px;
   bottom: 16px;
-  z-index: 2;
+  z-index: 3;
   color: rgba(51, 41, 34, 0.38);
   font-size: 0.72rem;
   font-weight: 700;
@@ -42,512 +46,509 @@
 }
 .ie-admin-link:hover { color: #a13f3d; }
 
-.ie-card-shell {
+/* ---------- the envelope ---------- */
+
+.ie-env {
   position: relative;
-  isolation: isolate;
-  width: min(1480px, 80vw, calc((100svh - 140px) * 1.7768));
-  aspect-ratio: 1672 / 941;
-  animation: ie-card-arrive 900ms cubic-bezier(0.18, 0.78, 0.2, 1) both;
+  z-index: 2;
+  /* Sized against both axes: a share of the width, a hard cap so it can't
+     get silly on an ultrawide, and a height bound so the envelope never
+     outgrows a short laptop window. The old flat 520px cap bound long
+     before the viewport ran out of room, leaving it marooned in space. */
+  width: min(66vw, 940px, calc((100svh - 190px) * 1.5));
+  aspect-ratio: 1.5;
+  transform-origin: center;
+  transition: transform 880ms cubic-bezier(0.2, 0.75, 0.2, 1), opacity 420ms ease;
 }
-.ie-card-shell::after {
-  content: "";
+.ie-access[data-stage="idle"] .ie-env {
+  opacity: 0;
+  transform: translate(-28%, -175%) rotate(-13deg) scale(0.66);
+}
+.ie-access[data-stage="breaking"] .ie-env { transform: scale(1.02); }
+.ie-access[data-stage="welcoming"] .ie-env { transform: scale(1.12); }
+.ie-access[data-stage="launching"] .ie-env,
+.ie-access[data-stage="done"] .ie-env { opacity: 0; transform: scale(1.55); }
+
+.ie-env-shadow {
   position: absolute;
-  right: 7%;
-  bottom: -24px;
-  left: 7%;
-  z-index: -1;
-  height: 44px;
+  left: 8%;
+  right: 8%;
+  bottom: -6%;
+  height: 12%;
   border-radius: 50%;
-  background: rgba(50, 13, 20, 0.42);
-  filter: blur(22px);
-  opacity: 0.72;
-  transform: scaleX(0.94);
-  transition: opacity 520ms ease, transform 680ms ease;
+  background: rgba(60, 20, 26, 0.44);
+  filter: blur(16px);
+  opacity: 0;
+  transform: scaleX(1.25);
+  transition: opacity 700ms ease, transform 700ms ease;
 }
-.ie-access.ie-turning .ie-card-shell::after { opacity: 0.9; transform: scaleX(0.82) translateY(8px); }
-.ie-access.ie-lifting .ie-card-shell::after { opacity: 0.5; transform: scaleX(0.7) translateY(88px); }
+.ie-access[data-stage="arriving"] .ie-env-shadow,
+.ie-access[data-stage="sealed"] .ie-env-shadow,
+.ie-access[data-stage="writing"] .ie-env-shadow,
+.ie-access[data-stage="breaking"] .ie-env-shadow { opacity: 0.5; transform: scaleX(1); }
+
+/* Wrong code: the envelope shudders and the wax holds. */
+.ie-env.ie-refusing { animation: ie-refuse 520ms cubic-bezier(0.36, 0.07, 0.19, 0.97); }
+@keyframes ie-refuse {
+  10%, 90% { transform: translateX(-2%) rotate(-0.5deg); }
+  30%, 70% { transform: translateX(2.4%) rotate(0.7deg); }
+  50% { transform: translateX(-1.6%) rotate(-0.4deg); }
+}
+
+/* ---------- the card inside ---------- */
 
 .ie-card {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  transform-style: preserve-3d;
-  will-change: transform;
-  transition: transform 680ms cubic-bezier(0.2, 0.72, 0.2, 1);
-}
-.ie-access.ie-turning .ie-card { transform: rotateY(180deg) translateZ(20px); }
-.ie-access.ie-opening .ie-card { transform: translateY(96px) scale(0.78) rotateY(180deg) translateZ(30px); }
-.ie-access.ie-lifting .ie-card { transform: translateY(96px) scale(0.78) rotateY(180deg) translateZ(44px); }
-.ie-access.ie-launching .ie-card { transform: rotateY(180deg) translateZ(44px); }
-
-.ie-face {
   position: absolute;
-  inset: 0;
-  border: 1px solid rgba(113, 43, 49, 0.16);
-  box-shadow: 0 30px 90px rgba(73, 22, 29, 0.25);
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-  border-radius: 6px;
-}
-.ie-front {
-  z-index: 2;
+  inset: 3.5%;
+  z-index: 4;
+  container-type: inline-size;
   overflow: hidden;
+  border-radius: 2px;
+  background: #fffaf0;
+  box-shadow: 0 2px 10px rgba(70, 24, 32, 0.18);
   display: grid;
   place-items: center;
-  background: #fffaf0;
-  text-align: center;
+  /* Width of the botanical rails on each edge. Everything else on the card
+     derives its clearance from this one value, so the copy can never end up
+     sitting on the flowers at any viewport. */
+  --ie-rail-w: 20%;
+  --ie-rail-gap: 4%;
 }
-.ie-front::before {
-  content: "";
+
+/* The rails tile vertically at their natural width ratio -- the reason the
+   card can change aspect without the botanical art distorting. The previous
+   version stretched a single landscape image to 100% 100%, which squashed the
+   flowers badly once the card went portrait on a phone. */
+.ie-rail {
   position: absolute;
-  inset: 0;
-  background: var(--ie-hero-art) center / 100% 100% no-repeat;
-  transform-origin: bottom center;
-  animation: ie-bloom 1500ms cubic-bezier(0.18, 0.78, 0.2, 1) both;
+  top: 0;
+  bottom: 0;
+  z-index: 0;
+  width: var(--ie-rail-w);
+  background-size: 100% auto;
+  background-repeat: repeat-y;
+  pointer-events: none;
 }
-.ie-copy {
+.ie-rail-left { left: 0; background-image: var(--ie-rail-left); background-position: left top; }
+.ie-rail-right { right: 0; background-image: var(--ie-rail-right); background-position: right top; }
+
+.ie-card-copy {
   position: relative;
   z-index: 1;
-  width: min(720px, 64%);
+  width: 100%;
+  /* Reserve the rails plus a gutter, so the centre column is the only place
+     copy can land. Symmetric, so the block also reads as optically centred. */
+  padding-inline: calc(var(--ie-rail-w) + var(--ie-rail-gap));
   display: grid;
   justify-items: center;
-  padding: 32px;
+  text-align: center;
+  opacity: 0;
+  transition: opacity 420ms ease;
 }
-.ie-copy > * { opacity: 0; animation: ie-copy-arrive 600ms ease both; }
-.ie-copy .ie-monogram { animation-delay: 180ms; }
-.ie-copy > .ie-eyebrow { animation-delay: 280ms; }
-.ie-copy h1 { animation-delay: 380ms; }
-.ie-copy .ie-access-date { animation-delay: 480ms; }
-.ie-copy .ie-code-form { animation-delay: 580ms; }
-.ie-copy h1 {
-  margin-top: 8px;
-  color: #712b31;
-  font-family: var(--font-heading);
-  font-weight: 400;
-  font-size: clamp(2.4rem, 4.3vw, 3.8rem);
-  line-height: 1.02;
-}
-.ie-copy .ie-code-form { width: min(420px, 100%); margin-top: 24px; }
-.ie-copy .ie-access-date { font-size: 1.15rem; }
-
-.ie-back {
-  z-index: 1;
-  overflow: visible;
-  background: #a8444c;
-  perspective: 1400px;
-  transform: rotateY(180deg);
-}
-.ie-back::before {
-  content: "";
-  position: absolute;
-  inset: 13px;
-  z-index: 1;
-  border: 1px solid rgba(255, 244, 220, 0.18);
-  box-shadow: inset 0 0 42px rgba(70, 17, 28, 0.15);
-  pointer-events: none;
-  transition: opacity 520ms ease;
-}
+.ie-access[data-stage="opening"] .ie-card-copy,
+.ie-access[data-stage="welcoming"] .ie-card-copy,
+.ie-access[data-stage="launching"] .ie-card-copy,
+.ie-access[data-stage="done"] .ie-card-copy { opacity: 1; }
 
 .ie-monogram {
-  width: 60px;
-  height: 60px;
-  margin-bottom: 18px;
+  width: clamp(26px, 5cqw, 44px);
+  aspect-ratio: 1;
   display: grid;
   place-items: center;
+  margin-bottom: 5px;
   border: 1px solid #a13f3d;
   border-radius: 50%;
   color: #a13f3d;
-  font-family: var(--font-heading);
-  font-size: 1.1rem;
+  font-family: var(--font-display);
+  font-size: clamp(0.42rem, 1.1cqw, 0.66rem);
+  letter-spacing: 0.06em;
 }
 .ie-eyebrow {
+  margin: 0;
   color: #a13f3d;
-  font-size: 0.85rem;
+  font-family: var(--font-body);
+  font-size: clamp(0.4rem, 1cqw, 0.58rem);
   font-weight: 800;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
 }
-.ie-access-date {
-  margin-top: 8px;
-  color: #1f5c76;
-  font-family: var(--font-heading);
-  font-size: 1.1rem;
-}
-
-.ie-insert,
-.ie-env-pocket,
-.ie-env-side,
-.ie-env-flap,
-.ie-seal { position: absolute; }
-
-.ie-insert {
-  inset: 7%;
-  z-index: 2;
-  display: grid;
-  grid-template-rows: 1fr auto;
-  justify-items: center;
-  padding: 6% 8% 5%;
-  overflow: hidden;
-  background: #fffaf0 var(--ie-hero-art) center / 100% 100% no-repeat;
-  border: 1px solid rgba(113, 43, 49, 0.15);
-  /* Static, not transitioned -- animating box-shadow forces a full
-     repaint every frame (it can't be composited like transform/opacity
-     can), and doing that on the same element as a concurrent transform
-     was the main source of the choppiness reported on mobile. One
-     shadow that reads fine at every phase instead of three that
-     interpolate between each other. */
-  box-shadow: 0 26px 64px rgba(71, 24, 31, 0.26);
-  opacity: 0;
-  transform: translateY(8%) scale(0.88) rotateX(-3deg);
-  transform-origin: center center;
-  will-change: transform;
-  transition: opacity 180ms ease 360ms, transform 850ms cubic-bezier(0.16, 0.82, 0.2, 1), z-index 0s linear 620ms;
-  border-radius: 4px;
-}
-.ie-access.ie-opening .ie-insert { opacity: 1; }
-.ie-access.ie-lifting .ie-insert {
-  z-index: 8;
-  transform: translateY(-30%) scale(0.92) rotateX(0);
-}
-.ie-access.ie-launching .ie-insert {
-  z-index: 10;
-  transform: translateY(0) scale(1.12) rotateX(0);
-  transition: transform 820ms cubic-bezier(0.16, 0.82, 0.2, 1), z-index 0s;
-}
-.ie-insert-copy {
-  position: relative;
-  z-index: 1;
-  /* end, not center -- .ie-insert's "1fr auto" rows give this row all the
-     card's leftover height, and centering short copy inside it left a
-     visibly empty band between the flourish line and the footer's own
-     divider on wide cards. Anchoring to the footer instead pushes any
-     extra space above the monogram, which reads as intentional margin. */
-  align-self: end;
-  width: min(760px, 66%);
-  min-width: 0;
-  display: grid;
-  justify-items: center;
-  text-align: center;
-}
-.ie-insert-copy > .ie-monogram,
-.ie-insert-copy > .ie-eyebrow {
-  opacity: 0;
-  transform: translateY(12px);
-}
-.ie-access.ie-welcoming .ie-insert-copy > .ie-monogram { animation: ie-copy-arrive 420ms ease both; }
-.ie-access.ie-welcoming .ie-insert-copy > .ie-eyebrow { animation: ie-copy-arrive 420ms ease 90ms both; }
-
-/* A quieter "signature line" anchored at the card's bottom edge, separate
-   from the centered welcome message above -- previously this sat inside
-   .ie-insert-copy at a small size, crowding the top of the card and
-   leaving the rest empty. */
-.ie-insert-footer {
-  position: relative;
-  z-index: 1;
-  align-self: end;
-  /* Narrower than the full card width -- at 100% the date/venue line ran
-     under the corner floral art on both sides. Stacking the date and
-     venue onto their own lines (see the <br /> in the component) instead
-     of one long line is what actually needed the narrower box; this just
-     keeps it centered within that. */
-  width: min(420px, 78%);
-  padding-top: 18px;
-  display: grid;
-  justify-items: center;
-  gap: 6px;
-  text-align: center;
-  opacity: 0;
-  transform: translateY(12px);
-}
-.ie-insert-footer::before {
-  content: "";
-  display: block;
-  width: 30%;
-  height: 1px;
-  margin-bottom: 10px;
-  background: #712b31;
-  opacity: 0.3;
-}
-.ie-insert-footer-label {
-  color: #a13f3d;
-  font-size: 0.78rem;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-.ie-insert-footer .ie-access-date {
-  margin-top: 0;
-  /* At 1.4rem the venue line ran into the corner floral art on wide
-     cards -- the 420px box leaves barely any clearance from the blooms
-     at this vertical position. Matching the mobile size (already tuned
-     for this exact line) keeps it clear at every width. */
-  font-size: 1.05rem;
-  line-height: 1.35;
-}
-.ie-access.ie-welcoming .ie-insert-footer { animation: ie-copy-arrive 420ms ease 980ms both; }
-
 .ie-script {
-  position: relative;
-  z-index: 1;
   width: 100%;
   min-width: 0;
-  margin-top: 10px;
+  margin: 6px 0 0;
   color: #712b31;
   font-family: var(--font-script);
-  /* Default/SSR fallback before JS measures the real text width via
-     canvas and sets an inline font-size (see InviteEntrance) -- that
-     measurement is what actually makes "Welcome, <Household>" fill the
-     card regardless of name length; this clamp only covers the brief
-     window before that effect runs. */
-  font-size: clamp(1.6rem, 5vw, 3.9rem);
-  /* 1.12 clipped descenders (e.g. the "y" in a household name) against
-     .ie-insert's overflow: hidden -- this script font's descenders need
-     more room than that line-height reserves. */
-  line-height: 1.32;
-  text-align: center;
-  text-shadow: 0 2px 0 rgba(255, 255, 255, 0.72), 0 12px 30px rgba(113, 43, 49, 0.16);
+  /* Fallback only: an inline font-size measured on canvas replaces this as
+     soon as the household name is known (see InviteEntrance). */
+  font-size: clamp(1.1rem, 3.4cqw, 2.1rem);
+  /* 1.12 clipped descenders against the card's overflow; this script's
+     descenders need more room than that reserves. */
+  line-height: 1.3;
+  text-wrap: balance;
 }
-.ie-script span {
-  display: block;
-  overflow: hidden;
-  white-space: normal;
-  clip-path: inset(0 100% 0 0);
+.ie-script span { display: block; clip-path: inset(0 100% 0 0); }
+.ie-access[data-stage="welcoming"] .ie-script span,
+.ie-access[data-stage="launching"] .ie-script span,
+.ie-access[data-stage="done"] .ie-script span {
+  animation: ie-write 950ms cubic-bezier(0.2, 0.7, 0.2, 1) forwards;
 }
-.ie-script::after {
-  content: "";
-  display: block;
-  width: 42%;
-  height: 1px;
-  margin: 22px auto 0;
-  background: currentColor;
-  opacity: 0.5;
-  transform: scaleX(0);
-  transform-origin: left;
-}
-.ie-access.ie-welcoming .ie-script span { animation: ie-write-welcome 1100ms cubic-bezier(0.18, 0.7, 0.2, 1) forwards; }
-.ie-access.ie-welcoming .ie-script::after { animation: ie-draw-flourish 450ms ease 850ms forwards; }
+@keyframes ie-write { to { clip-path: inset(0 0 0 0); } }
 
-.ie-env-pocket {
-  right: 0;
-  bottom: 0;
+.ie-flourish {
+  width: 36%;
+  height: 1px;
+  margin-top: 12px;
+  background: #712b31;
+  opacity: 0.4;
+  transform: scaleX(0);
+  transform-origin: center;
+}
+.ie-access[data-stage="welcoming"] .ie-flourish,
+.ie-access[data-stage="launching"] .ie-flourish,
+.ie-access[data-stage="done"] .ie-flourish {
+  animation: ie-draw 460ms ease 720ms forwards;
+}
+@keyframes ie-draw { to { transform: scaleX(1); } }
+
+/* ---------- the two flaps ---------- */
+
+/* Each flap is a full-width panel rather than a triangle, so the card stays
+   completely covered until the unfold. The iconic envelope V is painted onto
+   the upper panel instead of being its shape -- a real triangle would leave
+   the card showing through the top corners before the reveal. */
+.ie-flap {
+  position: absolute;
   left: 0;
-  z-index: 4;
-  height: 58%;
-  clip-path: polygon(0 0, 50% 48%, 100% 0, 100% 100%, 0 100%);
-  background: #993a44;
-  box-shadow: inset 0 16px 34px rgba(79, 25, 35, 0.2), 0 -2px 0 rgba(255, 245, 221, 0.1);
-  will-change: transform;
-  transition: opacity 380ms ease, transform 700ms cubic-bezier(0.18, 0.78, 0.2, 1);
-}
-.ie-env-side { bottom: 0; z-index: 3; width: 51%; height: 67%; background: #bd5c63; will-change: transform; transition: opacity 380ms ease, transform 700ms cubic-bezier(0.18, 0.78, 0.2, 1); }
-.ie-env-side.ie-left { left: 0; clip-path: polygon(0 0, 100% 55%, 0 100%); }
-.ie-env-side.ie-right { right: 0; clip-path: polygon(100% 0, 0 55%, 100% 100%); }
-.ie-env-flap {
-  inset: 0 0 auto;
+  right: 0;
   z-index: 6;
-  height: 62%;
-  transform-origin: top center;
-  clip-path: polygon(0 0, 100% 0, 50% 100%);
-  background: #d17a76;
-  box-shadow: 0 12px 26px rgba(65, 17, 27, 0.18);
-  will-change: transform;
-  transition: opacity 380ms ease, transform 680ms cubic-bezier(0.2, 0.78, 0.2, 1) 160ms, z-index 0s linear 760ms;
+  overflow: hidden;
+  background: #a8444c;
+  transition: transform 820ms cubic-bezier(0.36, 0.72, 0.24, 1), opacity 420ms ease,
+    z-index 0s linear 400ms;
 }
-.ie-env-flap::after {
+
+.ie-flap-top {
+  top: 0;
+  height: 53%;
+  transform-origin: top center;
+  box-shadow: 0 5px 16px rgba(64, 16, 24, 0.28);
+}
+.ie-flap-top::before {
   content: "";
   position: absolute;
   inset: 0;
-  background: var(--ie-hero-art) top center / 100% auto no-repeat;
-  opacity: 0.18;
+  z-index: 1;
+  background: linear-gradient(172deg, #c2686a, #b55a5f);
+  clip-path: polygon(0 0, 100% 0, 50% 96%);
 }
-.ie-seal {
-  top: 43%;
-  left: 50%;
-  z-index: 7;
-  width: 68px;
-  height: 68px;
+
+.ie-flap-bot {
+  bottom: 0;
+  height: 51%;
+  transform-origin: bottom center;
+  background: linear-gradient(185deg, #9e3f48, #a8444c);
+}
+
+.ie-access[data-stage="opening"] .ie-flap-top,
+.ie-access[data-stage="welcoming"] .ie-flap-top,
+.ie-access[data-stage="launching"] .ie-flap-top,
+.ie-access[data-stage="done"] .ie-flap-top { transform: rotateX(173deg); z-index: 1; }
+.ie-access[data-stage="opening"] .ie-flap-bot,
+.ie-access[data-stage="welcoming"] .ie-flap-bot,
+.ie-access[data-stage="launching"] .ie-flap-bot,
+.ie-access[data-stage="done"] .ie-flap-bot { transform: rotateX(-173deg); z-index: 1; }
+.ie-access[data-stage="welcoming"] .ie-flap,
+.ie-access[data-stage="launching"] .ie-flap,
+.ie-access[data-stage="done"] .ie-flap { opacity: 0; }
+
+/* ---------- the address block ---------- */
+
+.ie-addr {
+  position: absolute;
+  left: 9%;
+  right: 9%;
+  /* Centred in the lower flap rather than pinned to its bottom edge: once the
+     envelope scales with the viewport, a bottom anchor leaves a widening void
+     between the wax and the address block. */
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 3;
+  display: grid;
+  gap: clamp(8px, 1.2vw, 13px);
+  justify-items: center;
+  text-align: center;
+  transition: opacity 300ms ease;
+}
+/* The writing goes with the envelope: fade it as the flap turns, rather than
+   letting the guest read their own code mirrored on the flap's back face. */
+.ie-access[data-stage="opening"] .ie-addr,
+.ie-access[data-stage="welcoming"] .ie-addr,
+.ie-access[data-stage="launching"] .ie-addr,
+.ie-access[data-stage="done"] .ie-addr { opacity: 0; pointer-events: none; }
+
+.ie-addr-names {
+  margin: 0;
+  color: #ffeede;
+  font-family: var(--font-display);
+  font-size: clamp(0.55rem, 1.1vw, 0.74rem);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  opacity: 0.75;
+}
+/* The plaque itself: warm paper stock laid onto the envelope, lifted just
+   enough to read as affixed rather than printed. */
+.ie-addr-plate {
+  position: relative;
+  width: 100%;
+  /* Capped so the plaque doesn't stretch into a slab once the envelope grows
+     with the viewport -- a label keeps its own proportions. */
+  max-width: 440px;
+  min-height: clamp(38px, 4.8vw, 50px);
+  border: 1px solid rgba(113, 43, 49, 0.2);
+  border-radius: 3px;
+  background: linear-gradient(180deg, #fffaf0, #f7ecd9);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7), 0 3px 10px rgba(58, 12, 20, 0.22);
+  transition: border-color 180ms ease, box-shadow 180ms ease;
+}
+.ie-addr-plate:has(.ie-code-input:focus) {
+  border-color: rgba(161, 63, 61, 0.7);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7), 0 0 0 3px rgba(161, 63, 61, 0.15),
+    0 3px 10px rgba(58, 12, 20, 0.22);
+}
+
+/* Ink and placeholder share the plaque's centre; only one shows at a time,
+   so both are taken out of flow rather than competing for the line box. */
+.ie-addr-ink,
+.ie-addr-ph {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-inline: 12px;
+  pointer-events: none;
+}
+.ie-addr-ink {
+  overflow: hidden;
+  color: #712b31;
+  font-family: var(--font-script);
+  font-size: clamp(1rem, 2.1vw, 1.5rem);
+  line-height: 1;
+}
+.ie-addr-ph {
+  color: rgba(117, 103, 92, 0.8);
+  font-family: var(--font-body);
+  font-size: clamp(0.5rem, 1vw, 0.62rem);
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  transition: opacity 160ms ease;
+}
+/* Standard field behaviour: the prompt steps aside once the guest is writing. */
+.ie-addr-plate:has(.ie-code-input:focus) .ie-addr-ph { opacity: 0; }
+
+.ie-caret {
+  width: 1.5px;
+  height: 1.05em;
+  margin-left: 1px;
+  background: #712b31;
+  opacity: 0;
+}
+.ie-addr-plate:has(.ie-code-input:focus) .ie-caret {
+  opacity: 0.85;
+  animation: ie-blink 1.05s steps(1) infinite;
+}
+@keyframes ie-blink { 50% { opacity: 0; } }
+
+/* The real input sits transparent over the plaque, so the guest writes onto
+   the envelope instead of into a form field below the artwork. */
+.ie-code-input {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: transparent;
+  caret-color: transparent;
+  text-align: center;
+  /* 16px keeps iOS Safari from zooming the viewport on focus. */
+  font-size: 16px;
+  cursor: text;
+}
+.ie-code-input:focus { outline: none; }
+.ie-code-input:disabled { cursor: default; }
+
+.ie-addr-action {
   display: grid;
   place-items: center;
-  border: 6px double rgba(255, 247, 222, 0.24);
-  border-radius: 50%;
-  background: #712b31;
-  color: #fff9ea;
-  font-family: var(--font-heading);
-  font-size: 1rem;
-  box-shadow: 0 12px 28px rgba(71, 24, 31, 0.28);
-  transform: translate(-50%, -50%);
-  transition: opacity 280ms ease 320ms, transform 480ms ease 320ms;
+  min-height: clamp(28px, 3.2vw, 34px);
 }
-.ie-access.ie-opening .ie-env-flap { z-index: 1; transform: rotateX(180deg); }
-.ie-access.ie-opening .ie-seal { opacity: 0; transform: translate(-50%, -20%) scale(0.68); }
-.ie-access.ie-lifting:not(.ie-launching) .ie-env-pocket { transform: translateY(40%); }
-.ie-access.ie-lifting:not(.ie-launching) .ie-env-side.ie-left { transform: translate(-7%, 32%); }
-.ie-access.ie-lifting:not(.ie-launching) .ie-env-side.ie-right { transform: translate(7%, 32%); }
-.ie-access.ie-launching .ie-back::before { opacity: 0; }
-.ie-access.ie-launching .ie-env-pocket { opacity: 0; transform: translateY(56%) scale(0.96); }
-.ie-access.ie-launching .ie-env-side.ie-left { opacity: 0; transform: translate(-18%, 42%) rotate(-2deg); }
-.ie-access.ie-launching .ie-env-side.ie-right { opacity: 0; transform: translate(18%, 42%) rotate(2deg); }
-.ie-access.ie-launching .ie-env-flap { opacity: 0; transform: rotateX(180deg) translateY(-26%); }
-.ie-access.ie-launching .ie-card-shell::after { opacity: 0; transform: scaleX(0.48) translateY(120px); }
-
-.ie-code-form {
-  width: 100%;
-  margin-top: 14px;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 10px;
-  text-align: left;
-}
-.ie-code-form label {
-  grid-column: 1 / -1;
-  color: #75675c;
-  font-size: 0.82rem;
-  font-weight: 800;
+.ie-addr-go {
+  border: 1px solid rgba(255, 238, 222, 0.45);
+  border-radius: 999px;
+  background: transparent;
+  padding: 8px 18px;
+  color: #ffeede;
+  font-family: var(--font-body);
+  font-size: clamp(0.48rem, 0.95vw, 0.6rem);
+  font-weight: 700;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
+  cursor: pointer;
+  transition: background 180ms ease, border-color 180ms ease, transform 180ms ease;
 }
-.ie-code-form input {
-  min-width: 0;
-  min-height: 52px;
-  border: 1px solid rgba(75, 54, 40, 0.2);
-  border-radius: 4px;
-  background: #fffdf6;
-  padding: 10px 14px;
-  font-size: 1.02rem;
-  outline-color: #1f5c76;
+.ie-addr-go:hover:not(:disabled) { background: rgba(255, 238, 222, 0.14); transform: translateY(-1px); }
+.ie-addr-go:focus-visible { outline: 2px solid #ffeede; outline-offset: 2px; }
+.ie-addr-go:disabled { opacity: 0.6; cursor: default; }
+
+/* ---------- wax seal ---------- */
+
+/* Two halves held together rather than one blob with a crack drawn on it, so
+   the break is a consequence of the flaps pulling apart. */
+.ie-seal {
+  position: absolute;
+  left: 50%;
+  top: 51%;
+  z-index: 8;
+  width: 14.5%;
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
 }
-.ie-code-submit {
-  width: 52px;
-  height: 52px;
-  border: 0;
+.ie-seal-half {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 50%;
+  overflow: hidden;
+  /* Opacity runs ahead of the travel so the wax has cleared by the time the
+     flaps expose the card -- a lingering dark blob over the reveal reads as
+     a glitch. */
+  transition: transform 560ms cubic-bezier(0.34, 0.64, 0.3, 1), opacity 360ms ease;
+}
+.ie-seal-half::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 200%;
   border-radius: 50%;
-  background: #a13f3d;
-  color: #fffdf6;
-  font-size: 1.3rem;
-  box-shadow: 0 9px 20px rgba(113, 43, 49, 0.2);
-  transition: background 180ms ease, box-shadow 220ms ease, transform 220ms ease;
+  background: radial-gradient(circle at 36% 30%, #8f3540, #712b31 60%, #571e25);
+  box-shadow: 0 4px 12px rgba(58, 12, 20, 0.45);
 }
-.ie-code-submit:hover { background: #712b31; box-shadow: 0 13px 26px rgba(113, 43, 49, 0.28); transform: translateY(-2px); }
-.ie-code-submit:disabled { opacity: 0.6; }
+/* The parted faces catch a little light, so the break reads as depth. */
+.ie-seal-half::after {
+  content: "";
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  height: 1px;
+  background: rgba(255, 238, 222, 0.14);
+  opacity: 0;
+  transition: opacity 300ms ease;
+}
+.ie-seal-t { top: 0; }
+.ie-seal-t::before { top: 0; }
+.ie-seal-t::after { bottom: 0; }
+.ie-seal-b { bottom: 0; }
+.ie-seal-b::before { bottom: 0; }
+.ie-seal-b::after { top: 0; }
+
+.ie-seal-ring {
+  position: absolute;
+  inset: 12%;
+  z-index: 2;
+  border: 1.5px double rgba(255, 238, 222, 0.4);
+  border-radius: 50%;
+  transition: opacity 280ms ease;
+}
+.ie-seal-mono {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  color: #ffeede;
+  font-family: var(--font-display);
+  font-size: clamp(0.46rem, 1.2vw, 0.78rem);
+  letter-spacing: 0.06em;
+  transition: opacity 280ms ease;
+}
+
+.ie-access[data-stage="breaking"] .ie-seal-t,
+.ie-access[data-stage="opening"] .ie-seal-t,
+.ie-access[data-stage="welcoming"] .ie-seal-t,
+.ie-access[data-stage="launching"] .ie-seal-t,
+.ie-access[data-stage="done"] .ie-seal-t { transform: translateY(-34%) rotate(-4deg); opacity: 0; }
+.ie-access[data-stage="breaking"] .ie-seal-b,
+.ie-access[data-stage="opening"] .ie-seal-b,
+.ie-access[data-stage="welcoming"] .ie-seal-b,
+.ie-access[data-stage="launching"] .ie-seal-b,
+.ie-access[data-stage="done"] .ie-seal-b { transform: translateY(34%) rotate(4deg); opacity: 0; }
+.ie-access[data-stage="breaking"] .ie-seal-half::after { opacity: 1; }
+.ie-access[data-stage="breaking"] .ie-seal-ring,
+.ie-access[data-stage="breaking"] .ie-seal-mono,
+.ie-access[data-stage="opening"] .ie-seal-ring,
+.ie-access[data-stage="opening"] .ie-seal-mono,
+.ie-access[data-stage="welcoming"] .ie-seal-ring,
+.ie-access[data-stage="welcoming"] .ie-seal-mono,
+.ie-access[data-stage="launching"] .ie-seal-ring,
+.ie-access[data-stage="launching"] .ie-seal-mono,
+.ie-access[data-stage="done"] .ie-seal-ring,
+.ie-access[data-stage="done"] .ie-seal-mono { opacity: 0; }
+
+/* ---------- error ---------- */
+
 .ie-error {
-  grid-column: 1 / -1;
-  min-height: 22px;
+  position: absolute;
+  left: 50%;
+  bottom: 8%;
+  z-index: 9;
+  max-width: min(420px, 82%);
+  transform: translateX(-50%);
+  border: 1px solid rgba(161, 63, 61, 0.3);
+  border-radius: 4px;
+  background: rgba(255, 250, 240, 0.96);
+  padding: 8px 14px;
   color: #712b31;
-  font-size: 0.88rem;
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  line-height: 1.5;
+  text-align: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 260ms ease;
 }
+.ie-error:not(:empty) { opacity: 1; }
 
-@keyframes ie-card-arrive {
-  from { opacity: 0; transform: translateY(24px) scale(0.975); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
-}
-@keyframes ie-bloom {
-  from { opacity: 0.16; transform: translateY(14px) scale(0.97); filter: saturate(0.75); }
-  to { opacity: 1; transform: translateY(0) scale(1); filter: saturate(1); }
-}
-@keyframes ie-copy-arrive {
-  from { opacity: 0; transform: translateY(12px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-@keyframes ie-write-welcome { to { clip-path: inset(0 0 0 0); } }
-@keyframes ie-draw-flourish { to { transform: scaleX(1); } }
+/* ---------- portrait / phone ---------- */
 
-/* Below 640px the desktop card's fixed 1672:941 landscape aspect-ratio
-   stops working: width shrinks to fit the viewport but height shrinks
-   proportionally with it, and .ie-front's overflow: hidden silently
-   clips the copy -- on a narrow phone the code form (the whole point of
-   this screen) renders completely off the visible card, unreachable.
-   Below this width the card switches to an explicit, generous height
-   instead of an aspect-ratio, sized to comfortably fit the front face's
-   content; overflow-y: auto is a safety net for anything that still
-   doesn't fit (a long error message, an unusually tall system font)
-   rather than silently clipping again. */
-@media (max-width: 640px) {
-  .ie-access { padding: 16px; }
-  /* A blurred, animating floor shadow is a well-known mobile jank source
-     (filter: blur forces re-rasterizing on every transform/opacity
-     change) -- purely decorative, and not worth the cost at the smaller
-     mobile card size where it's barely noticeable anyway. */
-  .ie-card-shell::after { display: none; }
-  .ie-card-shell {
-    width: min(420px, 92vw);
-    /* Shorter than the earlier 640px/88svh: that height, combined with
-       the now-narrow width, made the card read as an oddly tall,
-       dominating slab instead of an invitation card. */
-    height: min(560px, 78svh);
-    aspect-ratio: auto;
-  }
-  .ie-front,
-  .ie-back { overflow-y: auto; }
-  .ie-access.ie-turning,
-  .ie-access.ie-opening,
-  .ie-access.ie-lifting { background: #fbf6eb; }
-  .ie-back {
-    overflow: hidden;
-    background: #a8444c;
-    opacity: 0;
-    transform: none;
-    transition: opacity 420ms ease, background-color 520ms ease;
-  }
-  .ie-front { opacity: 1; transition: opacity 420ms ease; }
-  .ie-access.ie-turning .ie-front { opacity: 0; }
-  .ie-access.ie-turning .ie-back { opacity: 1; }
-  .ie-access.ie-turning .ie-card,
-  .ie-access.ie-opening .ie-card,
-  .ie-access.ie-lifting .ie-card { transform: translateY(10px) scale(0.98); }
-  .ie-access.ie-launching .ie-card { transform: translateY(0) scale(1); }
-  .ie-access.ie-lifting .ie-back,
-  .ie-access.ie-launching .ie-back { overflow: visible; background: transparent; }
-  .ie-back::before {
-    inset: 13px;
-    border-color: rgba(255, 244, 220, 0.22);
-    background: transparent;
-    box-shadow: inset 0 0 34px rgba(70, 17, 28, 0.18);
-  }
-  .ie-copy { width: min(420px, 92%); padding: 28px 20px; }
-  .ie-copy .ie-code-form { margin-top: 20px; }
-  /* The floral art's background-size: 100% 100% on the desktop card is
-     deliberate -- the card's aspect-ratio is authored to match the
-     art's own, so it fills edge-to-edge with no crop. Once the card
-     drops that aspect-ratio for a taller mobile box, the same stretch
-     distorts the floral pattern noticeably; cover crops instead of
-     warping it. */
-  .ie-front::before,
-  .ie-insert { background-size: cover; }
-  .ie-seal { width: 58px; height: 58px; font-size: 0.9rem; }
-  /* Flat 2D transforms only on mobile -- the card flip here is already
-     an opacity crossfade, not a 3D rotation, so the insert's own small
-     rotateX tilt is an unnecessary (if minor) 3D compositing cost left
-     over from the desktop version. */
-  .ie-insert { transform: translateY(8%) scale(0.88); }
-  .ie-access.ie-lifting .ie-insert { transform: translateY(-8%) scale(0.96); }
-  .ie-access.ie-launching .ie-insert { transform: translateY(0) scale(1.02); }
-  .ie-insert-copy { width: 80%; }
-  .ie-script {
-    width: 96%;
-    margin-top: 8px;
-    font-size: clamp(1.75rem, 8.2vw, 2.15rem);
-    line-height: 1.28;
-  }
-  .ie-insert-footer { padding-top: 10px; }
-  .ie-insert-footer-label { font-size: 0.68rem; }
-  .ie-insert-footer .ie-access-date {
-    max-width: 255px;
-    font-size: 1.05rem;
-    line-height: 1.35;
-    text-wrap: balance;
-  }
-  .ie-script span {
-    max-width: 100%;
-    overflow: visible;
-    white-space: normal;
-    overflow-wrap: anywhere;
-  }
+/* The envelope turns portrait, as real ones do, and the rails widen slightly
+   to stay in proportion with the narrower card. The mechanic is untouched --
+   only these two numbers and the aspect ratio differ from desktop. */
+@media (max-width: 760px) {
+  .ie-access { padding: 24px; }
+  .ie-env { width: min(92vw, 420px, calc((100svh - 120px) * 0.78)); aspect-ratio: 0.78; }
+  .ie-card { --ie-rail-w: 20%; --ie-rail-gap: 2.5%; }
+  .ie-seal { width: 18%; }
+  .ie-access[data-stage="welcoming"] .ie-env { transform: scale(1.05); }
+  .ie-access[data-stage="launching"] .ie-env,
+  .ie-access[data-stage="done"] .ie-env { transform: scale(1.35); }
+  .ie-addr { left: 7%; right: 7%; }
+  .ie-addr-plate { min-height: 44px; }
+  .ie-addr-ink { font-size: 1.2rem; }
+  .ie-addr-ph { font-size: 0.54rem; }
+  .ie-addr-action { min-height: 32px; }
+  .ie-addr-go { font-size: 0.54rem; padding: 8px 16px; }
 }
 
 @media (max-width: 400px) {
-  .ie-card-shell { height: min(560px, 80svh); }
-  .ie-copy h1 { font-size: 2.1rem; }
+  .ie-env { width: 94vw; }
+  .ie-card { --ie-rail-w: 21%; --ie-rail-gap: 2%; }
 }
 
-/* Deliberately no @media (prefers-reduced-motion: reduce) override here --
-   this sequence always plays in full regardless of that OS setting (see
-   the comment in invite-entrance.tsx for why). */
+/* Deliberately no prefers-reduced-motion override: this is a one-time,
+   few-second moment for a small trusted guest list, and the couple chose
+   showing it in full over an abbreviated fallback. Revisit if the site is
+   ever opened to a wider audience. */
