@@ -35,9 +35,11 @@ const OPEN_BEATS: [Stage, number][] = [
   ["opening", 300],
   ["welcoming", 1150],
   ["launching", 2750],
-  ["done", 3450],
+  ["done", 3200],
 ];
-const HANDOFF_MS = 3900;
+// The card's fade completes around 3170ms. Handing off right after it lands
+// rather than half a second later -- that gap was a dead, blank screen.
+const HANDOFF_MS = 3300;
 
 const initialState: RedeemCodeState = { error: null, householdName: null };
 
@@ -85,10 +87,13 @@ export function InviteEntrance() {
     });
   }, []);
 
-  // Focus the address line as soon as the envelope settles, so a guest on a
-  // desktop keyboard can start typing without hunting for the field.
+  // Focus the address line once the envelope settles, so a guest on a desktop
+  // keyboard can start typing without hunting for the field. Skipped on touch
+  // devices: there, autofocus throws the on-screen keyboard over the envelope
+  // before the guest has even seen it.
   useEffect(() => {
     if (stage !== "sealed") return;
+    if (!window.matchMedia("(pointer: fine)").matches) return;
     inputRef.current?.focus({ preventScroll: true });
   }, [stage]);
 
@@ -171,6 +176,11 @@ export function InviteEntrance() {
   useEffect(() => {
     if (!state.householdName || startedRef.current) return;
     startedRef.current = true;
+
+    // Fetch /home while the envelope is still opening. Without this the
+    // handoff stalls on a round trip, which on a phone turns the last beat
+    // into a blank wait.
+    router.prefetch("/home");
 
     // Deliberately plays in full regardless of prefers-reduced-motion. This is
     // a one-time, few-second moment for a small trusted guest list, and the
