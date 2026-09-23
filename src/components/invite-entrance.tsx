@@ -252,13 +252,19 @@ export function InviteEntrance() {
             <p className="ie-addr-names" id="ie-access-title">
               Gayathri &amp; Hrishikesh
             </p>
-            <div className="ie-addr-lines">
-              <div className="ie-addr-ink" aria-hidden="true">
+            {/* A paper address plaque, the way a real wedding envelope carries
+                one -- the guest writes on the label rather than on bare red,
+                which also gives the ink somewhere with real contrast to sit. */}
+            <div className="ie-addr-plate">
+              <span className="ie-addr-ink" aria-hidden="true">
                 <span>{code}</span>
                 <i className="ie-caret" />
-              </div>
-              <div className="ie-addr-rule" />
-              <div className="ie-addr-rule" />
+              </span>
+              {code ? null : (
+                <span className="ie-addr-ph" aria-hidden="true">
+                  Your invite code
+                </span>
+              )}
               <input
                 ref={inputRef}
                 id="invite-code"
@@ -276,13 +282,15 @@ export function InviteEntrance() {
                 aria-describedby="ie-code-error"
               />
             </div>
-            {code.trim() ? (
-              <button className="ie-addr-go" type="submit" disabled={!canType}>
-                {pending ? "Opening…" : "Open the invitation →"}
-              </button>
-            ) : (
-              <p className="ie-addr-hint">Write your invite code</p>
-            )}
+            {/* Height is reserved whether or not the button is showing, so the
+                plaque doesn't jump the moment the guest starts typing. */}
+            <div className="ie-addr-action">
+              {code.trim() ? (
+                <button className="ie-addr-go" type="submit" disabled={!canType}>
+                  {pending ? "Opening…" : "Open the invitation →"}
+                </button>
+              ) : null}
+            </div>
           </form>
         </div>
 

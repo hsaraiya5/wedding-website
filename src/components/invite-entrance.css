@@ -270,10 +270,10 @@
   position: absolute;
   left: 9%;
   right: 9%;
-  bottom: 10%;
+  bottom: 7%;
   z-index: 3;
   display: grid;
-  gap: 5px;
+  gap: 4px;
   justify-items: center;
   text-align: center;
   transition: opacity 300ms ease;
@@ -294,53 +294,70 @@
   text-transform: uppercase;
   opacity: 0.8;
 }
-.ie-addr-lines { position: relative; width: 100%; padding-top: 3px; }
-.ie-addr-rule {
-  height: 1px;
-  margin-top: 15px;
-  background: rgba(255, 238, 222, 0.4);
-  transition: background 180ms ease, box-shadow 180ms ease;
+/* The plaque itself: warm paper stock laid onto the envelope, lifted just
+   enough to read as affixed rather than printed. */
+.ie-addr-plate {
+  position: relative;
+  width: 100%;
+  min-height: clamp(38px, 6.2vw, 46px);
+  border: 1px solid rgba(113, 43, 49, 0.2);
+  border-radius: 3px;
+  background: linear-gradient(180deg, #fffaf0, #f7ecd9);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7), 0 3px 10px rgba(58, 12, 20, 0.22);
+  transition: border-color 180ms ease, box-shadow 180ms ease;
 }
-.ie-addr-rule:first-of-type { margin-top: 0; }
-/* Focus is expressed by the ruled lines brightening -- a standard outline box
-   around a transparent input would float over the artwork. */
-.ie-addr-lines:has(.ie-code-input:focus) .ie-addr-rule {
-  background: rgba(255, 244, 228, 0.92);
-  box-shadow: 0 0 9px rgba(255, 238, 222, 0.5);
+.ie-addr-plate:has(.ie-code-input:focus) {
+  border-color: rgba(161, 63, 61, 0.7);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7), 0 0 0 3px rgba(161, 63, 61, 0.15),
+    0 3px 10px rgba(58, 12, 20, 0.22);
 }
 
-.ie-addr-ink {
+/* Ink and placeholder share the plaque's centre; only one shows at a time,
+   so both are taken out of flow rather than competing for the line box. */
+.ie-addr-ink,
+.ie-addr-ph {
   position: absolute;
-  left: 0;
-  right: 0;
-  top: 0;
-  height: 26px;
+  inset: 0;
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: center;
+  padding-inline: 12px;
   pointer-events: none;
 }
-.ie-addr-ink span {
-  color: #fff4e4;
+.ie-addr-ink {
+  overflow: hidden;
+  color: #712b31;
   font-family: var(--font-script);
-  font-size: clamp(1.05rem, 2.9vw, 1.75rem);
+  font-size: clamp(1.05rem, 2.7vw, 1.7rem);
   line-height: 1;
-  text-shadow: 0 1px 2px rgba(60, 12, 20, 0.45);
 }
+.ie-addr-ph {
+  color: rgba(117, 103, 92, 0.8);
+  font-family: var(--font-body);
+  font-size: clamp(0.52rem, 1.2vw, 0.68rem);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  transition: opacity 160ms ease;
+}
+/* Standard field behaviour: the prompt steps aside once the guest is writing. */
+.ie-addr-plate:has(.ie-code-input:focus) .ie-addr-ph { opacity: 0; }
+
 .ie-caret {
   width: 1.5px;
-  height: 1.1em;
-  align-self: flex-end;
-  margin-bottom: 0.12em;
-  background: #fff4e4;
-  opacity: 0.9;
+  height: 1.05em;
+  margin-left: 1px;
+  background: #712b31;
+  opacity: 0;
 }
-.ie-access[data-stage="sealed"] .ie-caret,
-.ie-access[data-stage="writing"] .ie-caret { animation: ie-blink 1.05s steps(1) infinite; }
+.ie-addr-plate:has(.ie-code-input:focus) .ie-caret {
+  opacity: 0.85;
+  animation: ie-blink 1.05s steps(1) infinite;
+}
 @keyframes ie-blink { 50% { opacity: 0; } }
 
-/* The real input is transparent and sits over the ruled lines, so the guest
-   writes onto the envelope instead of into a form field below the artwork. */
+/* The real input sits transparent over the plaque, so the guest writes onto
+   the envelope instead of into a form field below the artwork. */
 .ie-code-input {
   position: absolute;
   inset: 0;
@@ -350,6 +367,7 @@
   background: transparent;
   color: transparent;
   caret-color: transparent;
+  text-align: center;
   /* 16px keeps iOS Safari from zooming the viewport on focus. */
   font-size: 16px;
   cursor: text;
@@ -357,22 +375,23 @@
 .ie-code-input:focus { outline: none; }
 .ie-code-input:disabled { cursor: default; }
 
-.ie-addr-hint,
-.ie-addr-go {
-  margin: 6px 0 0;
-  font-family: var(--font-body);
-  font-size: clamp(0.5rem, 1.22vw, 0.66rem);
-  font-weight: 700;
-  letter-spacing: 0.11em;
-  text-transform: uppercase;
+.ie-addr-action {
+  display: grid;
+  place-items: center;
+  min-height: clamp(26px, 4.4vw, 30px);
+  margin-top: 2px;
 }
-.ie-addr-hint { color: rgba(255, 238, 222, 0.7); }
 .ie-addr-go {
   border: 1px solid rgba(255, 238, 222, 0.45);
   border-radius: 999px;
   background: transparent;
   padding: 7px 16px;
   color: #ffeede;
+  font-family: var(--font-body);
+  font-size: clamp(0.5rem, 1.22vw, 0.66rem);
+  font-weight: 700;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
   cursor: pointer;
   transition: background 180ms ease, border-color 180ms ease, transform 180ms ease;
 }
@@ -389,7 +408,7 @@
   left: 50%;
   top: 51%;
   z-index: 8;
-  width: 16%;
+  width: 14.5%;
   aspect-ratio: 1;
   transform: translate(-50%, -50%);
   pointer-events: none;
@@ -509,11 +528,16 @@
   .ie-access { padding: 24px; }
   .ie-env { width: min(86%, 340px); aspect-ratio: 0.78; }
   .ie-card { --ie-rail-w: 20%; --ie-rail-gap: 2.5%; }
-  .ie-seal { width: 20%; }
+  .ie-seal { width: 18%; }
   .ie-access[data-stage="welcoming"] .ie-env { transform: scale(1.16); }
   .ie-access[data-stage="launching"] .ie-env,
   .ie-access[data-stage="done"] .ie-env { transform: scale(1.5); }
-  .ie-addr { left: 7%; right: 7%; bottom: 9%; }
+  .ie-addr { left: 7%; right: 7%; bottom: 6%; }
+  .ie-addr-plate { min-height: 42px; }
+  .ie-addr-ink { font-size: 1.25rem; }
+  .ie-addr-ph { font-size: 0.56rem; }
+  .ie-addr-action { min-height: 28px; }
+  .ie-addr-go { font-size: 0.56rem; padding: 7px 14px; }
 }
 
 @media (max-width: 400px) {
