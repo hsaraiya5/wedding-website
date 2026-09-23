@@ -281,7 +281,7 @@
   transform: translateY(-50%);
   z-index: 3;
   display: grid;
-  gap: 4px;
+  gap: clamp(8px, 1.2vw, 13px);
   justify-items: center;
   text-align: center;
   transition: opacity 300ms ease;
@@ -297,17 +297,20 @@
   margin: 0;
   color: #ffeede;
   font-family: var(--font-display);
-  font-size: clamp(0.62rem, 1.5vw, 0.86rem);
-  letter-spacing: 0.1em;
+  font-size: clamp(0.55rem, 1.1vw, 0.74rem);
+  letter-spacing: 0.16em;
   text-transform: uppercase;
-  opacity: 0.8;
+  opacity: 0.75;
 }
 /* The plaque itself: warm paper stock laid onto the envelope, lifted just
    enough to read as affixed rather than printed. */
 .ie-addr-plate {
   position: relative;
   width: 100%;
-  min-height: clamp(38px, 6.2vw, 46px);
+  /* Capped so the plaque doesn't stretch into a slab once the envelope grows
+     with the viewport -- a label keeps its own proportions. */
+  max-width: 440px;
+  min-height: clamp(38px, 4.8vw, 50px);
   border: 1px solid rgba(113, 43, 49, 0.2);
   border-radius: 3px;
   background: linear-gradient(180deg, #fffaf0, #f7ecd9);
@@ -336,15 +339,15 @@
   overflow: hidden;
   color: #712b31;
   font-family: var(--font-script);
-  font-size: clamp(1.05rem, 2.7vw, 1.7rem);
+  font-size: clamp(1rem, 2.1vw, 1.5rem);
   line-height: 1;
 }
 .ie-addr-ph {
   color: rgba(117, 103, 92, 0.8);
   font-family: var(--font-body);
-  font-size: clamp(0.52rem, 1.2vw, 0.68rem);
+  font-size: clamp(0.5rem, 1vw, 0.62rem);
   font-weight: 700;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
   transition: opacity 160ms ease;
 }
@@ -386,19 +389,18 @@
 .ie-addr-action {
   display: grid;
   place-items: center;
-  min-height: clamp(26px, 4.4vw, 30px);
-  margin-top: 2px;
+  min-height: clamp(28px, 3.2vw, 34px);
 }
 .ie-addr-go {
   border: 1px solid rgba(255, 238, 222, 0.45);
   border-radius: 999px;
   background: transparent;
-  padding: 7px 16px;
+  padding: 8px 18px;
   color: #ffeede;
   font-family: var(--font-body);
-  font-size: clamp(0.5rem, 1.22vw, 0.66rem);
+  font-size: clamp(0.48rem, 0.95vw, 0.6rem);
   font-weight: 700;
-  letter-spacing: 0.11em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   cursor: pointer;
   transition: background 180ms ease, border-color 180ms ease, transform 180ms ease;
@@ -541,11 +543,11 @@
   .ie-access[data-stage="launching"] .ie-env,
   .ie-access[data-stage="done"] .ie-env { transform: scale(1.35); }
   .ie-addr { left: 7%; right: 7%; }
-  .ie-addr-plate { min-height: 42px; }
-  .ie-addr-ink { font-size: 1.25rem; }
-  .ie-addr-ph { font-size: 0.56rem; }
-  .ie-addr-action { min-height: 28px; }
-  .ie-addr-go { font-size: 0.56rem; padding: 7px 14px; }
+  .ie-addr-plate { min-height: 44px; }
+  .ie-addr-ink { font-size: 1.2rem; }
+  .ie-addr-ph { font-size: 0.54rem; }
+  .ie-addr-action { min-height: 32px; }
+  .ie-addr-go { font-size: 0.54rem; padding: 8px 16px; }
 }
 
 @media (max-width: 400px) {
