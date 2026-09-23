@@ -51,7 +51,11 @@
 .ie-env {
   position: relative;
   z-index: 2;
-  width: min(54%, 520px);
+  /* Sized against both axes: a share of the width, a hard cap so it can't
+     get silly on an ultrawide, and a height bound so the envelope never
+     outgrows a short laptop window. The old flat 520px cap bound long
+     before the viewport ran out of room, leaving it marooned in space. */
+  width: min(66vw, 940px, calc((100svh - 190px) * 1.5));
   aspect-ratio: 1.5;
   transform-origin: center;
   transition: transform 880ms cubic-bezier(0.2, 0.75, 0.2, 1), opacity 420ms ease;
@@ -61,9 +65,9 @@
   transform: translate(-28%, -175%) rotate(-13deg) scale(0.66);
 }
 .ie-access[data-stage="breaking"] .ie-env { transform: scale(1.02); }
-.ie-access[data-stage="welcoming"] .ie-env { transform: scale(1.34); }
+.ie-access[data-stage="welcoming"] .ie-env { transform: scale(1.12); }
 .ie-access[data-stage="launching"] .ie-env,
-.ie-access[data-stage="done"] .ie-env { opacity: 0; transform: scale(1.85); }
+.ie-access[data-stage="done"] .ie-env { opacity: 0; transform: scale(1.55); }
 
 .ie-env-shadow {
   position: absolute;
@@ -270,7 +274,11 @@
   position: absolute;
   left: 9%;
   right: 9%;
-  bottom: 7%;
+  /* Centred in the lower flap rather than pinned to its bottom edge: once the
+     envelope scales with the viewport, a bottom anchor leaves a widening void
+     between the wax and the address block. */
+  top: 50%;
+  transform: translateY(-50%);
   z-index: 3;
   display: grid;
   gap: 4px;
@@ -526,13 +534,13 @@
    only these two numbers and the aspect ratio differ from desktop. */
 @media (max-width: 760px) {
   .ie-access { padding: 24px; }
-  .ie-env { width: min(86%, 340px); aspect-ratio: 0.78; }
+  .ie-env { width: min(92vw, 420px, calc((100svh - 120px) * 0.78)); aspect-ratio: 0.78; }
   .ie-card { --ie-rail-w: 20%; --ie-rail-gap: 2.5%; }
   .ie-seal { width: 18%; }
-  .ie-access[data-stage="welcoming"] .ie-env { transform: scale(1.16); }
+  .ie-access[data-stage="welcoming"] .ie-env { transform: scale(1.05); }
   .ie-access[data-stage="launching"] .ie-env,
-  .ie-access[data-stage="done"] .ie-env { transform: scale(1.5); }
-  .ie-addr { left: 7%; right: 7%; bottom: 6%; }
+  .ie-access[data-stage="done"] .ie-env { transform: scale(1.35); }
+  .ie-addr { left: 7%; right: 7%; }
   .ie-addr-plate { min-height: 42px; }
   .ie-addr-ink { font-size: 1.25rem; }
   .ie-addr-ph { font-size: 0.56rem; }
@@ -541,7 +549,7 @@
 }
 
 @media (max-width: 400px) {
-  .ie-env { width: 92%; }
+  .ie-env { width: 94vw; }
   .ie-card { --ie-rail-w: 21%; --ie-rail-gap: 2%; }
 }
 
