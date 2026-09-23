@@ -68,34 +68,21 @@ export function InviteEntrance() {
     };
   }, []);
 
-  // Land the envelope only once its artwork has decoded, otherwise the first
-  // frame of the arrival is an untextured red rectangle. Capped so a slow or
-  // failed image fetch can't hold the guest on a blank screen.
+  // The envelope is drawn entirely in CSS, so nothing has to load before it
+  // can fly in. Its floral rails belong to the card inside, which isn't
+  // uncovered until seconds later -- warm them in the background so a late
+  // decode doesn't show as a pop mid-unfold.
   useEffect(() => {
-    let cancelled = false;
-    const start = () => {
-      if (cancelled) return;
-      setStage("arriving");
-      later(() => setStage("sealed"), 760);
-    };
+    // Deferred by a frame rather than set synchronously, so the off-screen
+    // idle position actually paints and the envelope has somewhere to fly in
+    // from instead of snapping into place.
+    later(() => setStage("arriving"), 30);
+    later(() => setStage("sealed"), 790);
 
-    const img = new window.Image();
-    img.onload = start;
-    img.onerror = start;
-    img.src = designAssets.hero;
-    const fallback = window.setTimeout(start, 1200);
-
-    // Warm the card's side rails too -- they're revealed mid-unfold, where a
-    // late decode would show as a visible pop.
     [designAssets.floralLeft, designAssets.floralRight].forEach((src) => {
       const rail = new window.Image();
       rail.src = src;
     });
-
-    return () => {
-      cancelled = true;
-      window.clearTimeout(fallback);
-    };
   }, []);
 
   // Focus the address line as soon as the envelope settles, so a guest on a
@@ -207,7 +194,6 @@ export function InviteEntrance() {
   }, [state]);
 
   const artStyle = {
-    "--ie-hero-art": `url(${designAssets.hero})`,
     "--ie-rail-left": `url(${designAssets.floralLeft})`,
     "--ie-rail-right": `url(${designAssets.floralRight})`,
   } as CSSProperties;
