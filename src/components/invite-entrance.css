@@ -217,7 +217,12 @@
 .ie-insert-copy {
   position: relative;
   z-index: 1;
-  align-self: center;
+  /* end, not center -- .ie-insert's "1fr auto" rows give this row all the
+     card's leftover height, and centering short copy inside it left a
+     visibly empty band between the flourish line and the footer's own
+     divider on wide cards. Anchoring to the footer instead pushes any
+     extra space above the monogram, which reads as intentional margin. */
+  align-self: end;
   width: min(760px, 66%);
   min-width: 0;
   display: grid;
@@ -272,7 +277,11 @@
 }
 .ie-insert-footer .ie-access-date {
   margin-top: 0;
-  font-size: 1.4rem;
+  /* At 1.4rem the venue line ran into the corner floral art on wide
+     cards -- the 420px box leaves barely any clearance from the blooms
+     at this vertical position. Matching the mobile size (already tuned
+     for this exact line) keeps it clear at every width. */
+  font-size: 1.05rem;
   line-height: 1.35;
 }
 .ie-access.ie-welcoming .ie-insert-footer { animation: ie-copy-arrive 420ms ease 980ms both; }
