@@ -431,14 +431,47 @@
 
 @media (prefers-reduced-motion: reduce) {
   .wh-bird-flight { display: none; }
+
+  /* Every hero animation is applied through `.wh-home.wh-ready X`, so these
+     cancellations have to match that specificity or they lose. They didn't,
+     which meant the animations still ran for reduced-motion guests -- and
+     because those animations use fill mode `both`, each element the override
+     had already made visible snapped to its 0% keyframe the instant
+     .wh-ready landed. On screen that was the venue card painting, vanishing,
+     then fading back in with everything else. */
   .wh-home .wh-art::before,
-  .wh-home .wh-panel::after { opacity: 1; clip-path: inset(0); transform: none; animation: none; }
-  .wh-home .wh-panel::after { opacity: 0.1; }
+  .wh-home.wh-ready .wh-art::before {
+    opacity: 1;
+    clip-path: inset(0);
+    transform: none;
+    animation: none;
+  }
+  .wh-home .wh-panel::after,
+  .wh-home.wh-ready .wh-panel::after {
+    opacity: 0.1;
+    clip-path: inset(0);
+    transform: none;
+    animation: none;
+  }
   .wh-home .wh-art-copy,
+  .wh-home.wh-ready .wh-art-copy,
   .wh-home .wh-content > .wh-eyebrow,
+  .wh-home.wh-ready .wh-content > .wh-eyebrow,
   .wh-home .wh-content > .wh-message,
+  .wh-home.wh-ready .wh-content > .wh-message,
   .wh-home .wh-content > .wh-venue-row,
+  .wh-home.wh-ready .wh-content > .wh-venue-row,
+  .wh-home .wh-content > .cd-root,
+  .wh-home.wh-ready .wh-content > .cd-root,
   .wh-home .wh-content > .wh-actions,
-  .wh-scroll-cue { opacity: 1; transform: none; animation: none; }
-  .wh-home .wh-title { clip-path: inset(0); animation: none; }
+  .wh-home.wh-ready .wh-content > .wh-actions,
+  .wh-scroll-cue,
+  .wh-home.wh-ready .wh-scroll-cue {
+    opacity: 1;
+    transform: none;
+    animation: none;
+  }
+  .wh-home .wh-title,
+  .wh-home.wh-ready .wh-title { clip-path: inset(0); animation: none; }
+  .wh-message.wh-typing span::after { animation: none; opacity: 0; }
 }
