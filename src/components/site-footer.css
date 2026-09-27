@@ -48,7 +48,26 @@
 .sf-meta { margin-top: 9px; color: var(--muted-foreground); font-size: 1rem; }
 
 @media (max-width: 700px) {
-  .sf-footer { min-height: 290px; padding: 58px 24px 150px; }
+  /* A phone is too narrow for the art to bleed in from the sides without
+     crowding the sign-off, so it moves to the bottom corners. The previous
+     version reserved 150px of padding above a 150px strip, which stacked the
+     art below the text as a separate block, and kept the desktop's sideways
+     mask -- that's what left the hollow gap across the middle.
+
+     Now the art rises from the bottom corners behind the text and fades
+     upward, so the footer reads as one piece rather than two. */
+  .sf-footer { min-height: 250px; padding: 52px 24px 60px; }
   .sf-footer::before,
-  .sf-footer::after { top: auto; bottom: 0; width: 50%; height: 150px; background-size: auto 220px; }
+  .sf-footer::after {
+    top: auto;
+    bottom: 0;
+    width: 47%;
+    height: 185px;
+    background-size: auto 185px;
+    opacity: 0.4;
+    -webkit-mask-image: linear-gradient(to top, #000 50%, transparent 100%);
+    mask-image: linear-gradient(to top, #000 50%, transparent 100%);
+  }
+  .sf-footer::before { left: 0; background-position: left bottom; }
+  .sf-footer::after { right: 0; background-position: right bottom; }
 }
