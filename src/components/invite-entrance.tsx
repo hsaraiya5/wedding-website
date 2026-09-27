@@ -81,9 +81,19 @@ export function InviteEntrance() {
     later(() => setStage("arriving"), 30);
     later(() => setStage("sealed"), 790);
 
-    [designAssets.floralLeft, designAssets.floralRight].forEach((src) => {
-      const rail = new window.Image();
-      rail.src = src;
+    // The card's rails, plus the art the landing page paints behind its hero.
+    // The entrance gives us roughly three seconds of runway, which is the only
+    // chance to have that artwork ready before /home needs it -- otherwise the
+    // hero graphic arrives well after the copy and the page assembles itself
+    // in stages.
+    [
+      designAssets.floralLeft,
+      designAssets.floralRight,
+      designAssets.hero,
+      designAssets.floral,
+    ].forEach((src) => {
+      const warm = new window.Image();
+      warm.src = src;
     });
   }, []);
 

@@ -234,10 +234,17 @@
 .wh-content > .wh-eyebrow,
 .wh-content > .wh-message,
 .wh-content > .wh-venue-row,
+/* The countdown has to be hidden with the rest. It was the one direct child
+   of .wh-content missing from this list, so on arrival it painted its title
+   and empty digit boxes while every sibling was still at opacity 0 -- a line
+   of text alone on a blank page for a frame, which read as a flash when
+   coming off the invite entrance. */
+.wh-content > .cd-root,
 .wh-content > .wh-actions { opacity: 0; transform: translateY(14px); }
 .wh-home.wh-ready .wh-content > .wh-eyebrow { animation: wh-copy-in 520ms ease 140ms both; }
 .wh-home.wh-ready .wh-content > .wh-message { animation: wh-copy-in 520ms ease 640ms both; }
 .wh-home.wh-ready .wh-content > .wh-venue-row { animation: wh-copy-in 520ms ease 820ms both; }
+.wh-home.wh-ready .wh-content > .cd-root { animation: wh-copy-in 520ms ease 950ms both; }
 .wh-home.wh-ready .wh-content > .wh-actions { animation: wh-copy-in 520ms ease 1100ms both; }
 
 .wh-title {
