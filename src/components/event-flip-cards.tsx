@@ -49,11 +49,16 @@ function CalendarIcon() {
 function CalendarButton({ event }: { event: Event }) {
   const [downloaded, setDownloaded] = useState(false);
 
-  const handleDownload = () => {
-    if (!event.event_date || !event.start_time || !event.end_time) return;
+  // An end time is optional, so the only thing a calendar entry truly needs is
+  // a date and a start. Without those there's nothing to hand the guest, and a
+  // button that silently does nothing is worse than no button.
+  if (!event.event_date || !event.start_time) return null;
+  const eventDate = event.event_date;
+  const startTime = event.start_time;
 
-    const start = formatIcsDateTime(event.event_date, event.start_time);
-    const end = formatIcsDateTime(event.event_date, event.end_time);
+  const handleDownload = () => {
+    const start = formatIcsDateTime(eventDate, startTime);
+    const end = event.end_time ? formatIcsDateTime(eventDate, event.end_time) : null;
     const description = event.description ?? "";
     const escape = (value: string) =>
       value.replace(/\\/g, "\\\\").replace(/\n/g, "\\n").replace(/,/g, "\\,").replace(/;/g, "\\;");
@@ -68,7 +73,9 @@ function CalendarButton({ event }: { event: Event }) {
       `UID:${start}-${event.name.toLowerCase().replace(/[^a-z0-9]+/g, "-")}@gayathri-hrishikesh-wedding`,
       `DTSTAMP:${formatIcsDateTime(new Date().toISOString().slice(0, 10), "00:00")}`,
       `DTSTART:${start}`,
-      `DTEND:${end}`,
+      // Omitted rather than invented when the event has no end time -- a made-up
+      // duration would show up in the guest's calendar as if we'd stated it.
+      ...(end ? [`DTEND:${end}`] : []),
       `SUMMARY:${escape(event.name)}`,
       `DESCRIPTION:${escape(description)}`,
       `LOCATION:${escape("Wyndham Grand Pittsburgh Downtown, Pittsburgh, PA")}`,
