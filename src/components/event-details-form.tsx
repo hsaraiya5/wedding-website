@@ -122,7 +122,7 @@ export function EventDetailsForm({ event, eventIndex = 0 }: { event: Event; even
             />
           </div>
           <div className="av-field">
-            <Label htmlFor="end_time">End time</Label>
+            <Label htmlFor="end_time">End time (optional)</Label>
             <Input
               id="end_time"
               name="end_time"
