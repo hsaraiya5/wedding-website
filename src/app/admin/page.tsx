@@ -95,10 +95,19 @@ export default async function AdminDashboardPage() {
 
       {eventStats.length > 0 ? (
         <div>
-          <h2 className="mb-4 font-heading text-xl">RSVPs by event</h2>
+          <div className="mb-4 flex flex-wrap items-baseline justify-between gap-2">
+            <h2 className="font-heading text-xl">RSVPs by event</h2>
+            <Link href="/admin/guest-list" className="text-sm font-semibold text-primary">
+              Guest list by event &rarr;
+            </Link>
+          </div>
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
             {eventStats.map((event) => (
-              <div key={event.id} className="av-event-stat">
+              <Link
+                key={event.id}
+                href={`/admin/guest-list?event=${event.id}`}
+                className="av-event-stat"
+              >
                 <span className="av-event-stat-name">{event.name}</span>
                 <div className="av-event-stat-main">
                   <strong>{event.yes}</strong>
@@ -112,7 +121,7 @@ export default async function AdminDashboardPage() {
                     <span className="av-pending">{event.pending}</span> pending
                   </span>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         </div>
