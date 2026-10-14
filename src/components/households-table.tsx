@@ -1,16 +1,14 @@
 "use client";
 
-import { useMemo, useState } from "react";
 import Link from "next/link";
-import { Input } from "@/components/ui/input";
 import { buttonVariants } from "@/components/ui/button";
 import { DeleteHouseholdButton } from "@/components/delete-household-button";
 import { formatRsvpDeadlineDate } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
-type EventRef = { name: string } | { name: string }[] | null;
+export type EventRef = { name: string } | { name: string }[] | null;
 
-type Guest = {
+export type Guest = {
   id: string;
   first_name: string;
   last_name: string;
@@ -18,11 +16,11 @@ type Guest = {
   rsvps: { event_id: string; attending: "yes" | "no" | null }[];
 };
 
-type WhatsappNumber = { phone_number: string };
+export type WhatsappNumber = { phone_number: string };
 
-type RsvpDeadline = { id: string; label: string; deadline: string | null };
+export type RsvpDeadline = { id: string; label: string; deadline: string | null };
 
-type Household = {
+export type Household = {
   id: string;
   display_name: string;
   code: string;
@@ -46,12 +44,12 @@ function eventList(guest: Guest): { name: string; status: "yes" | "no" | "pendin
   });
 }
 
-function rsvpDeadline(household: Household): RsvpDeadline | null {
+export function rsvpDeadline(household: Household): RsvpDeadline | null {
   if (Array.isArray(household.rsvp_deadlines)) return household.rsvp_deadlines[0] ?? null;
   return household.rsvp_deadlines;
 }
 
-function deadlineText(deadline: RsvpDeadline): string {
+export function deadlineText(deadline: RsvpDeadline): string {
   return deadline.deadline ? formatRsvpDeadlineDate(deadline.deadline) : deadline.label;
 }
 
@@ -62,97 +60,15 @@ function responseSummary(household: Household) {
 }
 
 export function HouseholdsTable({ households }: { households: Household[] }) {
-  const [search, setSearch] = useState("");
-  const [groupFilter, setGroupFilter] = useState("");
-  const [deadlineFilter, setDeadlineFilter] = useState("");
-
-  const groups = useMemo(() => {
-    const set = new Set(households.map((h) => h.group_tag).filter(Boolean) as string[]);
-    return Array.from(set).sort();
-  }, [households]);
-
-  // Deadlines actually in use, soonest first, so the filter only ever offers
-  // dates that would return something.
-  const deadlines = useMemo(() => {
-    const byId = new Map<string, RsvpDeadline>();
-    for (const household of households) {
-      const deadline = rsvpDeadline(household);
-      if (deadline) byId.set(deadline.id, deadline);
-    }
-    return Array.from(byId.values()).sort((a, b) =>
-      (a.deadline ?? "").localeCompare(b.deadline ?? "")
-    );
-  }, [households]);
-
-  const filtered = useMemo(() => {
-    const query = search.trim().toLowerCase();
-    return households.filter((household) => {
-      if (groupFilter && household.group_tag !== groupFilter) {
-        return false;
-      }
-      if (deadlineFilter && rsvpDeadline(household)?.id !== deadlineFilter) {
-        return false;
-      }
-      if (!query) {
-        return true;
-      }
-      const haystack = [
-        household.display_name,
-        ...household.guests.flatMap((g) => [g.first_name, g.last_name]),
-      ]
-        .join(" ")
-        .toLowerCase();
-      return haystack.includes(query);
-    });
-  }, [households, search, groupFilter, deadlineFilter]);
-
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex flex-wrap items-center gap-2">
-        <Input
-          placeholder="Search by household or guest name..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="max-w-xs rounded-full"
-        />
-        <select
-          value={groupFilter}
-          onChange={(e) => setGroupFilter(e.target.value)}
-          className="h-8 rounded-full border border-input bg-transparent px-3 text-sm"
-        >
-          <option value="">All groups</option>
-          {groups.map((group) => (
-            <option key={group} value={group}>
-              {group}
-            </option>
-          ))}
-        </select>
-        {deadlines.length > 1 ? (
-          <select
-            value={deadlineFilter}
-            onChange={(e) => setDeadlineFilter(e.target.value)}
-            className="h-8 rounded-full border border-input bg-transparent px-3 text-sm"
-          >
-            <option value="">All RSVP dates</option>
-            {deadlines.map((deadline) => (
-              <option key={deadline.id} value={deadline.id}>
-                {deadlineText(deadline)}
-              </option>
-            ))}
-          </select>
-        ) : null}
-        <span className="text-sm text-muted-foreground">
-          {filtered.length} of {households.length}
-        </span>
-      </div>
-
-      {filtered.length === 0 ? (
+      {households.length === 0 ? (
         <p className="py-8 text-center text-sm text-muted-foreground">
           No households match your search.
         </p>
       ) : (
         <div className="flex flex-col gap-4">
-          {filtered.map((household) => {
+          {households.map((household) => {
             const summary = responseSummary(household);
             const deadline = rsvpDeadline(household);
             return (
