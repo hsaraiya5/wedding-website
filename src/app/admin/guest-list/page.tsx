@@ -29,7 +29,7 @@ export default async function AdminGuestListPage({
     supabase
       .from("guests")
       .select(
-        "id, first_name, last_name, households(id, display_name, group_tag), guest_events(event_id), rsvps(event_id, attending)"
+        "id, first_name, last_name, households(id, display_name, group_tag, rsvp_deadlines(label, deadline)), guest_events(event_id), rsvps(event_id, attending)"
       )
       .order("first_name"),
   ]);

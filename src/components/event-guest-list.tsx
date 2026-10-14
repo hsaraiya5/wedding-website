@@ -3,10 +3,19 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { Input } from "@/components/ui/input";
-import { formatEventDayFull } from "@/lib/format";
+import { formatEventDayFull, formatRsvpDeadlineDate } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
-type Household = { id: string; display_name: string; group_tag: string | null };
+type RsvpDeadline = { label: string; deadline: string | null };
+
+type Household = {
+  id: string;
+  display_name: string;
+  group_tag: string | null;
+  // The RSVP date is assigned to the household, so a guest's own date is
+  // whichever one their household carries.
+  rsvp_deadlines: RsvpDeadline | RsvpDeadline[] | null;
+};
 
 type Guest = {
   id: string;
@@ -26,6 +35,17 @@ type Status = "yes" | "no" | "pending";
 function household(guest: Guest): Household | null {
   if (Array.isArray(guest.households)) return guest.households[0] ?? null;
   return guest.households;
+}
+
+function deadlineOf(household: Household | null): RsvpDeadline | null {
+  if (!household) return null;
+  if (Array.isArray(household.rsvp_deadlines)) return household.rsvp_deadlines[0] ?? null;
+  return household.rsvp_deadlines;
+}
+
+function deadlineText(deadline: RsvpDeadline | null): string {
+  if (!deadline) return "";
+  return deadline.deadline ? formatRsvpDeadlineDate(deadline.deadline) : deadline.label;
 }
 
 export function EventGuestList({
@@ -49,7 +69,13 @@ export function EventGuestList({
       .map((guest) => {
         const attending = guest.rsvps.find((r) => r.event_id === eventId)?.attending;
         const status: Status = attending === "yes" ? "yes" : attending === "no" ? "no" : "pending";
-        return { guest, status, household: household(guest) };
+        const guestHousehold = household(guest);
+        return {
+          guest,
+          status,
+          household: guestHousehold,
+          deadline: deadlineOf(guestHousehold),
+        };
       })
       .sort((a, b) => {
         const byHousehold = (a.household?.display_name ?? "").localeCompare(
@@ -183,6 +209,11 @@ export function EventGuestList({
               ) : null}
               {row.household?.group_tag ? (
                 <span className="av-pill bg-muted text-foreground">{row.household.group_tag}</span>
+              ) : null}
+              {row.deadline ? (
+                <span className="text-xs text-muted-foreground">
+                  RSVP by {deadlineText(row.deadline)}
+                </span>
               ) : null}
               <span
                 className={cn(

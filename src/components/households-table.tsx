@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Input } from "@/components/ui/input";
 import { buttonVariants } from "@/components/ui/button";
 import { DeleteHouseholdButton } from "@/components/delete-household-button";
+import { formatRsvpDeadlineDate } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
 type EventRef = { name: string } | { name: string }[] | null;
@@ -19,11 +20,16 @@ type Guest = {
 
 type WhatsappNumber = { phone_number: string };
 
+type RsvpDeadline = { id: string; label: string; deadline: string | null };
+
 type Household = {
   id: string;
   display_name: string;
   code: string;
   group_tag: string | null;
+  // Assigned per household (NOT NULL in the schema), so every guest inside
+  // inherits it -- shown once on the card rather than repeated per guest.
+  rsvp_deadlines: RsvpDeadline | RsvpDeadline[] | null;
   household_whatsapp_numbers: WhatsappNumber[];
   guests: Guest[];
 };
@@ -40,6 +46,15 @@ function eventList(guest: Guest): { name: string; status: "yes" | "no" | "pendin
   });
 }
 
+function rsvpDeadline(household: Household): RsvpDeadline | null {
+  if (Array.isArray(household.rsvp_deadlines)) return household.rsvp_deadlines[0] ?? null;
+  return household.rsvp_deadlines;
+}
+
+function deadlineText(deadline: RsvpDeadline): string {
+  return deadline.deadline ? formatRsvpDeadlineDate(deadline.deadline) : deadline.label;
+}
+
 function responseSummary(household: Household) {
   const invited = household.guests.reduce((sum, g) => sum + g.guest_events.length, 0);
   const answered = household.guests.reduce((sum, g) => sum + g.rsvps.length, 0);
@@ -49,16 +64,33 @@ function responseSummary(household: Household) {
 export function HouseholdsTable({ households }: { households: Household[] }) {
   const [search, setSearch] = useState("");
   const [groupFilter, setGroupFilter] = useState("");
+  const [deadlineFilter, setDeadlineFilter] = useState("");
 
   const groups = useMemo(() => {
     const set = new Set(households.map((h) => h.group_tag).filter(Boolean) as string[]);
     return Array.from(set).sort();
   }, [households]);
 
+  // Deadlines actually in use, soonest first, so the filter only ever offers
+  // dates that would return something.
+  const deadlines = useMemo(() => {
+    const byId = new Map<string, RsvpDeadline>();
+    for (const household of households) {
+      const deadline = rsvpDeadline(household);
+      if (deadline) byId.set(deadline.id, deadline);
+    }
+    return Array.from(byId.values()).sort((a, b) =>
+      (a.deadline ?? "").localeCompare(b.deadline ?? "")
+    );
+  }, [households]);
+
   const filtered = useMemo(() => {
     const query = search.trim().toLowerCase();
     return households.filter((household) => {
       if (groupFilter && household.group_tag !== groupFilter) {
+        return false;
+      }
+      if (deadlineFilter && rsvpDeadline(household)?.id !== deadlineFilter) {
         return false;
       }
       if (!query) {
@@ -72,7 +104,7 @@ export function HouseholdsTable({ households }: { households: Household[] }) {
         .toLowerCase();
       return haystack.includes(query);
     });
-  }, [households, search, groupFilter]);
+  }, [households, search, groupFilter, deadlineFilter]);
 
   return (
     <div className="flex flex-col gap-4">
@@ -95,6 +127,20 @@ export function HouseholdsTable({ households }: { households: Household[] }) {
             </option>
           ))}
         </select>
+        {deadlines.length > 1 ? (
+          <select
+            value={deadlineFilter}
+            onChange={(e) => setDeadlineFilter(e.target.value)}
+            className="h-8 rounded-full border border-input bg-transparent px-3 text-sm"
+          >
+            <option value="">All RSVP dates</option>
+            {deadlines.map((deadline) => (
+              <option key={deadline.id} value={deadline.id}>
+                {deadlineText(deadline)}
+              </option>
+            ))}
+          </select>
+        ) : null}
         <span className="text-sm text-muted-foreground">
           {filtered.length} of {households.length}
         </span>
@@ -108,6 +154,7 @@ export function HouseholdsTable({ households }: { households: Household[] }) {
         <div className="flex flex-col gap-4">
           {filtered.map((household) => {
             const summary = responseSummary(household);
+            const deadline = rsvpDeadline(household);
             return (
               <div key={household.id} className="av-household-card">
                 <div className="av-household-header">
@@ -130,6 +177,11 @@ export function HouseholdsTable({ households }: { households: Household[] }) {
                       {summary.invited > 0 ? (
                         <span className={cn("av-response-badge", summary.complete && "av-complete")}>
                           {summary.answered} of {summary.invited} answered
+                        </span>
+                      ) : null}
+                      {deadline ? (
+                        <span className="av-pill bg-muted text-foreground">
+                          RSVP by {deadlineText(deadline)}
                         </span>
                       ) : null}
                     </div>
