@@ -11,7 +11,7 @@ export type GuestContext = {
     rsvp_deadline: string | null;
     hotel_covered_by_host: boolean;
   };
-  guests: { id: string; first_name: string; last_name: string }[];
+  guests: { id: string; first_name: string; last_name: string | null }[];
   events: {
     id: string;
     name: string;

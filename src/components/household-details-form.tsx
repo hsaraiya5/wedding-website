@@ -75,7 +75,7 @@ export function HouseholdDetailsForm({
   const removeGuestRow = (index: number) =>
     setNewGuests((prev) => prev.filter((_, i) => i !== index));
 
-  const validGuests = newGuests.filter((g) => g.first_name.trim() && g.last_name.trim());
+  const validGuests = newGuests.filter((g) => g.first_name.trim());
 
   return (
     <form action={formAction} className="flex flex-col gap-5">
@@ -184,7 +184,7 @@ export function HouseholdDetailsForm({
                   onChange={(e) => updateGuest(index, "first_name", e.target.value)}
                 />
                 <Input
-                  placeholder="Last name"
+                  placeholder="Last name (optional)"
                   value={guest.last_name}
                   onChange={(e) => updateGuest(index, "last_name", e.target.value)}
                 />

@@ -6,12 +6,13 @@ import { saveGuest, deleteGuest } from "@/app/actions/admin";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { InvitationsForm } from "@/components/invitations-form";
+import { guestFullName } from "@/lib/format";
 
-type Guest = { id: string; first_name: string; last_name: string };
+type Guest = { id: string; first_name: string; last_name: string | null };
 type Event = { id: string; name: string; event_date: string | null };
 
-function initials(first: string, last: string) {
-  return (first[0] ?? "") + (last[0] ?? "");
+function initials(first: string, last: string | null) {
+  return (first[0] ?? "") + (last?.[0] ?? "");
 }
 
 function GuestRow({
@@ -30,7 +31,7 @@ function GuestRow({
   const [deleting, startDeleteTransition] = useTransition();
 
   const handleDelete = () => {
-    if (!confirm(`Remove ${guest.first_name} ${guest.last_name}?`)) return;
+    if (!confirm(`Remove ${guestFullName(guest.first_name, guest.last_name)}?`)) return;
     startDeleteTransition(async () => {
       await deleteGuest(guest.id, householdId);
       router.refresh();
@@ -45,7 +46,11 @@ function GuestRow({
         <div className="flex items-center gap-2">
           <span className="av-avatar">{initials(guest.first_name, guest.last_name)}</span>
           <Input name="first_name" defaultValue={guest.first_name} placeholder="First name" required />
-          <Input name="last_name" defaultValue={guest.last_name} placeholder="Last name" required />
+          <Input
+            name="last_name"
+            defaultValue={guest.last_name ?? ""}
+            placeholder="Last name (optional)"
+          />
           <Button type="submit" variant="outline" size="sm" className="rounded-full" disabled={pending}>
             {pending ? "Saving..." : "Save"}
           </Button>
@@ -111,7 +116,7 @@ function AddGuestForm({
       <input type="hidden" name="event_ids" value={JSON.stringify(Array.from(selectedEvents))} />
       <div className="flex items-center gap-2">
         <Input name="first_name" placeholder="First name" required />
-        <Input name="last_name" placeholder="Last name" required />
+        <Input name="last_name" placeholder="Last name (optional)" />
       </div>
 
       {events.length > 0 ? (

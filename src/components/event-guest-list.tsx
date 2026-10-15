@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { Input } from "@/components/ui/input";
-import { formatEventDayFull, formatRsvpDeadlineDate } from "@/lib/format";
+import { formatEventDayFull, formatRsvpDeadlineDate, guestFullName } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
 type RsvpDeadline = { label: string; deadline: string | null };
@@ -20,7 +20,7 @@ type Household = {
 type Guest = {
   id: string;
   first_name: string;
-  last_name: string;
+  last_name: string | null;
   // Supabase types a to-one embed as either the row or an array of rows
   // depending on how it infers the relationship, so normalise both.
   households: Household | Household[] | null;
@@ -101,7 +101,7 @@ export function EventGuestList({
     return invited.filter((row) => {
       if (statusFilter && row.status !== statusFilter) return false;
       if (!query) return true;
-      return [row.guest.first_name, row.guest.last_name, row.household?.display_name ?? ""]
+      return [row.guest.first_name, row.guest.last_name ?? "", row.household?.display_name ?? ""]
         .join(" ")
         .toLowerCase()
         .includes(query);
@@ -197,7 +197,7 @@ export function EventGuestList({
           {rows.map((row) => (
             <div key={row.guest.id} className="av-guest-summary-row">
               <span className="av-guest-summary-name">
-                {row.guest.first_name} {row.guest.last_name}
+                {guestFullName(row.guest.first_name, row.guest.last_name)}
               </span>
               {row.household ? (
                 <Link

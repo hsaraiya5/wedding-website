@@ -7,7 +7,12 @@ import { Section } from "@/components/section";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
-import { formatEventDay, formatEventTime, formatRsvpDeadlineDate } from "@/lib/format";
+import {
+  formatEventDay,
+  formatEventTime,
+  formatRsvpDeadlineDate,
+  guestFullName,
+} from "@/lib/format";
 import "./rsvp-section.css";
 import "./site-button.css";
 
@@ -24,7 +29,7 @@ type Household = {
 
 type WhatsappNumber = { id: string; phone_number: string };
 
-type Guest = { id: string; first_name: string; last_name: string };
+type Guest = { id: string; first_name: string; last_name: string | null };
 
 type Event = {
   id: string;
@@ -227,7 +232,7 @@ export function RsvpForm({
               {rsvpGuests.map((guest) => (
                 <div key={guest.id} className="rv-person-card">
                   <span className="rv-person-name">
-                    {guest.first_name} {guest.last_name}
+                    {guestFullName(guest.first_name, guest.last_name)}
                   </span>
                   <div className="rv-person-events">
                     {events
@@ -276,7 +281,7 @@ export function RsvpForm({
                         type="button"
                         role="tab"
                         aria-selected={index === activeGuestIndex}
-                        aria-label={`${guest.first_name} ${guest.last_name}`}
+                        aria-label={guestFullName(guest.first_name, guest.last_name)}
                         onClick={() => goToGuest(index)}
                         className="rv-dot"
                       >
@@ -291,7 +296,7 @@ export function RsvpForm({
                     <div key={activeGuest.id} className={cn("rv-card", slideFromLeft && "rv-from-left")}>
                       <div className="rv-guest-heading">
                         <h3>
-                          {activeGuest.first_name} {activeGuest.last_name}
+                          {guestFullName(activeGuest.first_name, activeGuest.last_name)}
                         </h3>
                       </div>
                       <div className="rv-choice-grid">
