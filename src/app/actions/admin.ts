@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { parsePalette, parseTraditionList } from "@/lib/parse-admin-lists";
+import { guestFullName } from "@/lib/format";
 
 export type ActionState = { error: string | null };
 
@@ -31,7 +32,9 @@ export async function saveHousehold(
     return { error: "RSVP date is required." };
   }
 
-  let guests: { first_name: string; last_name: string; event_ids?: string[] }[] | null = null;
+  let guests:
+    | { first_name: string; last_name: string | null; event_ids?: string[] }[]
+    | null = null;
   if (!householdId) {
     try {
       guests = JSON.parse(guestsRaw || "[]");
@@ -181,8 +184,8 @@ export async function saveGuest(
   const lastName = String(formData.get("last_name") ?? "").trim();
   const eventIdsRaw = String(formData.get("event_ids") ?? "");
 
-  if (!firstName || !lastName) {
-    return { error: "First and last name are both required." };
+  if (!firstName) {
+    return { error: "First name is required." };
   }
 
   let eventIds: string[] | null = null;
@@ -202,7 +205,7 @@ export async function saveGuest(
     p_guest_id: guestId,
     p_household_id: householdId,
     p_first_name: firstName,
-    p_last_name: lastName,
+    p_last_name: lastName || null,
     p_event_ids: eventIds,
   });
 
@@ -217,7 +220,7 @@ export async function saveGuest(
 
   if (data?.possible_duplicate) {
     return {
-      error: `Heads up: another guest named "${firstName} ${lastName}" already exists. Saved anyway.`,
+      error: `Heads up: another guest named "${guestFullName(firstName, lastName)}" already exists. Saved anyway.`,
     };
   }
 

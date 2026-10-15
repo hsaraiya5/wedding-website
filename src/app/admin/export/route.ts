@@ -90,7 +90,7 @@ export async function GET(request: Request) {
         household.code,
         whatsappNumbers,
         guest.first_name,
-        guest.last_name,
+        guest.last_name ?? "",
         invitedEventNames,
         rsvpStatus,
         household.rsvp_submitted_at ?? "",

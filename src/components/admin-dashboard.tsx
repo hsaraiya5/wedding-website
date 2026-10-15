@@ -63,7 +63,7 @@ export function AdminDashboard({
       }
       const haystack = [
         household.display_name,
-        ...household.guests.flatMap((g) => [g.first_name, g.last_name]),
+        ...household.guests.flatMap((g) => [g.first_name, g.last_name ?? ""]),
       ]
         .join(" ")
         .toLowerCase();
