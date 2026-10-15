@@ -82,3 +82,12 @@ export function formatEventDayPart(eventDate: string | null, time: string | null
   const part = hours < 12 ? "morning" : hours < 17 ? "afternoon" : "evening";
   return `${weekday} ${part}`;
 }
+
+// guests.last_name is optional, so joining the parts blindly leaves a
+// trailing space for single-name guests.
+export function guestFullName(
+  firstName: string,
+  lastName: string | null | undefined
+): string {
+  return [firstName, lastName].filter((part) => part && part.trim()).join(" ");
+}

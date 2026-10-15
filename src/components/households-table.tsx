@@ -12,7 +12,7 @@ export type EventRef = { name: string } | { name: string }[] | null;
 export type Guest = {
   id: string;
   first_name: string;
-  last_name: string;
+  last_name: string | null;
   guest_events: { event_id: string; events: EventRef }[];
   rsvps: { event_id: string; attending: "yes" | "no" | null }[];
 };
