@@ -27,6 +27,9 @@ export function AdminDashboard({
   const [search, setSearch] = useState("");
   const [groupFilter, setGroupFilter] = useState("");
   const [deadlineFilter, setDeadlineFilter] = useState("");
+  // Tracks only the collapsed ids, so households default to expanded and a
+  // newly added one shows its guests without needing to be seeded here.
+  const [collapsedIds, setCollapsedIds] = useState<Set<string>>(new Set());
 
   const groups = useMemo(() => {
     const set = new Set(households.map((h) => h.group_tag).filter(Boolean) as string[]);
@@ -69,6 +72,28 @@ export function AdminDashboard({
   }, [households, search, groupFilter, deadlineFilter]);
 
   const filteredActive = filtered.length !== households.length;
+  const anyExpanded = filtered.some((h) => !collapsedIds.has(h.id));
+
+  const toggleHousehold = (householdId: string) => {
+    setCollapsedIds((previous) => {
+      const next = new Set(previous);
+      if (!next.delete(householdId)) next.add(householdId);
+      return next;
+    });
+  };
+
+  // Both bulk actions apply to the filtered households only, leaving the
+  // collapsed state of everything currently filtered out untouched.
+  const setAllCollapsed = (collapsed: boolean) => {
+    setCollapsedIds((previous) => {
+      const next = new Set(previous);
+      for (const household of filtered) {
+        if (collapsed) next.add(household.id);
+        else next.delete(household.id);
+      }
+      return next;
+    });
+  };
 
   const stats = useMemo(() => {
     const guests = filtered.flatMap((h) => h.guests);
@@ -141,6 +166,15 @@ export function AdminDashboard({
         <span className="text-sm text-muted-foreground">
           {filtered.length} of {households.length} households
         </span>
+        {filtered.length > 0 ? (
+          <button
+            type="button"
+            onClick={() => setAllCollapsed(anyExpanded)}
+            className="text-sm font-medium text-primary hover:underline"
+          >
+            {anyExpanded ? "Collapse all" : "Expand all"}
+          </button>
+        ) : null}
         {filteredActive ? (
           <button
             type="button"
@@ -206,7 +240,11 @@ export function AdminDashboard({
 
       <div>
         <h2 className="mb-5 font-heading text-xl">Households</h2>
-        <HouseholdsTable households={filtered} />
+        <HouseholdsTable
+          households={filtered}
+          collapsedIds={collapsedIds}
+          onToggle={toggleHousehold}
+        />
       </div>
     </>
   );

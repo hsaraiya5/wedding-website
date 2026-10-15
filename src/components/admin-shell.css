@@ -261,6 +261,9 @@
    next guest, so scanning "who's doing what" doesn't turn into parsing
    a paragraph. */
 .av-guest-summary-list { display: flex; flex-direction: column; gap: 8px; }
+/* The class's display:flex outranks the UA [hidden] rule, so collapsing a
+   household card needs this to actually hide the guest rows. */
+.av-guest-summary-list[hidden] { display: none; }
 .av-guest-summary-row {
   display: flex;
   flex-wrap: wrap;
