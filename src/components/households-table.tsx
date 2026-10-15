@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { ChevronDown } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { DeleteHouseholdButton } from "@/components/delete-household-button";
 import { formatRsvpDeadlineDate } from "@/lib/format";
@@ -59,7 +60,17 @@ function responseSummary(household: Household) {
   return { invited, answered, complete: invited > 0 && answered >= invited };
 }
 
-export function HouseholdsTable({ households }: { households: Household[] }) {
+export function HouseholdsTable({
+  households,
+  collapsedIds,
+  onToggle,
+}: {
+  households: Household[];
+  // Held by AdminDashboard so the collapse-all / expand-all buttons up with
+  // the filters can act on exactly the households being shown.
+  collapsedIds: Set<string>;
+  onToggle: (householdId: string) => void;
+}) {
   return (
     <div className="flex flex-col gap-4">
       {households.length === 0 ? (
@@ -71,10 +82,23 @@ export function HouseholdsTable({ households }: { households: Household[] }) {
           {households.map((household) => {
             const summary = responseSummary(household);
             const deadline = rsvpDeadline(household);
+            const collapsed = collapsedIds.has(household.id);
             return (
               <div key={household.id} className="av-household-card">
                 <div className="av-household-header">
                   <div className="flex flex-1 items-center gap-3">
+                    <button
+                      type="button"
+                      onClick={() => onToggle(household.id)}
+                      aria-expanded={!collapsed}
+                      aria-controls={`household-guests-${household.id}`}
+                      aria-label={`${collapsed ? "Show" : "Hide"} guests in ${household.display_name}`}
+                      className="shrink-0 rounded-full p-1 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                    >
+                      <ChevronDown
+                        className={cn("size-4 transition-transform", collapsed && "-rotate-90")}
+                      />
+                    </button>
                     <div className="flex flex-wrap items-center gap-2.5">
                       <Link
                         href={`/admin/households/${household.id}`}
@@ -121,7 +145,11 @@ export function HouseholdsTable({ households }: { households: Household[] }) {
                   </p>
                 ) : null}
 
-                <div className="av-guest-summary-list">
+                <div
+                  id={`household-guests-${household.id}`}
+                  className="av-guest-summary-list"
+                  hidden={collapsed}
+                >
                   {household.guests.map((guest) => {
                     const guestEventList = eventList(guest);
                     return (
