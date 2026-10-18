@@ -20,6 +20,9 @@ export function AdminHeader({ email }: { email: string | undefined }) {
             <Link href="/admin/guest-list" className="transition-colors hover:text-foreground">
               Guest list
             </Link>
+            <Link href="/admin/notes" className="transition-colors hover:text-foreground">
+              Guest notes
+            </Link>
             <Link href="/admin/travel" className="transition-colors hover:text-foreground">
               Travel
             </Link>
