@@ -17,4 +17,6 @@ export const designAssets = {
   wardrobeSangeet: "/design/wardrobe-sangeet-pencil.2ba39e7c.webp",
   wardrobeWedding: "/design/wardrobe-wedding-pencil.f9e3979e.webp",
   wardrobeReception: "/design/wardrobe-reception-pencil.9b7420eb.webp",
+  hotelWyndham: "/design/hotel-wyndham-pencil.28dda986.webp",
+  hotelEven: "/design/hotel-even-pencil.04aa0e6e.webp",
 };
