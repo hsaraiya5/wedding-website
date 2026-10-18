@@ -116,7 +116,10 @@ export function SiteHeader({
   };
 
   const artStyle = { "--sh-hero-art": `url(${designAssets.hero})` } as CSSProperties;
-  const floralStyle = { "--sh-floral-art": `url(${designAssets.floral})` } as CSSProperties;
+  const floralStyle = {
+    "--sh-floral-art": `url(${designAssets.floral})`,
+    "--sh-sprig-art": `url(${designAssets.eventIconReception})`,
+  } as CSSProperties;
 
   return (
     <>
