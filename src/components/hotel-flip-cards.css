@@ -142,16 +142,46 @@
   padding: 36px 38px 38px;
 }
 
-.hf-facts { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--border); }
-.hf-facts li {
+.hf-facts {
   display: grid;
-  grid-template-columns: 9.5rem minmax(0, 1fr);
-  gap: 4px 20px;
-  border-bottom: 1px solid var(--border);
-  padding: 12px 0;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px 24px;
+  margin: 0;
+  border-block: 1px solid var(--border);
+  padding-block: 14px;
 }
-.hf-facts li span { color: var(--muted-foreground); font-size: 0.9rem; }
-.hf-facts li strong { color: var(--foreground); font-size: 0.94rem; font-weight: 600; }
+.hf-facts-single { grid-template-columns: 1fr; }
+.hf-facts dt { color: var(--primary); font-size: 0.68rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; }
+.hf-facts dd { margin: 3px 0 0; color: var(--foreground); font-size: 0.94rem; font-weight: 600; }
+
+/* Parking gets its own lifted panel: the notes guests most need before
+   arriving, with the price a driver checks first beside the heading. */
+.hf-parking {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--background) 70%, var(--card));
+  padding: 18px 20px;
+}
+.hf-parking-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 12px; }
+.hf-parking-head h4 { color: var(--accent-foreground); font-size: 1.35rem; font-weight: 600; line-height: 1.1; }
+.hf-parking-price {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  border: 1px solid color-mix(in srgb, var(--primary) 40%, transparent);
+  border-radius: 999px;
+  padding: 3px 12px;
+}
+.hf-parking-price strong { color: var(--accent-foreground); font-family: var(--font-heading); font-size: 1.25rem; font-weight: 600; font-variant-numeric: tabular-nums; }
+.hf-parking-price span { color: var(--muted-foreground); font-size: 0.68rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; }
+.hf-parking-body { display: flex; flex-direction: column; gap: 8px; font-size: 0.9rem; }
+.hf-parking-body ul { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 6px; list-style: disc; }
+.hf-parking-body li::marker { color: var(--primary); }
+.hf-parking-body a { color: var(--primary); font-weight: 600; text-decoration: underline; text-underline-offset: 2px; text-decoration-thickness: 1px; }
+.hf-parking-body a:hover { color: var(--accent-foreground); }
 
 .hf-links {
   display: flex;
@@ -186,9 +216,6 @@
   .hf-front-title { padding-inline: 12px; }
   .hf-hotel-copy h3 { font-size: 1.65rem; }
   .hf-back-content { padding: 28px 24px 30px; }
-  /* Labels stack over their values -- a side column leaves too little room
-     for longer parking notes at phone width. */
-  .hf-facts li { grid-template-columns: 1fr; }
 }
 
 @media (prefers-reduced-motion: reduce) {

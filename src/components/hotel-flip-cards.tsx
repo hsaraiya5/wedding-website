@@ -3,6 +3,8 @@
 import Image from "next/image";
 import { useEffect, useRef, useState, type KeyboardEvent, type MouseEvent } from "react";
 import { designAssets } from "@/lib/design-assets";
+import { rowMatchedHeight, type FlipMeasure } from "@/lib/flip-heights";
+import { renderAnswer } from "@/components/faq-section";
 import "./hotel-flip-cards.css";
 
 export type HotelOption = {
@@ -21,47 +23,71 @@ export type HotelOption = {
   checkout_time: string | null;
 };
 
-// The designer's pencil drawings, matched on the hotel's name since the art
-// ships with the site rather than being uploaded per hotel. A hotel with no
-// drawing still gets a front, just without the picture.
-const hotelArt = [
+type HotelDesign = {
+  match: RegExp;
+  art: { src: string; alt: string };
+  // Sits beside room types on the back.
+  fact: { label: string; value: string };
+  // The parking cost a driver checks first, beside the Parking heading.
+  parkingPrice: { amount: string; unit: string };
+};
+
+// There are only ever these two hotels, so each back is designed for its
+// hotel rather than templated: the drawing, the fact that matters most (the
+// Wyndham is the venue, so it gets no distance), and the parking price.
+// Matched on the hotel's name; the editable text (address, description, room
+// types, parking notes, links) still comes from the admin Travel page. A
+// hotel with no match gets a plain card from those fields alone.
+const hotelDesigns: HotelDesign[] = [
   {
     match: /wyndham/i,
-    src: designAssets.hotelWyndham,
-    alt: "Pencil drawing of the Wyndham Grand Pittsburgh Downtown tower",
+    art: {
+      src: designAssets.hotelWyndham,
+      alt: "Pencil drawing of the Wyndham Grand Pittsburgh Downtown tower",
+    },
+    fact: { label: "Events", value: "All in this hotel" },
+    parkingPrice: { amount: "$44", unit: "valet / night" },
   },
   {
     match: /\beven\b/i,
-    src: designAssets.hotelEven,
-    alt: "Pencil drawing of the EVEN Hotel Pittsburgh Downtown building",
+    art: {
+      src: designAssets.hotelEven,
+      alt: "Pencil drawing of the EVEN Hotel Pittsburgh Downtown building",
+    },
+    fact: { label: "To the venue", value: "0.5 miles, with shuttle" },
+    parkingPrice: { amount: "$30", unit: "self-park / day" },
   },
 ];
 
 // Plain flat cards with a click-to-flip: the front is the hotel's drawing and
-// name, the back holds every detail. Like EventFlipCards, each card sizes to
-// its front and grows to fit the back when flipped, so the drawing never sits
-// over a void left for the longer back.
+// name, the back holds every detail. Any number can be open at once (so both
+// backs can be compared side by side), and cards in a row share a height --
+// see rowMatchedHeight.
 export function HotelFlipCards({ options }: { options: HotelOption[] }) {
-  const [openKey, setOpenKey] = useState<string | null>(null);
+  const [openIds, setOpenIds] = useState<Set<string>>(new Set());
+  const cardRefs = useRef<Record<string, HTMLElement | null>>({});
   const triggerRefs = useRef<Record<string, HTMLButtonElement | null>>({});
   const backRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const frontContentRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const backContentRefs = useRef<Record<string, HTMLDivElement | null>>({});
-  const [heights, setHeights] = useState<Record<string, { front: number; back: number }>>({});
+  const [heights, setHeights] = useState<Record<string, FlipMeasure>>({});
+  const ids = options.map((option) => option.id);
 
   useEffect(() => {
     const measure = () => {
-      const next: Record<string, { front: number; back: number }> = {};
+      const next: Record<string, FlipMeasure> = {};
       for (const option of options) {
         const front = frontContentRefs.current[option.id]?.offsetHeight ?? 0;
         const back = backContentRefs.current[option.id]?.offsetHeight ?? 0;
-        if (front) next[option.id] = { front, back };
+        const top = cardRefs.current[option.id]?.offsetTop ?? 0;
+        if (front) next[option.id] = { front, back, top };
       }
       setHeights(next);
     };
     measure();
-    // Text rewraps at every width, so the heights are only right until the
-    // next resize -- re-measure whenever either face's content changes size.
+    // Text rewraps at every width (and the column count changes), so the
+    // heights are only right until the next resize -- re-measure whenever
+    // either face's content changes size.
     const observer = new ResizeObserver(measure);
     for (const option of options) {
       const front = frontContentRefs.current[option.id];
@@ -73,12 +99,16 @@ export function HotelFlipCards({ options }: { options: HotelOption[] }) {
   }, [options]);
 
   const openCard = (key: string) => {
-    setOpenKey(key);
+    setOpenIds((previous) => new Set(previous).add(key));
     window.setTimeout(() => backRefs.current[key]?.focus({ preventScroll: true }), 420);
   };
 
   const closeCard = (key: string, restoreFocus: boolean) => {
-    setOpenKey((prev) => (prev === key ? null : prev));
+    setOpenIds((previous) => {
+      const next = new Set(previous);
+      next.delete(key);
+      return next;
+    });
     if (restoreFocus) triggerRefs.current[key]?.focus({ preventScroll: true });
   };
 
@@ -88,7 +118,7 @@ export function HotelFlipCards({ options }: { options: HotelOption[] }) {
   };
 
   const handleCardKeyDown = (event: KeyboardEvent<HTMLElement>, key: string) => {
-    if (event.key === "Escape" && openKey === key) {
+    if (event.key === "Escape" && openIds.has(key)) {
       event.preventDefault();
       closeCard(key, true);
     }
@@ -97,25 +127,29 @@ export function HotelFlipCards({ options }: { options: HotelOption[] }) {
   return (
     <div className="hf-grid">
       {options.map((option) => {
-        const isOpen = openKey === option.id;
+        const isOpen = openIds.has(option.id);
         const backId = `hf-back-${option.id}`;
-        const art = hotelArt.find((entry) => entry.match.test(option.name));
-        const measured = heights[option.id];
-        // Never shrink on open, and before the first measurement (server
-        // render) set no height so the front sizes the card.
-        const innerHeight = measured
-          ? isOpen
-            ? Math.max(measured.front, measured.back)
-            : measured.front
-          : undefined;
+        const design = hotelDesigns.find((entry) => entry.match.test(option.name));
+        const art = design?.art;
+        const facts = [
+          { label: "Room types", value: option.room_types || "Coming soon" },
+          design
+            ? design.fact
+            : option.distance_from_venue
+              ? { label: "Distance from venue", value: option.distance_from_venue }
+              : null,
+        ].filter((fact): fact is { label: string; value: string } => fact !== null);
 
         return (
           <article
             key={option.id}
             className={`hf-flip ${isOpen ? "hf-flipped" : ""}`.trim()}
             onKeyDown={(e) => handleCardKeyDown(e, option.id)}
+            ref={(node) => {
+              cardRefs.current[option.id] = node;
+            }}
           >
-            <div className="hf-inner" style={{ height: innerHeight }}>
+            <div className="hf-inner" style={{ height: rowMatchedHeight(option.id, ids, heights, openIds) }}>
               <div className="hf-face hf-front">
                 <button
                   type="button"
@@ -186,28 +220,30 @@ export function HotelFlipCards({ options }: { options: HotelOption[] }) {
                     {option.address ? <p className="hf-address">{option.address}</p> : null}
                     {option.description ? <p className="hf-description">{option.description}</p> : null}
                   </div>
-                  <ul className="hf-facts">
-                    <li>
-                      <span>Room types</span>
-                      <strong>{option.room_types || "Coming soon"}</strong>
-                    </li>
-                    <li>
-                      <span>Distance from venue</span>
-                      <strong>{option.distance_from_venue || "Coming soon"}</strong>
-                    </li>
-                    <li>
-                      <span>Parking</span>
-                      <strong>{option.parking_info || "Coming soon"}</strong>
-                    </li>
-                    <li>
-                      <span>Check-in</span>
-                      <strong>{option.checkin_time || "Coming soon"}</strong>
-                    </li>
-                    <li>
-                      <span>Check-out</span>
-                      <strong>{option.checkout_time || "Coming soon"}</strong>
-                    </li>
-                  </ul>
+                  <dl className={`hf-facts ${facts.length === 1 ? "hf-facts-single" : ""}`.trim()}>
+                    {facts.map((fact) => (
+                      <div key={fact.label}>
+                        <dt>{fact.label}</dt>
+                        <dd>{fact.value}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                  {option.parking_info || design ? (
+                    <section className="hf-parking" aria-label="Parking">
+                      <div className="hf-parking-head">
+                        <h4 className="font-heading">Parking</h4>
+                        {design ? (
+                          <span className="hf-parking-price">
+                            <strong>{design.parkingPrice.amount}</strong>
+                            <span>{design.parkingPrice.unit}</span>
+                          </span>
+                        ) : null}
+                      </div>
+                      <div className="hf-parking-body">
+                        {option.parking_info ? renderAnswer(option.parking_info) : <p>Details coming soon.</p>}
+                      </div>
+                    </section>
+                  ) : null}
                   <div className="hf-links">
                     {option.booking_link ? (
                       <a className="hf-book-link" href={option.booking_link} target="_blank" rel="noopener noreferrer">

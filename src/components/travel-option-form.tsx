@@ -170,13 +170,18 @@ export function TravelOptionForm({ travelOption }: { travelOption: TravelOption 
             </div>
             <div className="av-field">
               <Label htmlFor="parking_info">Parking</Label>
-              <Input
+              <Textarea
                 id="parking_info"
                 name="parking_info"
+                rows={4}
                 value={parkingInfo}
                 onChange={(e) => setParkingInfo(e.target.value)}
-                placeholder="e.g. Valet only, $45/night"
+                placeholder="- Valet only, $45/night"
               />
+              <p className="av-section-hint">
+                Start a line with &ldquo;- &rdquo; for a bullet. Links work like FAQ answers:
+                [SpotHero](https://spothero.com).
+              </p>
             </div>
           </div>
 
