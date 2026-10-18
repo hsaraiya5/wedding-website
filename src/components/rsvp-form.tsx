@@ -366,8 +366,8 @@ export function RsvpForm({
                   <h4>Stay in the loop.</h4>
                   <p>
                     Add one or more phone numbers to join the WhatsApp group for hotel, schedule,
-                    and weekend announcements. Group invites go out closer to the date, so don&apos;t
-                    worry if you don&apos;t see anything right away.
+                    and weekend announcements. You will get added to the WhatsApp group closer to
+                    the event date, so please stay tuned!
                   </p>
                 </div>
                 <div className="flex flex-col gap-2">
