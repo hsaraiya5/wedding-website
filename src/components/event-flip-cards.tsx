@@ -208,7 +208,7 @@ export function EventFlipCards({ events, startIndex = 0 }: { events: Event[]; st
   const floralStyle = { "--ef-floral-art": `url(${designAssets.floral})` } as CSSProperties;
 
   return (
-    <div className={`ef-grid ${openIds.size > 0 ? "ef-has-open" : ""}`.trim()} style={floralStyle}>
+    <div className="ef-grid" style={floralStyle}>
       {events.map((event, index) => {
         const position = startIndex + index;
         const accent = accents[position % accents.length];
