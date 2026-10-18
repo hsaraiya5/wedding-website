@@ -427,8 +427,12 @@ export function RsvpForm({
                       name="dietary_needs"
                       value={dietaryNeeds}
                       onChange={(event) => setDietaryNeeds(event.target.value)}
-                      placeholder="Allergies, dietary restrictions, or meal considerations"
+                      placeholder="Allergies or anything else we should know"
+                      aria-describedby="dietary_needs_note"
                     />
+                    <p className="rv-needs-note" id="dietary_needs_note">
+                      Every meal is vegetarian, with vegan and no onion &amp; garlic options.
+                    </p>
                   </div>
                   <div className="rv-needs-field">
                     <Label htmlFor="accessibility_needs">
