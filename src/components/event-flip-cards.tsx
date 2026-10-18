@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useRef, useState, type CSSProperties, type KeyboardEvent, type MouseEvent } from "react";
 import { formatEventDayFull, formatEventTime, formatIcsDateTime } from "@/lib/format";
 import { designAssets } from "@/lib/design-assets";
@@ -35,6 +36,16 @@ const accents = [
   { color: "#7b3546", wash: "#eadbd8" },
   { color: "#a13f3d", wash: "#f1ddd8" },
   { color: "#5f7452", wash: "#dfe6d9" },
+];
+
+// The designers' gold line icons, matched on the event's name since they ship
+// with the site. An event with no match just has no icon. Sizes are the
+// files' own (240px tall); CSS sets the rendered height.
+const eventIcons = [
+  { match: /haldi/i, src: designAssets.eventIconHaldi, width: 241 },
+  { match: /sangeet|garba/i, src: designAssets.eventIconSangeet, width: 223 },
+  { match: /viv|wedding|ceremony/i, src: designAssets.eventIconWedding, width: 175 },
+  { match: /reception/i, src: designAssets.eventIconReception, width: 140 },
 ];
 
 function CalendarIcon() {
@@ -192,6 +203,7 @@ export function EventFlipCards({ events, startIndex = 0 }: { events: Event[]; st
       {events.map((event, index) => {
         const position = startIndex + index;
         const accent = accents[position % accents.length];
+        const icon = eventIcons.find((entry) => entry.match.test(event.name));
         const itinerary = (event.extra_content as { itinerary?: ItineraryContent })?.itinerary;
         const isOpen = openKey === event.id;
         const isPeeling = peelingKey === event.id;
@@ -231,7 +243,19 @@ export function EventFlipCards({ events, startIndex = 0 }: { events: Event[]; st
                   }}
                   onClick={() => openCard(event.id)}
                 >
-                  <span className="ef-date">{formatEventDayFull(event.event_date)}</span>
+                  <span className="ef-top-row">
+                    <span className="ef-date">{formatEventDayFull(event.event_date)}</span>
+                    {icon ? (
+                      <Image
+                        src={icon.src}
+                        alt=""
+                        aria-hidden="true"
+                        width={icon.width}
+                        height={240}
+                        className="ef-icon"
+                      />
+                    ) : null}
+                  </span>
                   <span className="ef-heading">
                     <h3 className="font-heading">{event.name}</h3>
                     {itinerary?.subtitle ? <span className="ef-subtitle">{itinerary.subtitle}</span> : null}

@@ -119,7 +119,12 @@
 /* Right padding keeps the date clear of the peeling corner, which grows on hover. */
 .ef-date { display: block; padding-right: 44px; color: var(--ef-color); font-size: 0.82rem; font-weight: 700; }
 
+/* The event's icon shares the date's line, top right -- beside the name it
+   squeezed long titles onto two lines. Its right margin keeps it clear of
+   the peeling corner even fully grown on hover. */
+.ef-top-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 52px; }
 .ef-heading { display: block; }
+.ef-icon { flex: none; width: auto; height: 52px; max-width: 60px; margin-right: 34px; object-fit: contain; }
 .ef-front h3 { color: var(--accent-foreground); font-size: 3.1rem; line-height: 0.98; }
 .ef-subtitle { display: block; margin-top: 8px; color: var(--ef-color); font-family: var(--font-display); font-style: italic; font-size: 1.4rem; line-height: 1.15; }
 
@@ -233,6 +238,8 @@
   .ef-meta-item { padding: 12px 12px; }
   .ef-back-footer { align-items: stretch; }
   .ef-front h3 { font-size: 2.55rem; }
+  .ef-top-row { min-height: 44px; }
+  .ef-icon { height: 44px; max-width: 52px; margin-right: 30px; }
   .ef-back h3 { font-size: 2.05rem; }
   .ef-calendar-button { width: 100%; justify-content: center; }
 }

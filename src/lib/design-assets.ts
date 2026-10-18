@@ -20,4 +20,8 @@ export const designAssets = {
   hotelWyndham: "/design/hotel-wyndham-pencil.28dda986.webp",
   hotelEven: "/design/hotel-even-pencil.04aa0e6e.webp",
   ghLogo: "/design/gh-logo.98ace190.webp",
+  eventIconHaldi: "/design/event-icon-haldi.ab534e0f.webp",
+  eventIconSangeet: "/design/event-icon-sangeet.1f114588.webp",
+  eventIconWedding: "/design/event-icon-wedding.547225dc.webp",
+  eventIconReception: "/design/event-icon-reception.1e4435c9.webp",
 };
