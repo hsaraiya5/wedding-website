@@ -165,7 +165,6 @@ export function WardrobePlanner({ events }: { events: Event[] }) {
             >
               <span className="wp-tab-head">
                 <span className="wp-tab-daypart">{formatEventDayPart(event.event_date, event.start_time)}</span>
-                <span className="wp-tab-look">Look {String(index + 1).padStart(2, "0")}</span>
               </span>
               <strong>{event.name}</strong>
             </button>
