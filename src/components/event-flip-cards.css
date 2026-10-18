@@ -116,17 +116,8 @@
 }
 .ef-trigger:focus-visible { outline: 3px solid color-mix(in srgb, var(--ef-color) 54%, transparent); outline-offset: -7px; }
 
-/* "Event 1" on the left, the date on the right. Right padding keeps the
-   date clear of the peeling corner, which grows on hover. */
-.ef-card-top {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 12px;
-  padding-right: 44px;
-}
-.ef-ordinal { color: var(--ef-color); font-family: var(--font-script); font-size: 1.45rem; line-height: 1; }
-.ef-date { color: var(--ef-color); font-size: 0.82rem; font-weight: 700; text-align: right; }
+/* Right padding keeps the date clear of the peeling corner, which grows on hover. */
+.ef-date { display: block; padding-right: 44px; color: var(--ef-color); font-size: 0.82rem; font-weight: 700; }
 
 .ef-heading { display: block; }
 .ef-front h3 { color: var(--accent-foreground); font-size: 3.1rem; line-height: 0.98; }
@@ -189,8 +180,6 @@
   flex-direction: column;
   padding: 36px 40px 38px;
 }
-.ef-back .ef-card-top { padding-right: 0; }
-.ef-ordinal-large { font-size: 1.75rem; }
 .ef-back-heading { margin-top: 10px; }
 .ef-back h3 { margin-top: 4px; color: var(--accent-foreground); font-size: 2.55rem; line-height: 0.98; }
 .ef-cultural-heading { margin-top: 7px; color: var(--ef-color); font-family: var(--font-display); font-style: italic; font-size: 1.28rem; line-height: 1.14; }
