@@ -81,16 +81,16 @@
   pointer-events: auto;
 }
 .ef-flip.ef-flipped .ef-front { pointer-events: none; }
-.ef-front::before,
+/* The floral watermark sits on the back only -- on the compact front it
+   crowded the title and read as off-centre. */
 .ef-back::before {
   content: "";
   position: absolute;
   inset: 0;
-  background: var(--ef-floral-art) var(--ef-motif-position, right bottom) / auto 74% no-repeat;
-  opacity: 0.105;
+  background: var(--ef-floral-art) right bottom / auto 74% no-repeat;
+  opacity: 0.055;
   pointer-events: none;
 }
-.ef-back::before { opacity: 0.055; background-position: right bottom; }
 .ef-front::after,
 .ef-back::after {
   content: "";

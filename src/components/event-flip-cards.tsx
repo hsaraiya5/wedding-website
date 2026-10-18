@@ -192,7 +192,6 @@ export function EventFlipCards({ events, startIndex = 0 }: { events: Event[]; st
       {events.map((event, index) => {
         const position = startIndex + index;
         const accent = accents[position % accents.length];
-        const motifPosition = position % 2 === 0 ? "left bottom" : "right bottom";
         const itinerary = (event.extra_content as { itinerary?: ItineraryContent })?.itinerary;
         const isOpen = openKey === event.id;
         const isPeeling = peelingKey === event.id;
@@ -201,7 +200,6 @@ export function EventFlipCards({ events, startIndex = 0 }: { events: Event[]; st
         const style = {
           "--ef-color": accent.color,
           "--ef-wash": accent.wash,
-          "--ef-motif-position": motifPosition,
         } as CSSProperties;
         const measured = heights[event.id];
         // Never shrink on open: an event with little back content keeps at
