@@ -30,6 +30,8 @@ export type Household = {
   // inherits it -- shown once on the card rather than repeated per guest.
   rsvp_deadlines: RsvpDeadline | RsvpDeadline[] | null;
   household_whatsapp_numbers: WhatsappNumber[];
+  dietary_needs: string | null;
+  accessibility_needs: string | null;
   guests: Guest[];
 };
 
@@ -83,6 +85,14 @@ export function HouseholdsTable({
             const summary = responseSummary(household);
             const deadline = rsvpDeadline(household);
             const collapsed = collapsedIds.has(household.id);
+            const details = [
+              {
+                label: "WhatsApp",
+                value: household.household_whatsapp_numbers.map((n) => n.phone_number).join(", "),
+              },
+              { label: "Dietary", value: household.dietary_needs?.trim() ?? "" },
+              { label: "Accessibility", value: household.accessibility_needs?.trim() ?? "" },
+            ].filter((detail) => detail.value);
             return (
               <div key={household.id} className="av-household-card">
                 <div className="av-household-header">
@@ -138,13 +148,6 @@ export function HouseholdsTable({
                   </div>
                 </div>
 
-                {household.household_whatsapp_numbers.length > 0 ? (
-                  <p className="text-xs text-muted-foreground">
-                    WhatsApp:{" "}
-                    {household.household_whatsapp_numbers.map((n) => n.phone_number).join(", ")}
-                  </p>
-                ) : null}
-
                 <div
                   id={`household-guests-${household.id}`}
                   className="av-guest-summary-list"
@@ -176,6 +179,17 @@ export function HouseholdsTable({
                     );
                   })}
                 </div>
+
+                {details.length > 0 ? (
+                  <dl className="av-household-details" hidden={collapsed}>
+                    {details.map((detail) => (
+                      <div key={detail.label} className="contents">
+                        <dt>{detail.label}</dt>
+                        <dd>{detail.value}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                ) : null}
               </div>
             );
           })}

@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
 import {
   HouseholdsTable,
   rsvpDeadline,
@@ -25,7 +26,9 @@ export function AdminDashboard({
   events: Event[];
 }) {
   const [search, setSearch] = useState("");
-  const [groupFilter, setGroupFilter] = useState("");
+  // Any combination of tags; a household has one tag, so a household shows
+  // when its tag is any of the selected ones. Empty means every group.
+  const [groupFilter, setGroupFilter] = useState<Set<string>>(new Set());
   const [deadlineFilter, setDeadlineFilter] = useState("");
   // Tracks only the collapsed ids, so households default to expanded and a
   // newly added one shows its guests without needing to be seeded here.
@@ -52,7 +55,7 @@ export function AdminDashboard({
   const filtered = useMemo(() => {
     const query = search.trim().toLowerCase();
     return households.filter((household) => {
-      if (groupFilter && household.group_tag !== groupFilter) {
+      if (groupFilter.size > 0 && !groupFilter.has(household.group_tag ?? "")) {
         return false;
       }
       if (deadlineFilter && rsvpDeadline(household)?.id !== deadlineFilter) {
@@ -73,6 +76,14 @@ export function AdminDashboard({
 
   const filteredActive = filtered.length !== households.length;
   const anyExpanded = filtered.some((h) => !collapsedIds.has(h.id));
+
+  const toggleGroup = (group: string) => {
+    setGroupFilter((previous) => {
+      const next = new Set(previous);
+      if (!next.delete(group)) next.add(group);
+      return next;
+    });
+  };
 
   const toggleHousehold = (householdId: string) => {
     setCollapsedIds((previous) => {
@@ -137,18 +148,6 @@ export function AdminDashboard({
           onChange={(e) => setSearch(e.target.value)}
           className="max-w-xs rounded-full"
         />
-        <select
-          value={groupFilter}
-          onChange={(e) => setGroupFilter(e.target.value)}
-          className="h-8 rounded-full border border-input bg-transparent px-3 text-sm"
-        >
-          <option value="">All groups</option>
-          {groups.map((group) => (
-            <option key={group} value={group}>
-              {group}
-            </option>
-          ))}
-        </select>
         {deadlines.length > 1 ? (
           <select
             value={deadlineFilter}
@@ -180,7 +179,7 @@ export function AdminDashboard({
             type="button"
             onClick={() => {
               setSearch("");
-              setGroupFilter("");
+              setGroupFilter(new Set());
               setDeadlineFilter("");
             }}
             className="text-sm font-medium text-primary hover:underline"
@@ -189,6 +188,31 @@ export function AdminDashboard({
           </button>
         ) : null}
       </div>
+
+      {groups.length > 0 ? (
+        <div className="-mt-4 flex flex-wrap items-center gap-2" role="group" aria-label="Filter by group">
+          <span className="text-xs font-bold uppercase tracking-wide text-muted-foreground">Groups</span>
+          {groups.map((group) => {
+            const active = groupFilter.has(group);
+            return (
+              <button
+                key={group}
+                type="button"
+                aria-pressed={active}
+                onClick={() => toggleGroup(group)}
+                className={cn(
+                  "av-pill cursor-pointer border transition-colors",
+                  active
+                    ? "border-primary bg-primary text-primary-foreground"
+                    : "border-border bg-transparent text-foreground hover:bg-muted"
+                )}
+              >
+                {group}
+              </button>
+            );
+          })}
+        </div>
+      ) : null}
 
       <div className="grid grid-cols-2 gap-5 sm:grid-cols-4">
         {stats.map((stat) => (
