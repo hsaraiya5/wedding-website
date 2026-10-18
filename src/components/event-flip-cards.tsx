@@ -243,19 +243,7 @@ export function EventFlipCards({ events, startIndex = 0 }: { events: Event[]; st
                   }}
                   onClick={() => openCard(event.id)}
                 >
-                  <span className="ef-top-row">
-                    <span className="ef-date">{formatEventDayFull(event.event_date)}</span>
-                    {icon ? (
-                      <Image
-                        src={icon.src}
-                        alt=""
-                        aria-hidden="true"
-                        width={icon.width}
-                        height={240}
-                        className="ef-icon"
-                      />
-                    ) : null}
-                  </span>
+                  <span className="ef-date">{formatEventDayFull(event.event_date)}</span>
                   <span className="ef-heading">
                     <h3 className="font-heading">{event.name}</h3>
                     {itinerary?.subtitle ? <span className="ef-subtitle">{itinerary.subtitle}</span> : null}
@@ -304,6 +292,16 @@ export function EventFlipCards({ events, startIndex = 0 }: { events: Event[]; st
                     <p className="gh-eyebrow" style={{ color: "var(--ef-color)" } as CSSProperties}>
                       What to expect
                     </p>
+                    {icon ? (
+                      <Image
+                        src={icon.src}
+                        alt=""
+                        aria-hidden="true"
+                        width={icon.width}
+                        height={240}
+                        className="ef-icon"
+                      />
+                    ) : null}
                   </div>
                   <div className="ef-back-heading">
                     <h3 className="font-heading">{event.name}</h3>
