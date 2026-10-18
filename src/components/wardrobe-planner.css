@@ -64,12 +64,10 @@
 }
 .wp-tab-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
 .wp-tab-daypart { color: var(--muted-foreground); font-size: 0.68rem; font-weight: 700; text-transform: uppercase; }
-.wp-tab-look { color: rgba(74, 62, 52, 0.46); font-family: var(--font-script); font-size: 1rem; white-space: nowrap; }
 .wp-tab strong { font-family: var(--font-heading); font-size: 1.3rem; font-weight: 500; line-height: 1.05; }
 .wp-tab:hover { background: rgba(255, 250, 240, 0.52); padding-left: 29px; color: var(--accent-foreground); }
 .wp-tab[aria-selected="true"] { background: var(--background); padding-left: 32px; color: var(--accent-foreground); }
 .wp-tab[aria-selected="true"]::before { opacity: 1; transform: scaleY(1); }
-.wp-tab[aria-selected="true"] .wp-tab-look { color: var(--wp-tab-color); }
 .wp-tab:focus-visible { outline: 2px solid color-mix(in srgb, var(--wp-tab-color) 64%, transparent); outline-offset: -6px; }
 
 .wp-detail {
@@ -229,7 +227,6 @@
     background: transparent;
     border-bottom-color: var(--wp-tab-color);
   }
-  .wp-tab-look { display: none; }
   .wp-tab-head { justify-content: flex-start; }
   .wp-tab-daypart { font-size: 0.62rem; }
   .wp-tab strong { font-size: 0.95rem; }
