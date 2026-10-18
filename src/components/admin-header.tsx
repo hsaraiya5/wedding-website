@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { signOutAdmin } from "@/app/actions/admin";
+import { GhLogo } from "@/components/gh-logo";
 
 export function AdminHeader({ email }: { email: string | undefined }) {
   const initial = email?.[0]?.toUpperCase() ?? "?";
@@ -9,9 +10,7 @@ export function AdminHeader({ email }: { email: string | undefined }) {
       <div className="mx-auto flex max-w-7xl items-center justify-between px-8 py-4">
         <div className="flex items-center gap-6">
           <Link href="/admin" className="flex items-center gap-2">
-            <span className="flex size-8 items-center justify-center rounded-full border border-primary/40 font-heading text-sm text-primary">
-              G&nbsp;H
-            </span>
+            <GhLogo height={34} className="h-[34px] w-auto" />
             <span className="font-heading text-lg leading-none">Wedding admin</span>
           </Link>
           <nav className="hidden items-center gap-4 text-sm font-medium text-muted-foreground sm:flex">

@@ -46,17 +46,11 @@
   gap: 18px;
 }
 .sh-monogram {
-  width: 44px;
-  height: 44px;
   display: grid;
   place-items: center;
-  border: 1px solid var(--primary);
-  border-radius: 50%;
-  color: var(--primary);
-  font-family: var(--font-heading);
-  font-size: 0.95rem;
   text-decoration: none;
 }
+.sh-monogram img { display: block; width: auto; height: 48px; }
 .sh-title {
   justify-self: center;
   color: var(--accent-foreground);
@@ -345,12 +339,8 @@
     gap: 12px;
     margin-bottom: 8px;
   }
-  .sh-overlay-mobile-header .sh-monogram {
-    flex: none;
-    width: 40px;
-    height: 40px;
-    font-size: 0.8rem;
-  }
+  .sh-overlay-mobile-header .sh-monogram { flex: none; }
+  .sh-overlay-mobile-header .sh-monogram img { height: 44px; }
   .sh-overlay-mobile-header .sh-overlay-eyebrow { font-size: 0.72rem; }
   .sh-overlay-mobile-title {
     margin-top: 2px;
