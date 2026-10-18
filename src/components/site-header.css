@@ -48,6 +48,9 @@
 .sh-monogram {
   display: grid;
   place-items: center;
+  /* Hug the logo at the start of its grid column rather than stretching
+     across it, which centred the logo in the header's left third. */
+  justify-self: start;
   text-decoration: none;
 }
 .sh-monogram img { display: block; width: auto; height: 48px; }
