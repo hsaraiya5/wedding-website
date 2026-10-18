@@ -336,24 +336,28 @@ export function RsvpForm({
                   ) : null}
                 </div>
 
-                <div className="rv-controls">
-                  <button
-                    type="button"
-                    className="rv-nav"
-                    disabled={activeGuestIndex === 0}
-                    onClick={() => goToGuest(Math.max(0, activeGuestIndex - 1))}
-                  >
-                    &larr; Previous guest
-                  </button>
-                  <button
-                    type="button"
-                    className="rv-nav"
-                    disabled={activeGuestIndex === rsvpGuests.length - 1}
-                    onClick={() => goToGuest(Math.min(rsvpGuests.length - 1, activeGuestIndex + 1))}
-                  >
-                    Next guest &rarr;
-                  </button>
-                </div>
+                {/* Only for households with more than one guest -- otherwise both
+                    buttons are disabled (and invisible) and the row is dead space. */}
+                {rsvpGuests.length > 1 ? (
+                  <div className="rv-controls">
+                    <button
+                      type="button"
+                      className="rv-nav"
+                      disabled={activeGuestIndex === 0}
+                      onClick={() => goToGuest(Math.max(0, activeGuestIndex - 1))}
+                    >
+                      &larr; Previous guest
+                    </button>
+                    <button
+                      type="button"
+                      className="rv-nav"
+                      disabled={activeGuestIndex === rsvpGuests.length - 1}
+                      onClick={() => goToGuest(Math.min(rsvpGuests.length - 1, activeGuestIndex + 1))}
+                    >
+                      Next guest &rarr;
+                    </button>
+                  </div>
+                ) : null}
               </>
             ) : (
               <p className="text-muted-foreground">No events found for your household.</p>
