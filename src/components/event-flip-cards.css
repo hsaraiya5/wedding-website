@@ -6,12 +6,14 @@
 .ef-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
+  /* Top-aligned so an opened card grows on its own and its row-mate stays
+     compact instead of stretching to match. */
+  align-items: start;
   gap: 26px;
 }
 
 .ef-flip {
   min-width: 0;
-  min-height: 530px;
   perspective: 1900px;
   perspective-origin: center;
 }
@@ -39,11 +41,13 @@
 .ef-inner {
   position: relative;
   width: 100%;
-  height: 100%;
-  min-height: 530px;
   transform-style: preserve-3d;
   transform-origin: center;
-  transition: transform 820ms cubic-bezier(0.18, 0.72, 0.18, 1), filter 240ms ease;
+  /* height is set inline from the measured faces (see EventFlipCards). */
+  transition:
+    transform 820ms cubic-bezier(0.18, 0.72, 0.18, 1),
+    height 620ms cubic-bezier(0.22, 0.7, 0.2, 1),
+    filter 240ms ease;
 }
 .ef-flip.ef-peeling .ef-inner { transform: rotateY(-12deg) translate3d(-4px, -2px, 8px); }
 .ef-flip.ef-peeling .ef-peel { opacity: 1; transform: translate(-4px, 4px) scale(1.18); }
@@ -67,7 +71,15 @@
   -webkit-transform: translateZ(0);
   transform: translateZ(0);
 }
-.ef-front { background: color-mix(in srgb, var(--ef-wash) 76%, #fffaf0); pointer-events: auto; }
+/* The front stays in flow so it sizes the card on the server render, before
+   any measurement exists; min-height lets it fill the box once the card has
+   grown for the back. */
+.ef-front {
+  position: relative;
+  min-height: 100%;
+  background: color-mix(in srgb, var(--ef-wash) 76%, #fffaf0);
+  pointer-events: auto;
+}
 .ef-flip.ef-flipped .ef-front { pointer-events: none; }
 .ef-front::before,
 .ef-back::before {
@@ -92,36 +104,32 @@
   position: relative;
   z-index: 1;
   width: 100%;
-  height: 100%;
-  min-height: 530px;
-  display: grid;
-  grid-template-rows: minmax(0, 1fr) auto;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
   border: 0;
   background: transparent;
-  padding: 0;
+  padding: 36px 40px 38px;
   color: var(--foreground);
   cursor: pointer;
   text-align: left;
 }
 .ef-trigger:focus-visible { outline: 3px solid color-mix(in srgb, var(--ef-color) 54%, transparent); outline-offset: -7px; }
 
-.ef-heading {
-  align-self: stretch;
-  display: grid;
-  align-content: center;
-  padding: 54px 48px 34px;
-}
-.ef-front h3 { color: var(--accent-foreground); font-size: 3.45rem; line-height: 0.96; }
-.ef-subtitle { display: block; margin-top: 10px; color: var(--ef-color); font-family: var(--font-display); font-style: italic; font-size: 1.55rem; line-height: 1.1; }
-.ef-date { display: block; margin-top: 30px; color: var(--foreground); font-size: 1rem; font-weight: 600; }
+/* Right padding keeps the date clear of the peeling corner, which grows on hover. */
+.ef-date { display: block; padding-right: 44px; color: var(--ef-color); font-size: 0.82rem; font-weight: 700; }
+
+.ef-heading { display: block; }
+.ef-front h3 { color: var(--accent-foreground); font-size: 3.1rem; line-height: 0.98; }
+.ef-subtitle { display: block; margin-top: 8px; color: var(--ef-color); font-family: var(--font-display); font-style: italic; font-size: 1.4rem; line-height: 1.15; }
 
 .ef-meta {
-  margin: 0 34px 32px;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  border-top: 1px solid rgba(113, 43, 49, 0.18);
+  border: 1px solid rgba(113, 43, 49, 0.12);
+  background: rgba(255, 250, 240, 0.58);
 }
-.ef-meta-item { min-width: 0; padding: 18px 14px 8px; }
+.ef-meta-item { min-width: 0; padding: 14px 16px; }
 .ef-meta-item + .ef-meta-item { border-left: 1px solid rgba(113, 43, 49, 0.15); }
 .ef-meta-label { display: block; color: var(--ef-color); font-size: 0.66rem; font-weight: 700; text-transform: uppercase; }
 .ef-meta-item strong { display: block; margin-top: 5px; color: var(--foreground); font-size: 0.88rem; line-height: 1.34; }
@@ -163,20 +171,20 @@
 .ef-flip.ef-flipped .ef-back { pointer-events: auto; }
 .ef-back:focus-visible { outline: 3px solid color-mix(in srgb, var(--ef-color) 54%, transparent); outline-offset: -7px; }
 
+/* Natural height, never stretched: its offsetHeight is what the card grows
+   to when flipped. */
 .ef-back-content {
   position: relative;
   z-index: 1;
-  height: 100%;
-  min-height: 530px;
-  display: grid;
-  grid-template-rows: auto auto minmax(0, 1fr) auto auto;
-  padding: 34px 40px;
+  display: flex;
+  flex-direction: column;
+  padding: 36px 40px 38px;
 }
 .ef-back-heading { margin-top: 10px; }
 .ef-back h3 { margin-top: 4px; color: var(--accent-foreground); font-size: 2.55rem; line-height: 0.98; }
 .ef-cultural-heading { margin-top: 7px; color: var(--ef-color); font-family: var(--font-display); font-style: italic; font-size: 1.28rem; line-height: 1.14; }
 
-.ef-tradition-copy { align-self: center; margin-top: 14px; }
+.ef-tradition-copy { margin-top: 18px; margin-bottom: 6px; }
 .ef-tradition-copy > p { color: var(--muted-foreground); font-size: 0.88rem; line-height: 1.52; }
 .ef-tradition-list { margin: 14px 0 0; padding: 0; display: grid; gap: 9px; list-style: none; }
 .ef-tradition-list li { border-left: 3px solid var(--ef-color); padding-left: 11px; color: var(--foreground); font-size: 0.82rem; line-height: 1.42; }
@@ -213,8 +221,7 @@
 .ef-calendar-icon { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 
 @media (max-width: 900px) {
-  .ef-heading { padding: 46px 38px 30px; }
-  .ef-meta { margin-right: 28px; margin-left: 28px; }
+  .ef-trigger, .ef-back-content { padding: 32px 32px 34px; }
   .ef-front h3 { font-size: 2.65rem; }
   .ef-back h3 { font-size: 2.15rem; }
 }
@@ -222,12 +229,8 @@
 @media (max-width: 640px) {
   .ef-grid { grid-template-columns: 1fr; }
   .ef-grid > .ef-flip:nth-child(odd):nth-last-child(1) { width: auto; justify-self: stretch; }
-  .ef-flip, .ef-inner, .ef-trigger, .ef-back-content { min-height: 520px; }
-  .ef-trigger { padding: 0; }
-  .ef-heading { padding: 32px 28px 24px; }
-  .ef-meta { margin: 0 24px 26px; }
-  .ef-meta-item { padding: 14px 10px 6px; }
-  .ef-back-content { padding: 30px 26px; }
+  .ef-trigger, .ef-back-content { padding: 30px 28px 30px; }
+  .ef-meta-item { padding: 12px 12px; }
   .ef-back-footer { align-items: stretch; }
   .ef-front h3 { font-size: 2.55rem; }
   .ef-back h3 { font-size: 2.05rem; }

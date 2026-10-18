@@ -115,7 +115,13 @@ export function EventFlipCards({ events, startIndex = 0 }: { events: Event[]; st
   const [peelingKey, setPeelingKey] = useState<string | null>(null);
   const triggerRefs = useRef<Record<string, HTMLButtonElement | null>>({});
   const backRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  const backContentRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const timers = useRef<number[]>([]);
+  // Each card is as tall as its front until it flips, then grows to fit the
+  // denser back. Both faces are stacked in the same box for the 3D turn, so
+  // the box can't size itself to whichever face is showing -- it gets an
+  // explicit height from these measurements, which also lets it animate.
+  const [heights, setHeights] = useState<Record<string, { front: number; back: number }>>({});
 
   useEffect(() => {
     const pending = timers.current;
@@ -123,6 +129,29 @@ export function EventFlipCards({ events, startIndex = 0 }: { events: Event[]; st
       pending.forEach((id) => window.clearTimeout(id));
     };
   }, []);
+
+  useEffect(() => {
+    const measure = () => {
+      const next: Record<string, { front: number; back: number }> = {};
+      for (const event of events) {
+        const front = triggerRefs.current[event.id]?.offsetHeight ?? 0;
+        const back = backContentRefs.current[event.id]?.offsetHeight ?? 0;
+        if (front) next[event.id] = { front, back };
+      }
+      setHeights(next);
+    };
+    measure();
+    // Text rewraps at every width, so the heights are only right until the
+    // next resize -- re-measure whenever either face's content changes size.
+    const observer = new ResizeObserver(measure);
+    for (const event of events) {
+      const front = triggerRefs.current[event.id];
+      const back = backContentRefs.current[event.id];
+      if (front) observer.observe(front);
+      if (back) observer.observe(back);
+    }
+    return () => observer.disconnect();
+  }, [events]);
 
   const openCard = (key: string) => {
     if (peelingKey === key || openKey === key) return;
@@ -174,6 +203,15 @@ export function EventFlipCards({ events, startIndex = 0 }: { events: Event[]; st
           "--ef-wash": accent.wash,
           "--ef-motif-position": motifPosition,
         } as CSSProperties;
+        const measured = heights[event.id];
+        // Never shrink on open: an event with little back content keeps at
+        // least its front's height. Before the first measurement (server
+        // render) there's no height at all and the front sizes the card.
+        const innerHeight = measured
+          ? isOpen
+            ? Math.max(measured.front, measured.back)
+            : measured.front
+          : undefined;
 
         return (
           <article
@@ -182,7 +220,7 @@ export function EventFlipCards({ events, startIndex = 0 }: { events: Event[]; st
             style={style}
             onKeyDown={(e) => handleCardKeyDown(e, event.id)}
           >
-            <div className="ef-inner">
+            <div className="ef-inner" style={{ height: innerHeight }}>
               <div className="ef-face ef-front">
                 <button
                   type="button"
@@ -195,10 +233,10 @@ export function EventFlipCards({ events, startIndex = 0 }: { events: Event[]; st
                   }}
                   onClick={() => openCard(event.id)}
                 >
+                  <span className="ef-date">{formatEventDayFull(event.event_date)}</span>
                   <span className="ef-heading">
                     <h3 className="font-heading">{event.name}</h3>
                     {itinerary?.subtitle ? <span className="ef-subtitle">{itinerary.subtitle}</span> : null}
-                    <span className="ef-date">{formatEventDayFull(event.event_date)}</span>
                   </span>
                   <span className="ef-meta">
                     <span className="ef-meta-item">
@@ -234,7 +272,12 @@ export function EventFlipCards({ events, startIndex = 0 }: { events: Event[]; st
                   }
                 }}
               >
-                <div className="ef-back-content">
+                <div
+                  className="ef-back-content"
+                  ref={(node) => {
+                    backContentRefs.current[event.id] = node;
+                  }}
+                >
                   <div className="ef-back-top">
                     <p className="gh-eyebrow" style={{ color: "var(--ef-color)" } as CSSProperties}>
                       What to expect
