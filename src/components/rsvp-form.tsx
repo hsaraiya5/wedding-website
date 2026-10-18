@@ -431,7 +431,7 @@ export function RsvpForm({
                       aria-describedby="dietary_needs_note"
                     />
                     <p className="rv-needs-note" id="dietary_needs_note">
-                      Every meal is vegetarian, with vegan and no onion &amp; garlic options.
+                      Every meal is vegetarian, with vegan, no onion, and no garlic options also available.
                     </p>
                   </div>
                   <div className="rv-needs-field">
