@@ -30,8 +30,21 @@
   filter: drop-shadow(0 12px 16px rgba(67, 57, 43, 0.08));
   pointer-events: none;
 }
-.sc-rail-left { left: 0; background-position: left top; }
-.sc-rail-right { right: 0; background-position: right top; transition-delay: 120ms; }
+/* The vine art is cropped tight, so blooms run straight into its inner edge
+   and read as sliced off. Fade that edge out instead. */
+.sc-rail-left {
+  left: 0;
+  background-position: left top;
+  -webkit-mask-image: linear-gradient(to right, #000 62%, transparent);
+  mask-image: linear-gradient(to right, #000 62%, transparent);
+}
+.sc-rail-right {
+  right: 0;
+  background-position: right top;
+  transition-delay: 120ms;
+  -webkit-mask-image: linear-gradient(to left, #000 62%, transparent);
+  mask-image: linear-gradient(to left, #000 62%, transparent);
+}
 .sc-section.sc-in-view .sc-rail {
   opacity: var(--sc-rail-opacity);
   clip-path: inset(0 0 0 0);
