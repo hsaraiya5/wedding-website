@@ -122,7 +122,23 @@ export function EventDetailsForm({ event, eventIndex = 0 }: { event: Event; even
             />
           </div>
           <div className="av-field">
-            <Label htmlFor="end_time">End time (optional)</Label>
+            <div className="flex items-center justify-between gap-2">
+              <Label htmlFor="end_time">End time (optional)</Label>
+              {/* Safari and iOS render a time input as a picker that always
+                  holds a value -- there's no way to empty it by hand, so an
+                  admin on a phone simply couldn't drop an end time once one
+                  had been set. This clears the field on any browser. */}
+              {endTime ? (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="xs"
+                  onClick={() => setEndTime("")}
+                >
+                  Clear
+                </Button>
+              ) : null}
+            </div>
             <Input
               id="end_time"
               name="end_time"
