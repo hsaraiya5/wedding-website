@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { redeemInviteCode, type RedeemCodeState } from "@/app/actions/guest";
 import { designAssets } from "@/lib/design-assets";
+import { GhLogo } from "@/components/gh-logo";
 import "./invite-entrance.css";
 
 // The invite-code entrance: a sealed envelope flies in and lands, the guest
@@ -238,7 +239,7 @@ export function InviteEntrance() {
           <div className="ie-rail ie-rail-right" aria-hidden="true" />
           <div className="ie-card-copy" ref={copyRef}>
             <div className="ie-monogram" aria-hidden="true">
-              G&nbsp;H
+              <GhLogo height={64} />
             </div>
             <p className="ie-eyebrow">You are invited</p>
             <p
@@ -306,7 +307,9 @@ export function InviteEntrance() {
           <span className="ie-seal-half ie-seal-t" />
           <span className="ie-seal-half ie-seal-b" />
           <span className="ie-seal-ring" />
-          <span className="ie-seal-mono">G&nbsp;H</span>
+          <span className="ie-seal-mono">
+            <GhLogo height={44} preload />
+          </span>
         </div>
       </div>
 

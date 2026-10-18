@@ -19,4 +19,5 @@ export const designAssets = {
   wardrobeReception: "/design/wardrobe-reception-pencil.9b7420eb.webp",
   hotelWyndham: "/design/hotel-wyndham-pencil.28dda986.webp",
   hotelEven: "/design/hotel-even-pencil.04aa0e6e.webp",
+  ghLogo: "/design/gh-logo.98ace190.webp",
 };

@@ -3,6 +3,7 @@
 import { useEffect, useState, type CSSProperties } from "react";
 import { Share2 } from "lucide-react";
 import { Countdown } from "@/components/countdown";
+import { GhLogo } from "@/components/gh-logo";
 import { designAssets } from "@/lib/design-assets";
 import { cn } from "@/lib/utils";
 import "./site-header.css";
@@ -122,7 +123,7 @@ export function SiteHeader({
       <header className="sh-header" style={floralStyle}>
         <div className="sh-header-inner">
           <a href="#welcome" className="sh-monogram" aria-label="Return to the top">
-            G&nbsp;H
+            <GhLogo height={48} preload />
           </a>
           <a href="#welcome" className="sh-title">
             Gayathri &amp; Hrishikesh
@@ -196,7 +197,7 @@ export function SiteHeader({
               below plus the art pane's own date/venue placard. */}
           <div className="sh-overlay-mobile-header">
             <span className="sh-monogram" aria-hidden="true">
-              G&nbsp;H
+              <GhLogo height={44} />
             </span>
             <div>
               <p className="sh-overlay-eyebrow">Wedding weekend</p>
