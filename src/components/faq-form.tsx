@@ -23,10 +23,14 @@ export function FaqForm({ faq }: { faq: Faq }) {
 
       <div className="av-field">
         <Label htmlFor="answer">Answer</Label>
-        <Textarea id="answer" name="answer" defaultValue={faq?.answer} rows={3} required />
+        <Textarea id="answer" name="answer" defaultValue={faq?.answer} rows={6} required />
         <p className="av-section-hint">
           To add a link, write [link text](https://...) -- e.g. [Directions to the
           Wyndham](https://maps.google.com/...). Guests see just the link text.
+        </p>
+        <p className="av-section-hint">
+          Start a line with &quot;- &quot; to make it a bullet. Line breaks are kept, and a blank
+          line starts a new paragraph.
         </p>
       </div>
 
