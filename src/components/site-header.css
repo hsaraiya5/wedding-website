@@ -56,11 +56,25 @@
 .sh-monogram img { display: block; width: auto; height: 48px; }
 .sh-title {
   justify-self: center;
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
   color: var(--accent-foreground);
   font-family: var(--font-heading);
   font-size: 1.25rem;
   text-decoration: none;
 }
+/* A pair of the designers' olive sprigs framing the names, mirrored so both
+   lean outward like a laurel. */
+.sh-title::before,
+.sh-title::after {
+  content: "";
+  flex: none;
+  width: 17px;
+  height: 30px;
+  background: var(--sh-sprig-art) center / contain no-repeat;
+}
+.sh-title::before { transform: scaleX(-1); }
 .sh-actions { display: flex; justify-content: flex-end; align-items: center; gap: 10px; }
 .sh-rsvp {
   display: inline-flex;
