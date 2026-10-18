@@ -528,7 +528,9 @@
    to stay in proportion with the narrower card. The mechanic is untouched --
    only these two numbers and the aspect ratio differ from desktop. */
 @media (max-width: 760px) {
-  .ie-access { padding: 24px; }
+  /* Side padding is the 8vw the envelope leaves over, so it centres instead
+     of overflowing to the right. */
+  .ie-access { padding: 24px 4vw; }
   .ie-env { width: min(92vw, 420px, calc((100svh - 120px) * 0.78)); aspect-ratio: 0.78; }
   .ie-card { --ie-rail-w: 20%; --ie-rail-gap: 2.5%; }
   .ie-seal { width: 18%; }
@@ -544,6 +546,7 @@
 }
 
 @media (max-width: 400px) {
+  .ie-access { padding-inline: 3vw; }
   .ie-env { width: 94vw; }
   .ie-card { --ie-rail-w: 21%; --ie-rail-gap: 2%; }
 }
