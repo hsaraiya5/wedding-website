@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useEffect, useRef, useState, type CSSProperties, type KeyboardEvent, type MouseEvent } from "react";
 import { formatEventDayFull, formatEventTime, formatIcsDateTime } from "@/lib/format";
 import { designAssets } from "@/lib/design-assets";
+import { rowMatchedHeight, type FlipMeasure } from "@/lib/flip-heights";
 import "./event-flip-cards.css";
 
 type TraditionItem = { label: string; text: string };
@@ -122,8 +123,10 @@ function CalendarButton({ event }: { event: Event }) {
 }
 
 export function EventFlipCards({ events, startIndex = 0 }: { events: Event[]; startIndex?: number }) {
-  const [openKey, setOpenKey] = useState<string | null>(null);
+  // Any number of cards can be open at once, so guests can compare backs.
+  const [openIds, setOpenIds] = useState<Set<string>>(new Set());
   const [peelingKey, setPeelingKey] = useState<string | null>(null);
+  const cardRefs = useRef<Record<string, HTMLElement | null>>({});
   const triggerRefs = useRef<Record<string, HTMLButtonElement | null>>({});
   const backRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const backContentRefs = useRef<Record<string, HTMLDivElement | null>>({});
@@ -132,7 +135,9 @@ export function EventFlipCards({ events, startIndex = 0 }: { events: Event[]; st
   // denser back. Both faces are stacked in the same box for the 3D turn, so
   // the box can't size itself to whichever face is showing -- it gets an
   // explicit height from these measurements, which also lets it animate.
-  const [heights, setHeights] = useState<Record<string, { front: number; back: number }>>({});
+  // Cards in a row share a height -- see rowMatchedHeight.
+  const [heights, setHeights] = useState<Record<string, FlipMeasure>>({});
+  const ids = events.map((event) => event.id);
 
   useEffect(() => {
     const pending = timers.current;
@@ -143,11 +148,12 @@ export function EventFlipCards({ events, startIndex = 0 }: { events: Event[]; st
 
   useEffect(() => {
     const measure = () => {
-      const next: Record<string, { front: number; back: number }> = {};
+      const next: Record<string, FlipMeasure> = {};
       for (const event of events) {
         const front = triggerRefs.current[event.id]?.offsetHeight ?? 0;
         const back = backContentRefs.current[event.id]?.offsetHeight ?? 0;
-        if (front) next[event.id] = { front, back };
+        const top = cardRefs.current[event.id]?.offsetTop ?? 0;
+        if (front) next[event.id] = { front, back, top };
       }
       setHeights(next);
     };
@@ -165,12 +171,11 @@ export function EventFlipCards({ events, startIndex = 0 }: { events: Event[]; st
   }, [events]);
 
   const openCard = (key: string) => {
-    if (peelingKey === key || openKey === key) return;
-    setOpenKey(null);
+    if (peelingKey === key || openIds.has(key)) return;
     setPeelingKey(key);
     const peelTimer = window.setTimeout(() => {
       setPeelingKey(null);
-      setOpenKey(key);
+      setOpenIds((previous) => new Set(previous).add(key));
       const focusTimer = window.setTimeout(() => {
         backRefs.current[key]?.focus({ preventScroll: true });
       }, 620);
@@ -180,7 +185,11 @@ export function EventFlipCards({ events, startIndex = 0 }: { events: Event[]; st
   };
 
   const closeCard = (key: string, restoreFocus: boolean) => {
-    setOpenKey((prev) => (prev === key ? null : prev));
+    setOpenIds((previous) => {
+      const next = new Set(previous);
+      next.delete(key);
+      return next;
+    });
     if (restoreFocus) triggerRefs.current[key]?.focus({ preventScroll: true });
   };
 
@@ -190,7 +199,7 @@ export function EventFlipCards({ events, startIndex = 0 }: { events: Event[]; st
   };
 
   const handleCardKeyDown = (event: KeyboardEvent<HTMLElement>, key: string) => {
-    if (event.key === "Escape" && openKey === key) {
+    if (event.key === "Escape" && openIds.has(key)) {
       event.preventDefault();
       closeCard(key, true);
     }
@@ -199,13 +208,13 @@ export function EventFlipCards({ events, startIndex = 0 }: { events: Event[]; st
   const floralStyle = { "--ef-floral-art": `url(${designAssets.floral})` } as CSSProperties;
 
   return (
-    <div className={`ef-grid ${openKey ? "ef-has-open" : ""}`.trim()} style={floralStyle}>
+    <div className={`ef-grid ${openIds.size > 0 ? "ef-has-open" : ""}`.trim()} style={floralStyle}>
       {events.map((event, index) => {
         const position = startIndex + index;
         const accent = accents[position % accents.length];
         const icon = eventIcons.find((entry) => entry.match.test(event.name));
         const itinerary = (event.extra_content as { itinerary?: ItineraryContent })?.itinerary;
-        const isOpen = openKey === event.id;
+        const isOpen = openIds.has(event.id);
         const isPeeling = peelingKey === event.id;
         const backId = `ef-back-${event.id}`;
 
@@ -213,15 +222,7 @@ export function EventFlipCards({ events, startIndex = 0 }: { events: Event[]; st
           "--ef-color": accent.color,
           "--ef-wash": accent.wash,
         } as CSSProperties;
-        const measured = heights[event.id];
-        // Never shrink on open: an event with little back content keeps at
-        // least its front's height. Before the first measurement (server
-        // render) there's no height at all and the front sizes the card.
-        const innerHeight = measured
-          ? isOpen
-            ? Math.max(measured.front, measured.back)
-            : measured.front
-          : undefined;
+        const innerHeight = rowMatchedHeight(event.id, ids, heights, openIds);
 
         return (
           <article
@@ -229,6 +230,9 @@ export function EventFlipCards({ events, startIndex = 0 }: { events: Event[]; st
             className={`ef-flip ${isPeeling ? "ef-peeling" : ""} ${isOpen ? "ef-flipped" : ""}`.trim()}
             style={style}
             onKeyDown={(e) => handleCardKeyDown(e, event.id)}
+            ref={(node) => {
+              cardRefs.current[event.id] = node;
+            }}
           >
             <div className="ef-inner" style={{ height: innerHeight }}>
               <div className="ef-face ef-front">

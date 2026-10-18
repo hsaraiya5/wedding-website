@@ -34,7 +34,8 @@ const BULLET_PATTERN = /^\s*[-*•]\s+/;
 
 type Block = { kind: "paragraph"; lines: string[] } | { kind: "list"; items: string[] };
 
-function renderAnswer(answer: string) {
+// Also renders the hotel cards' parking notes, which use the same format.
+export function renderAnswer(answer: string) {
   const blocks: Block[] = [];
   for (const rawLine of answer.split(/\r?\n/)) {
     const line = rawLine.trim();
