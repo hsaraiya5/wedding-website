@@ -2,22 +2,28 @@ import "./faq-section.css";
 
 type Faq = { id: string; question: string; answer: string };
 
-// Splits on bare URLs so answers can link out (e.g. to a donation page)
-// without needing a rich-text editor in the admin -- admins just paste the
-// URL directly into the answer text. Capturing group keeps the URL itself
-// in the split output, at every odd index.
-const URL_PATTERN = /(https?:\/\/\S+)/g;
+// Answers can link out without needing a rich-text editor in the admin.
+// Two forms: Markdown-style [link text](https://...) shows just the text,
+// for long URLs like Google Maps directions, and a bare https://... URL
+// pasted straight into the answer still links as itself.
+const LINK_PATTERN = /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)|(https?:\/\/\S+)/g;
 
 function renderAnswer(answer: string) {
-  return answer.split(URL_PATTERN).map((part, index) =>
-    index % 2 === 1 ? (
-      <a key={index} href={part} target="_blank" rel="noopener noreferrer">
-        {part}
+  const parts: React.ReactNode[] = [];
+  let lastIndex = 0;
+  for (const match of answer.matchAll(LINK_PATTERN)) {
+    const [whole, text, markdownUrl, bareUrl] = match;
+    parts.push(answer.slice(lastIndex, match.index));
+    const href = markdownUrl ?? bareUrl;
+    parts.push(
+      <a key={match.index} href={href} target="_blank" rel="noopener noreferrer">
+        {text ?? bareUrl}
       </a>
-    ) : (
-      part
-    )
-  );
+    );
+    lastIndex = match.index + whole.length;
+  }
+  parts.push(answer.slice(lastIndex));
+  return parts;
 }
 
 // Ported from the handoff's ".faq-list" -- native <details>/<summary>
