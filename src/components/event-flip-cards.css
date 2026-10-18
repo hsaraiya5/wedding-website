@@ -112,7 +112,7 @@
   padding: 54px 48px 34px;
 }
 .ef-front h3 { color: var(--accent-foreground); font-size: 3.45rem; line-height: 0.96; }
-.ef-subtitle { display: block; margin-top: 10px; color: var(--ef-color); font-family: var(--font-display); font-size: 1.55rem; line-height: 1.1; }
+.ef-subtitle { display: block; margin-top: 10px; color: var(--ef-color); font-family: var(--font-display); font-style: italic; font-size: 1.55rem; line-height: 1.1; }
 .ef-date { display: block; margin-top: 30px; color: var(--foreground); font-size: 1rem; font-weight: 600; }
 
 .ef-meta {
@@ -174,7 +174,7 @@
 }
 .ef-back-heading { margin-top: 10px; }
 .ef-back h3 { margin-top: 4px; color: var(--accent-foreground); font-size: 2.55rem; line-height: 0.98; }
-.ef-cultural-heading { margin-top: 7px; color: var(--ef-color); font-family: var(--font-display); font-size: 1.28rem; line-height: 1.14; }
+.ef-cultural-heading { margin-top: 7px; color: var(--ef-color); font-family: var(--font-display); font-style: italic; font-size: 1.28rem; line-height: 1.14; }
 
 .ef-tradition-copy { align-self: center; margin-top: 14px; }
 .ef-tradition-copy > p { color: var(--muted-foreground); font-size: 0.88rem; line-height: 1.52; }
