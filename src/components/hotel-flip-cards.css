@@ -1,11 +1,15 @@
 /* Same visual language as the original (non-flipping) .tv-hotel cards in
    travel-section.css -- plain card, no paper/floral texture, single shared
-   color -- with a simple 3D flip added on top. Prefixed "hf-". */
+   color -- with a simple 3D flip added on top. The front carries the
+   designer's pencil drawing, mounted like a print. Prefixed "hf-". */
 
 .hf-grid {
   width: 100%;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
+  /* Each card has its own height (front closed, back open), so a flipped
+     card grows without stretching its neighbour. */
+  align-items: start;
   gap: 24px;
 }
 
@@ -22,21 +26,18 @@
 }
 
 .hf-inner {
-  display: grid;
+  position: relative;
   width: 100%;
-  height: 100%;
+  /* height is set inline from the measured faces (see HotelFlipCards). */
   transform-style: preserve-3d;
   transform-origin: center;
-  transition: transform 620ms cubic-bezier(0.18, 0.72, 0.18, 1);
+  transition:
+    transform 620ms cubic-bezier(0.18, 0.72, 0.18, 1),
+    height 620ms cubic-bezier(0.22, 0.7, 0.2, 1);
 }
 .hf-flip.hf-flipped .hf-inner { transform: rotateY(-180deg); }
 
 .hf-face {
-  /* Both faces share the same grid cell (rather than the more typical
-     position: absolute) so .hf-inner's height auto-sizes to whichever
-     face is tallest -- lets long hotel descriptions grow the card instead
-     of being clipped to a hardcoded min-height. */
-  grid-area: 1 / 1;
   min-width: 0;
   overflow: hidden;
   border: 1px solid var(--border);
@@ -53,12 +54,12 @@
 }
 .hf-face:hover { border-color: rgba(161, 63, 61, 0.38); box-shadow: 0 18px 40px rgba(77, 55, 39, 0.1); }
 
+/* The front stays in flow so it sizes the card on the server render, before
+   any measurement exists; min-height lets it fill the box once the card has
+   grown for the back. */
 .hf-front {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  gap: 20px;
-  padding: 38px;
+  position: relative;
+  min-height: 100%;
 }
 .hf-flip.hf-flipped .hf-front { pointer-events: none; }
 
@@ -73,30 +74,86 @@
 }
 .hf-trigger:focus-visible { outline: 3px solid rgba(161, 63, 61, 0.5); outline-offset: -4px; }
 
+/* Natural height, never stretched: its offsetHeight is the closed card's. */
 .hf-front-content {
   position: relative;
   z-index: 2;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  gap: 20px;
-  height: 100%;
+  gap: 22px;
+  padding: 22px 22px 30px;
   pointer-events: none;
 }
-.hf-front-content a { pointer-events: auto; }
 
-.hf-hotel-copy h3 { margin-top: 8px; color: var(--accent-foreground); font-size: 1.9rem; }
-.hf-hotel-copy p { max-width: 620px; margin-top: 12px; color: var(--muted-foreground); }
-.hf-room-types {
-  max-width: none !important;
-  margin-top: 20px !important;
-  padding-top: 16px;
-  border-top: 1px solid var(--border);
+/* The drawing is on its own cream paper, so it reads as a print mounted on
+   the ivory card rather than trying to blend into it. */
+.hf-art {
+  overflow: hidden;
+  border: 1px solid rgba(113, 43, 49, 0.16);
+  border-radius: 3px;
+  background: #fdfaf1;
 }
-.hf-room-types span { display: block; color: var(--primary); font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; }
-.hf-room-types strong { display: block; margin-top: 4px; color: var(--foreground); font-size: 0.94rem; font-weight: 600; }
+.hf-art img {
+  display: block;
+  width: 100%;
+  height: auto;
+  transition: transform 700ms cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.hf-flip:not(.hf-flipped) .hf-front:hover .hf-art img { transform: scale(1.025); }
 
-.hf-front-links {
+.hf-front-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 10px 20px;
+  padding-inline: 16px;
+}
+
+.hf-hotel-copy h3 { margin-top: 8px; color: var(--accent-foreground); font-size: 1.9rem; line-height: 1.12; text-wrap: balance; }
+.hf-hotel-copy p { max-width: 620px; margin-top: 12px; color: var(--muted-foreground); }
+.hf-hotel-copy .hf-address { margin-top: 6px; color: var(--foreground); font-size: 0.92rem; }
+
+.hf-flip-hint {
+  color: var(--primary);
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+}
+
+.hf-back {
+  position: absolute;
+  inset: 0;
+  transform: rotateY(180deg);
+  pointer-events: none;
+  cursor: pointer;
+}
+.hf-flip.hf-flipped .hf-back { pointer-events: auto; }
+.hf-back:focus-visible { outline: 3px solid rgba(161, 63, 61, 0.5); outline-offset: -4px; }
+
+/* Natural height, never stretched: its offsetHeight is what the card grows
+   to when flipped. */
+.hf-back-content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 36px 38px 38px;
+}
+
+.hf-facts { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--border); }
+.hf-facts li {
+  display: grid;
+  grid-template-columns: 9.5rem minmax(0, 1fr);
+  gap: 4px 20px;
+  border-bottom: 1px solid var(--border);
+  padding: 12px 0;
+}
+.hf-facts li span { color: var(--muted-foreground); font-size: 0.9rem; }
+.hf-facts li strong { color: var(--foreground); font-size: 0.94rem; font-weight: 600; }
+
+.hf-links {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -118,53 +175,22 @@
 .hf-map-link { color: var(--primary); font-weight: 700; font-size: 0.86rem; }
 .hf-map-link:hover { color: var(--accent-foreground); }
 
-.hf-flip-hint {
-  position: absolute;
-  z-index: 2;
-  top: 16px;
-  right: 20px;
-  color: var(--muted-foreground);
-  font-size: 0.7rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-  pointer-events: none;
-}
-
-.hf-back {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  gap: 20px;
-  padding: 38px;
-  transform: rotateY(180deg);
-  pointer-events: none;
-  cursor: pointer;
-}
-.hf-flip.hf-flipped .hf-back { pointer-events: auto; }
-.hf-back:focus-visible { outline: 3px solid rgba(161, 63, 61, 0.5); outline-offset: -4px; }
-
-.hf-facts { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--border); }
-.hf-facts li {
-  display: flex;
-  justify-content: space-between;
-  gap: 24px;
-  border-bottom: 1px solid var(--border);
-  padding: 14px 0;
-}
-.hf-facts li span { color: var(--muted-foreground); }
-
 @media (max-width: 900px) {
-  .hf-front, .hf-back { padding: 32px; }
+  .hf-back-content { padding: 32px; }
 }
 
 @media (max-width: 700px) {
   .hf-grid { grid-template-columns: 1fr; gap: 16px; }
   .hf-grid > .hf-flip:nth-child(odd):nth-last-child(1) { width: auto; justify-self: stretch; }
-  /* The front face only has 3 short blocks (title/description, room
-     types, book link) -- space-between over a tall card stretched huge
-     gaps between them. Pack them together instead; the card is sized to
-     fit the back face's longer fact list, so there's still natural
-     breathing room below the button without an awkward mid-card void. */
-  .hf-front-content { justify-content: flex-start; }
+  .hf-front-content { padding: 14px 14px 24px; gap: 18px; }
+  .hf-front-title { padding-inline: 12px; }
+  .hf-hotel-copy h3 { font-size: 1.65rem; }
+  .hf-back-content { padding: 28px 24px 30px; }
+  /* Labels stack over their values -- a side column leaves too little room
+     for longer parking notes at phone width. */
+  .hf-facts li { grid-template-columns: 1fr; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hf-inner, .hf-art img { transition: none; }
 }
