@@ -44,11 +44,4 @@
   .lfm-loading { height: 340px; }
 }
 
-.gg-updated {
-  margin-top: 28px;
-  color: var(--muted-foreground);
-  font-size: 0.78rem;
-  text-align: center;
-  text-transform: uppercase;
-}
 
