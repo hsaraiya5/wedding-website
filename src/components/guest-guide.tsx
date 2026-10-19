@@ -103,7 +103,6 @@ export function GuestGuide() {
           ))}
         </div>
       </article>
-      <p className="gg-updated">Guest information last updated September 16, 2026</p>
     </div>
   );
 }
