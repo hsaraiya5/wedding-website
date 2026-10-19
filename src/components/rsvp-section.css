@@ -187,11 +187,18 @@
   grid-column: 1 / -1;
   display: grid;
   grid-template-columns: minmax(220px, 0.7fr) minmax(320px, 1.3fr);
-  align-items: end;
-  gap: 36px;
+  align-items: start;
+  column-gap: 36px;
   border-bottom: 1px solid var(--border);
   padding-bottom: 44px;
 }
+/* The eyebrow and heading span the full width; below them the paragraph and
+   the phone field start on the same line, so the field's label lines up
+   with the text instead of floating partway down beside it. */
+.rv-updates-copy { display: contents; }
+.rv-updates-copy .gh-eyebrow,
+.rv-updates-copy h4 { grid-column: 1 / -1; }
+.rv-updates > :last-child { grid-column: 2; grid-row: 3; margin-top: 12px; }
 .rv-updates-copy .gh-eyebrow { margin-bottom: 8px; }
 .rv-updates-copy h4 {
   color: var(--accent-foreground);
@@ -201,6 +208,7 @@
   line-height: 1.15;
 }
 .rv-updates-copy > p:last-child {
+  grid-column: 1;
   max-width: 360px;
   margin-top: 12px;
   color: var(--muted-foreground);
@@ -461,7 +469,8 @@
 
 @media (max-width: 700px) {
   .rv-end { grid-template-columns: 1fr; gap: 30px; }
-  .rv-updates { grid-template-columns: 1fr; gap: 26px; }
+  .rv-updates { grid-template-columns: 1fr; }
+  .rv-updates > :last-child { grid-column: 1; grid-row: auto; margin-top: 22px; }
   .rv-needs-grid { grid-template-columns: 1fr; }
   .rv-submit { flex-direction: column; }
   .rv-submit .gh-button { width: 100%; }
