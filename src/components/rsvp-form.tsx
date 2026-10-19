@@ -404,11 +404,7 @@ export function RsvpForm({
                     <button type="button" className="rv-edit-pill self-start" onClick={addPhoneNumber}>
                       Add another number
                     </button>
-                  ) : (
-                    <p className="text-sm text-muted-foreground">
-                      You&apos;ve added a number for every guest on your invitation.
-                    </p>
-                  )}
+                  ) : null}
                 </div>
               </div>
 
