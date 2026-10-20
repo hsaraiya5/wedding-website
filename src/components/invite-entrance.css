@@ -51,6 +51,13 @@
 .ie-env {
   position: relative;
   z-index: 2;
+  /* A size container so the address block can clear the wax seal in units of
+     the envelope's own width (cqw), which is what the seal is sized by. */
+  container-type: inline-size;
+  /* Distance from the lower flap's top edge to just below the seal: the seal
+     sits ~2% of the envelope's height into the flap and is 14.5% of its width
+     across, plus a little breathing room. */
+  --ie-seal-clear: 13.5cqw;
   /* Sized against both axes: a share of the width, a hard cap so it can't
      get silly on an ultrawide, and a height bound so the envelope never
      outgrows a short laptop window. The old flat 520px cap bound long
@@ -256,11 +263,12 @@
   position: absolute;
   left: 9%;
   right: 9%;
-  /* Centred in the lower flap rather than pinned to its bottom edge: once the
-     envelope scales with the viewport, a bottom anchor leaves a widening void
-     between the wax and the address block. */
-  top: 50%;
-  transform: translateY(-50%);
+  /* Centred in the part of the lower flap below the seal. Centring in the
+     whole flap let a short window (which shrinks the envelope but not this
+     block) push the names up under the wax. */
+  top: var(--ie-seal-clear);
+  bottom: 5%;
+  align-content: center;
   z-index: 3;
   display: grid;
   gap: clamp(8px, 1.2vw, 13px);
@@ -526,6 +534,7 @@
   .ie-env { width: min(92vw, 420px, calc((100svh - 120px) * 0.78)); aspect-ratio: 0.78; }
   .ie-card { --ie-rail-w: 20%; --ie-rail-gap: 2.5%; }
   .ie-seal { width: 18%; }
+  .ie-env { --ie-seal-clear: 14.5cqw; }
   .ie-access[data-stage="welcoming"] .ie-env { transform: scale(1.05); }
   .ie-access[data-stage="launching"] .ie-env,
   .ie-access[data-stage="done"] .ie-env { transform: scale(1.35); }
