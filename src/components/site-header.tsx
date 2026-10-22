@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState, type CSSProperties } from "react";
-import { Share2 } from "lucide-react";
 import { Countdown } from "@/components/countdown";
 import { GhLogo } from "@/components/gh-logo";
 import { designAssets } from "@/lib/design-assets";
@@ -11,12 +10,12 @@ import "./site-header.css";
 const links = [
   { href: "#welcome", label: "Welcome" },
   { href: "#events", label: "Events" },
-  { href: "#travel", label: "Travel & stay" },
-  { href: "#wardrobe", label: "Wardrobe planner" },
-  { href: "#guest-guide", label: "Guest guide" },
+  { href: "#travel", label: "Travel & Stay" },
+  { href: "#wardrobe", label: "Wardrobe Planner" },
+  { href: "#guest-guide", label: "Guest Guide" },
   { href: "#faq", label: "Questions" },
   { href: "#rsvp", label: "RSVP" },
-  { href: "#story", label: "Our story" },
+  { href: "#story", label: "Our Story" },
 ];
 
 export function SiteHeader({
@@ -28,7 +27,6 @@ export function SiteHeader({
 }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [activeId, setActiveId] = useState("welcome");
-  const [shared, setShared] = useState(false);
   const weddingStart = weddingStartIso ? new Date(weddingStartIso) : null;
 
   // Scroll-spy for the nav's active state. The design marks the section
@@ -94,25 +92,6 @@ export function SiteHeader({
       target.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "start" });
       window.history.replaceState(null, "", href);
     }, 260);
-  };
-
-  // Web Share API where it's available (mobile Safari/Chrome); everywhere
-  // else, copy the link and flip the button's label briefly -- same
-  // micro-pattern as CalendarButton's "downloaded" state in
-  // event-flip-cards.tsx.
-  const handleShare = async () => {
-    const shareData = { title: "Gayathri & Hrishikesh's Wedding", url: window.location.href };
-    if (navigator.share) {
-      try {
-        await navigator.share(shareData);
-      } catch {
-        // Cancelled share sheet -- nothing to do.
-      }
-      return;
-    }
-    await navigator.clipboard.writeText(window.location.href);
-    setShared(true);
-    window.setTimeout(() => setShared(false), 1800);
   };
 
   const artStyle = { "--sh-hero-art": `url(${designAssets.hero})` } as CSSProperties;
@@ -182,17 +161,6 @@ export function SiteHeader({
             &times;
           </button>
 
-          <button
-            type="button"
-            onClick={handleShare}
-            aria-label="Share this site"
-            className="sh-overlay-share"
-            tabIndex={menuOpen ? 0 : -1}
-          >
-            <Share2 aria-hidden="true" />
-            <span className="sr-only">{shared ? "Copied" : "Share"}</span>
-          </button>
-
           {/* Mobile-only mini-header -- desktop keeps the plain eyebrow
               below plus the art pane's own date/venue placard. */}
           <div className="sh-overlay-mobile-header">
@@ -200,13 +168,13 @@ export function SiteHeader({
               <GhLogo height={44} />
             </span>
             <div>
-              <p className="sh-overlay-eyebrow">Wedding weekend</p>
-              <p className="sh-overlay-mobile-title">Plan your weekend</p>
+              <p className="sh-overlay-eyebrow">Wedding Weekend</p>
+              <p className="sh-overlay-mobile-title">Plan Your Weekend</p>
               <p className="sh-overlay-mobile-subline">May 29-30, 2027 &middot; Pittsburgh</p>
             </div>
           </div>
 
-          <p className="sh-overlay-eyebrow sh-overlay-eyebrow-desktop">Wedding weekend</p>
+          <p className="sh-overlay-eyebrow sh-overlay-eyebrow-desktop">Wedding Weekend</p>
 
           <nav aria-label="Wedding website sections" className="sh-overlay-nav">
             {links.map((link, index) => (

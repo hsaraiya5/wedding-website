@@ -28,15 +28,6 @@
    shrink-wraps to that floor and the whole row collapses to a few px --
    the same failure mode as the cd-main grid earlier in this file. */
 .cd-units { margin-top: 10px; display: flex; flex-wrap: nowrap; justify-content: center; width: 100%; gap: 10px; }
-/* Shrinking degrades smoothly down to a point, but below it the label
-   text itself (fixed-size, no floor) just gets clipped -- "Minutes"
-   needed more width than a 5-unit row had left on a narrow phone, and
-   the box shrank right past the label instead of wrapping. Below 480px,
-   wrap into rows of up to 3 (doubling each box's width) instead. */
-@media (max-width: 480px) {
-  .cd-units { flex-wrap: wrap; row-gap: 12px; }
-  .cd-unit { flex: 0 1 calc(33.333% - 7px); }
-}
 .cd-unit {
   flex: 1 1 96px;
   min-width: 0;
@@ -172,14 +163,40 @@
   .cd-root.cd-main .cd-value { min-height: 76px; }
 }
 
-/* Six units (five without Seconds) in one row stops working below
-   ~480px: each box's own font-size already shrinks to fit its digits
-   (min(<size>, 55cqw)), but the label below it is a fixed size and just
-   gets clipped -- "SECONDS" needed 66px of text in a 46px box on a
-   375-390px phone. Two rows of up to 3 doubles each unit's width instead
-   of shrinking the label further, so the label stays fully readable. */
+.cd-label-short { display: none; }
+
+/* Phones: one slim strip instead of separate tiles. Two rows of six big
+   boxes crowded the welcome screen, so below 480px the units share one
+   bordered strip split by hairlines, with short labels (Hrs, Min, Sec)
+   that fit a ~60px cell. Applies to both the home and menu countdowns. */
 @media (max-width: 480px) {
-  .cd-root.cd-main .cd-units { grid-template-columns: repeat(3, minmax(0, 1fr)); row-gap: 14px; }
+  .cd-units,
+  .cd-root.cd-main .cd-units {
+    display: grid;
+    grid-template-columns: repeat(var(--cd-count, 5), minmax(0, 1fr));
+    gap: 0;
+    overflow: hidden;
+    border: 1px solid rgba(113, 43, 49, 0.18);
+    border-radius: 4px;
+    background: #fffdf6;
+    box-shadow: 0 10px 24px rgba(91, 45, 36, 0.08);
+  }
+  .cd-unit,
+  .cd-root.cd-main .cd-unit { border: 0; border-radius: 0; box-shadow: none; }
+  .cd-unit + .cd-unit { border-left: 1px solid rgba(113, 43, 49, 0.14); }
+  .cd-value,
+  .cd-root.cd-main .cd-value { min-height: 48px; font-size: min(1.75rem, 52cqw); }
+  .cd-label,
+  .cd-root.cd-main .cd-label { padding: 5px 2px 6px; font-size: 0.62rem; letter-spacing: 0.04em; }
+  .cd-label-full {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .cd-label-short { display: inline; }
 }
 
 /* Home page's main countdown reveals with the rest of WelcomeHome's
@@ -219,7 +236,14 @@
   100% { opacity: 1; transform: perspective(360px) rotateX(0); }
 }
 
+/* Must match the specificity of the .wh-ready / .sh-open rules that start
+   these animations, or they still run: with fill mode "both", units this
+   override had already made visible snapped back to their 0% keyframe the
+   moment .wh-ready landed, so the countdown painted, vanished, then faded
+   in again (see the matching note in welcome-home.css). */
 @media (prefers-reduced-motion: reduce) {
   .wh-home .cd-root.cd-main .cd-unit,
-  .sh-overlay .cd-root:not(.cd-main) .cd-value { opacity: 1; transform: none; animation: none; }
+  .wh-home.wh-ready .cd-root.cd-main .cd-unit,
+  .sh-overlay .cd-root:not(.cd-main) .cd-value,
+  .sh-overlay.sh-open .cd-root:not(.cd-main) .cd-value { opacity: 1; transform: none; animation: none; }
 }

@@ -12,7 +12,7 @@ import "./countdown.css";
 // transition it triggers finishes, both static halves already agree with
 // `value`, so dropping the panels back to their hidden resting state is
 // seamless.
-function Unit({ value, label }: { value: number | null; label: string }) {
+function Unit({ value, label, short }: { value: number | null; label: string; short: string }) {
   const text = value === null ? "--" : String(value).padStart(2, "0");
   const [previous, setPrevious] = useState(text);
   const [flipping, setFlipping] = useState(false);
@@ -56,7 +56,13 @@ function Unit({ value, label }: { value: number | null; label: string }) {
           <span className="cd-layer-inner">{text}</span>
         </span>
       </span>
-      <span className="cd-label">{label}</span>
+      {/* Phones show the short label; the full one stays for screen readers. */}
+      <span className="cd-label">
+        <span className="cd-label-full">{label}</span>
+        <span className="cd-label-short" aria-hidden="true">
+          {short}
+        </span>
+      </span>
     </div>
   );
 }
@@ -89,12 +95,12 @@ export function Countdown({
     <div className={cn("cd-root", variant === "main" && "cd-main")}>
       <p className="cd-title">{title}</p>
       <div className="cd-units" style={{ "--cd-count": showSeconds ? 6 : 5 } as React.CSSProperties}>
-        <Unit value={parts?.months ?? null} label="Months" />
-        <Unit value={parts?.weeks ?? null} label="Weeks" />
-        <Unit value={parts?.days ?? null} label="Days" />
-        <Unit value={parts?.hours ?? null} label="Hours" />
-        <Unit value={parts?.minutes ?? null} label="Minutes" />
-        {showSeconds ? <Unit value={parts?.seconds ?? null} label="Seconds" /> : null}
+        <Unit value={parts?.months ?? null} label="Months" short="Mo" />
+        <Unit value={parts?.weeks ?? null} label="Weeks" short="Wk" />
+        <Unit value={parts?.days ?? null} label="Days" short="Days" />
+        <Unit value={parts?.hours ?? null} label="Hours" short="Hrs" />
+        <Unit value={parts?.minutes ?? null} label="Minutes" short="Min" />
+        {showSeconds ? <Unit value={parts?.seconds ?? null} label="Seconds" short="Sec" /> : null}
       </div>
     </div>
   );
