@@ -183,7 +183,10 @@
   }
   .cd-unit,
   .cd-root.cd-main .cd-unit { border: 0; border-radius: 0; box-shadow: none; }
-  .cd-unit + .cd-unit { border-left: 1px solid rgba(113, 43, 49, 0.14); }
+  /* Listed with the cd-main selector too: the border reset just above is more
+     specific for the home countdown and was wiping these dividers out. */
+  .cd-unit + .cd-unit,
+  .cd-root.cd-main .cd-unit + .cd-unit { border-left: 1px solid rgba(113, 43, 49, 0.16); }
   .cd-value,
   .cd-root.cd-main .cd-value { min-height: 48px; font-size: min(1.75rem, 52cqw); }
   .cd-label,
