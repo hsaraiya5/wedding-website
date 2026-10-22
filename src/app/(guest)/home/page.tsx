@@ -93,7 +93,7 @@ export default async function HomePage({
 
           <div className="wh-actions">
             <a href="#events" className="gh-button">
-              View the itinerary
+              View the Itinerary
             </a>
             <a href="#rsvp" className="gh-button gh-button-secondary">
               {household.rsvp_submitted_at ? "View RSVP" : "RSVP"}
