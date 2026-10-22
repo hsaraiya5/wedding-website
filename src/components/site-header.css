@@ -235,25 +235,10 @@
 }
 .sh-overlay-eyebrow { color: var(--primary); font-size: 0.9rem; font-weight: 800; letter-spacing: 0; text-transform: uppercase; }
 
-/* Mobile-only mini-header and share button -- hidden by default so
+/* Mobile-only mini-header -- hidden by default so
    desktop's existing plain-eyebrow overlay is unaffected; see the
    max-width: 700px block below for the mobile presentation. */
 .sh-overlay-mobile-header { display: none; }
-.sh-overlay-share {
-  display: none;
-  position: absolute;
-  top: 72px;
-  right: 18px;
-  width: 40px;
-  height: 40px;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid var(--border);
-  border-radius: 50%;
-  background: #fffdf6;
-  color: var(--primary);
-}
-.sh-overlay-share svg { width: 17px; height: 17px; }
 
 .sh-overlay-nav { margin-top: 14px; display: grid; }
 .sh-overlay-nav a {
@@ -276,13 +261,11 @@
 /* Staggered enter reveals, matching the handoff's delays. */
 .sh-overlay-eyebrow,
 .sh-overlay-mobile-header,
-.sh-overlay-share,
 .sh-overlay-nav a,
 .sh-overlay-venue,
 .sh-overlay-countdown { opacity: 0; transform: translateY(12px); }
 .sh-overlay.sh-open .sh-overlay-eyebrow,
 .sh-overlay.sh-open .sh-overlay-mobile-header { animation: sh-copy-in 420ms ease 80ms both; }
-.sh-overlay.sh-open .sh-overlay-share { animation: sh-copy-in 420ms ease 130ms both; }
 .sh-overlay.sh-open .sh-overlay-nav a { animation: sh-copy-in 460ms ease both; }
 .sh-overlay.sh-open .sh-overlay-nav a:nth-child(1) { animation-delay: 130ms; }
 .sh-overlay.sh-open .sh-overlay-nav a:nth-child(2) { animation-delay: 180ms; }
@@ -312,7 +295,6 @@
   .sh-overlay * { animation: none !important; transition: none !important; }
   .sh-overlay-eyebrow,
   .sh-overlay-mobile-header,
-  .sh-overlay-share,
   .sh-overlay-nav a,
   .sh-overlay-venue,
   .sh-overlay-countdown { opacity: 1; transform: none; }
@@ -326,14 +308,12 @@
     /* The numbered-row mobile nav is much shorter than the plain
        heading-sized links this "safe center" vertical centering was
        written for -- centering it left a large dead gap between the
-       close/share buttons (pinned near the real top) and the header
+       close button (pinned near the real top) and the header
        block below. Top-aligning starts content right where the padding
        already clears those buttons. */
     align-content: start;
   }
   .sh-overlay-panel::after { width: 220px; height: 250px; background-size: auto 250px; }
-
-  .sh-overlay-share { display: flex; }
 
   .sh-overlay-eyebrow-desktop { display: none; }
   .sh-overlay-mobile-header {

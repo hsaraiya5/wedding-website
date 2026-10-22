@@ -294,7 +294,9 @@ export function InviteEntrance() {
             <div className="ie-addr-action">
               {code.trim() ? (
                 <button className="ie-addr-go" type="submit" disabled={!canType}>
-                  {pending ? "Opening…" : "Open the invitation →"}
+                  {/* Stays on "Opening…" once the code is accepted, instead of flicking
+                      back to the idle label in the beat before the seal breaks. */}
+                  {pending || state.householdName ? "Opening…" : "Open the invitation →"}
                 </button>
               ) : null}
             </div>
