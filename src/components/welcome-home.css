@@ -471,6 +471,13 @@
     transform: none;
     animation: none;
   }
+  /* The scroll arrow keeps a softer, slower bob even here: it's the one cue
+     that there's more below, and a still arrow read as decoration. */
+  .wh-home.wh-ready .wh-scroll-cue { animation: wh-cue-bounce-soft 2600ms ease-in-out infinite; }
+  @keyframes wh-cue-bounce-soft {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(3px); }
+  }
   .wh-home .wh-title,
   .wh-home.wh-ready .wh-title { clip-path: inset(0); animation: none; }
   .wh-message.wh-typing span::after { animation: none; opacity: 0; }
