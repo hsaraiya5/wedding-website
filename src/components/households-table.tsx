@@ -4,10 +4,11 @@ import Link from "next/link";
 import { ChevronDown } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { DeleteHouseholdButton } from "@/components/delete-household-button";
-import { formatRsvpDeadlineDate } from "@/lib/format";
+import { formatRsvpDeadlineDate, guestFullName } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
-export type EventRef = { name: string } | { name: string }[] | null;
+type EventInfo = { name: string; event_date?: string | null; start_time?: string | null };
+export type EventRef = EventInfo | EventInfo[] | null;
 
 export type Guest = {
   id: string;
@@ -30,21 +31,30 @@ export type Household = {
   // inherits it -- shown once on the card rather than repeated per guest.
   rsvp_deadlines: RsvpDeadline | RsvpDeadline[] | null;
   household_whatsapp_numbers: WhatsappNumber[];
+  // We're paying for their room; the guest site swaps the hotel cards for a
+  // "your stay is covered" note.
+  hotel_covered_by_host: boolean;
   dietary_needs: string | null;
   accessibility_needs: string | null;
   guests: Guest[];
 };
 
+// In the order they happen (Haldi, Sangeet, Vivaha, Reception) -- the
+// embedded rows come back in no particular order.
 function eventList(guest: Guest): { name: string; status: "yes" | "no" | "pending" }[] {
   const rsvpByEvent = new Map(guest.rsvps.map((r) => [r.event_id, r.attending]));
-  return guest.guest_events.flatMap((ge) => {
-    const events = Array.isArray(ge.events) ? ge.events : ge.events ? [ge.events] : [];
-    return events.map((event) => {
-      const attending = rsvpByEvent.get(ge.event_id);
-      const status = attending === "yes" ? "yes" : attending === "no" ? "no" : "pending";
-      return { name: event.name, status: status as "yes" | "no" | "pending" };
-    });
-  });
+  return guest.guest_events
+    .flatMap((ge) => {
+      const events = Array.isArray(ge.events) ? ge.events : ge.events ? [ge.events] : [];
+      return events.map((event) => {
+        const attending = rsvpByEvent.get(ge.event_id);
+        const status = attending === "yes" ? "yes" : attending === "no" ? "no" : "pending";
+        const when = `${event.event_date ?? "9999-12-31"} ${event.start_time ?? "99:99"}`;
+        return { name: event.name, status: status as "yes" | "no" | "pending", when };
+      });
+    })
+    .sort((a, b) => a.when.localeCompare(b.when))
+    .map(({ name, status }) => ({ name, status }));
 }
 
 export function rsvpDeadline(household: Household): RsvpDeadline | null {
@@ -134,6 +144,9 @@ export function HouseholdsTable({
                           RSVP by {deadlineText(deadline)}
                         </span>
                       ) : null}
+                      {household.hotel_covered_by_host ? (
+                        <span className="av-pill av-pill-yes">Hotel covered</span>
+                      ) : null}
                     </div>
                   </div>
 
@@ -157,7 +170,9 @@ export function HouseholdsTable({
                     const guestEventList = eventList(guest);
                     return (
                       <div key={guest.id} className="av-guest-summary-row">
-                        <span className="av-guest-summary-name">{guest.first_name}</span>
+                        <span className="av-guest-summary-name">
+                          {guestFullName(guest.first_name, guest.last_name)}
+                        </span>
                         {guestEventList.length > 0 ? (
                           guestEventList.map((e, i) => (
                             <span

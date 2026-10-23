@@ -26,7 +26,7 @@ export default async function EditHouseholdPage({
     await Promise.all([
       supabase.from("households").select("*").eq("id", id).single(),
       supabase.from("guests").select("*").eq("household_id", id).order("first_name"),
-      supabase.from("events").select("id, name, event_date").order("event_date"),
+      supabase.from("events").select("id, name, event_date").order("event_date").order("start_time"),
       supabase.from("rsvp_deadlines").select("id, label, deadline").order("deadline"),
     ]);
 

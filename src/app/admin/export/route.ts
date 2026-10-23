@@ -45,7 +45,11 @@ export async function GET(request: Request) {
 
   // Build event id -> name from the events table directly, since rsvps only
   // carries event_id.
-  const { data: events } = await supabase.from("events").select("id, name");
+  const { data: events } = await supabase
+    .from("events")
+    .select("id, name")
+    .order("event_date")
+    .order("start_time");
   for (const event of events ?? []) {
     eventNameById.set(event.id, event.name);
   }

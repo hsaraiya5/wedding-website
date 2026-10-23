@@ -22,10 +22,10 @@ export default async function AdminDashboardPage() {
     supabase
       .from("households")
       .select(
-        "id, display_name, code, group_tag, dietary_needs, accessibility_needs, rsvp_deadlines(id, label, deadline), household_whatsapp_numbers(phone_number), guests(id, first_name, last_name, guest_events(event_id, events(name)), rsvps(event_id, attending))"
+        "id, display_name, code, group_tag, hotel_covered_by_host, dietary_needs, accessibility_needs, rsvp_deadlines(id, label, deadline), household_whatsapp_numbers(phone_number), guests(id, first_name, last_name, guest_events(event_id, events(name, event_date, start_time)), rsvps(event_id, attending))"
       )
       .order("display_name"),
-    supabase.from("events").select("id, name, event_date").order("event_date"),
+    supabase.from("events").select("id, name, event_date").order("event_date").order("start_time"),
   ]);
 
   return (
