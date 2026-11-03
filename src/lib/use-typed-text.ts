@@ -1,23 +1,29 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 
-// Character-by-character reveal, matching the design's timing (18ms/char)
-// and respecting prefers-reduced-motion (shows the full text immediately
-// instead of animating). Starts once, the first time `active` turns true.
+const REDUCED_MOTION = "(prefers-reduced-motion: reduce)";
+
+function subscribeReducedMotion(onChange: () => void) {
+  const query = window.matchMedia(REDUCED_MOTION);
+  query.addEventListener("change", onChange);
+  return () => query.removeEventListener("change", onChange);
+}
+
+// Character-by-character reveal, matching the design's timing (18ms/char).
+// Starts once, the first time `active` turns true. With prefers-reduced-motion
+// the full text shows straight away -- without waiting for `active`, which
+// otherwise left the message popping in after the rest of the page.
 export function useTypedText(text: string, active: boolean) {
   const [typed, setTyped] = useState("");
   const startedRef = useRef(false);
-  const typing = typed.length > 0 && typed.length < text.length;
+  const reducedMotion = useSyncExternalStore(
+    subscribeReducedMotion,
+    () => window.matchMedia(REDUCED_MOTION).matches,
+    () => false
+  );
 
   useEffect(() => {
-    if (!active || startedRef.current) return;
+    if (reducedMotion || !active || startedRef.current) return;
     startedRef.current = true;
-
-    const showFullText = () => setTyped(text);
-
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      showFullText();
-      return;
-    }
 
     let index = 0;
     const interval = setInterval(() => {
@@ -28,7 +34,8 @@ export function useTypedText(text: string, active: boolean) {
       }
     }, 18);
     return () => clearInterval(interval);
-  }, [active, text]);
+  }, [active, text, reducedMotion]);
 
-  return { typed, typing };
+  if (reducedMotion) return { typed: text, typing: false };
+  return { typed, typing: typed.length > 0 && typed.length < text.length };
 }

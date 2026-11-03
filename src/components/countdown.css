@@ -239,12 +239,24 @@
   100% { opacity: 1; transform: perspective(360px) rotateX(0); }
 }
 
+/* On phones the home countdown is one strip, so it fades in as one piece:
+   staggering each cell left the strip's empty border on screen while its
+   numbers were still invisible. */
+@media (max-width: 480px) {
+  .wh-home .cd-root.cd-main .cd-unit,
+  .wh-home.wh-ready .cd-root.cd-main .cd-unit { opacity: 1; transform: none; animation: none; }
+  .wh-home .cd-root.cd-main .cd-units { opacity: 0; transform: translateY(10px); }
+  .wh-home.wh-ready .cd-root.cd-main .cd-units { animation: cd-unit-in 620ms ease 720ms both; }
+}
+
 /* Must match the specificity of the .wh-ready / .sh-open rules that start
    these animations, or they still run: with fill mode "both", units this
    override had already made visible snapped back to their 0% keyframe the
    moment .wh-ready landed, so the countdown painted, vanished, then faded
    in again (see the matching note in welcome-home.css). */
 @media (prefers-reduced-motion: reduce) {
+  .wh-home .cd-root.cd-main .cd-units,
+  .wh-home.wh-ready .cd-root.cd-main .cd-units,
   .wh-home .cd-root.cd-main .cd-unit,
   .wh-home.wh-ready .cd-root.cd-main .cd-unit,
   .sh-overlay .cd-root:not(.cd-main) .cd-value,
