@@ -63,7 +63,7 @@ export default async function HomePage({
           mapUrl="https://www.google.com/maps/search/?api=1&query=Wyndham+Grand+Pittsburgh+Downtown"
           caption={
             <>
-              May 29-30, 2027
+              May 29–30, 2027
               <br />
               Wyndham Grand, Pittsburgh Downtown
             </>
