@@ -144,7 +144,7 @@ export function SiteHeader({
         <div className="sh-overlay-art">
           <div className="sh-overlay-art-inner">
             <p>
-              May 29-30, 2027
+              May 29–30, 2027
               <br />
               Wyndham Grand, Pittsburgh Downtown
             </p>
@@ -170,7 +170,7 @@ export function SiteHeader({
             <div>
               <p className="sh-overlay-eyebrow">Wedding Weekend</p>
               <p className="sh-overlay-mobile-title">Plan Your Weekend</p>
-              <p className="sh-overlay-mobile-subline">May 29-30, 2027 &middot; Pittsburgh</p>
+              <p className="sh-overlay-mobile-subline">May 29–30, 2027 &middot; Pittsburgh</p>
             </div>
           </div>
 
