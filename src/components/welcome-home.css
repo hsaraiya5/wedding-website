@@ -438,7 +438,13 @@
   .wh-flying-bird:nth-child(2) { --wh-bird-top: 3%; --wh-bird-entry: 28%; --wh-flap-speed: 1800ms; --wh-flap-delay: -700ms; }
   .wh-flying-bird,
   .wh-home.wh-ready .wh-flying-bird { opacity: 0.32; transform: none; animation: none; }
+}
+/* On phones the hanging birds crowd the names, so they stay out entirely. */
+@media (prefers-reduced-motion: reduce) and (max-width: 700px) {
+  .wh-bird-flight { display: none; }
+}
 
+@media (prefers-reduced-motion: reduce) {
   /* Every hero animation is applied through `.wh-home.wh-ready X`, so these
      cancellations have to match that specificity or they lose. They didn't,
      which meant the animations still ran for reduced-motion guests -- and
