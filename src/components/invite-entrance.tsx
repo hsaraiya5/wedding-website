@@ -1,7 +1,6 @@
 "use client";
 
 import { useActionState, useEffect, useRef, useState, type CSSProperties } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { redeemInviteCode, type RedeemCodeState } from "@/app/actions/guest";
 import { designAssets } from "@/lib/design-assets";
@@ -45,7 +44,6 @@ const HANDOFF_MS = 3300;
 const initialState: RedeemCodeState = { error: null, householdName: null };
 
 export function InviteEntrance() {
-  const router = useRouter();
   const [state, formAction, pending] = useActionState(redeemInviteCode, initialState);
   const [stage, setStage] = useState<Stage>("idle");
   const [code, setCode] = useState("");
@@ -188,11 +186,6 @@ export function InviteEntrance() {
     if (!state.householdName || startedRef.current) return;
     startedRef.current = true;
 
-    // Fetch /home while the envelope is still opening. Without this the
-    // handoff stalls on a round trip, which on a phone turns the last beat
-    // into a blank wait.
-    router.prefetch("/home");
-
     // Deliberately plays in full regardless of prefers-reduced-motion. This is
     // a one-time, few-second moment for a small trusted guest list, and the
     // couple chose showing it whole over an abbreviated fallback.
@@ -201,9 +194,14 @@ export function InviteEntrance() {
     OPEN_BEATS.forEach(([next, at]) => later(() => setStage(next), at));
     later(() => {
       document.body.style.overflow = "";
-      router.push("/home");
+      // A full page load rather than router.push: a client-side navigation
+      // let iOS Safari paint /home for a frame before its stylesheets had
+      // arrived, flashing the whole page as raw unstyled text. A document
+      // load holds the paint until the CSS is in.
+      // eslint-disable-next-line @next/next/no-location-assign-relative-destination -- a full load is the point
+      window.location.assign("/home");
     }, HANDOFF_MS);
-  }, [state.householdName, router]);
+  }, [state.householdName]);
 
   // Wrong code: the envelope shudders and the seal holds.
   useEffect(() => {
