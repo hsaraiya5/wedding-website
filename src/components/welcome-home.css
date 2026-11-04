@@ -430,7 +430,14 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .wh-bird-flight { display: none; }
+  /* No flight across the screen; instead a pair of birds hang in the top
+     corner and only flap, slowly. Same .wh-ready specificity as the flight
+     animation they replace. */
+  .wh-flying-bird:nth-child(n + 3) { display: none; }
+  .wh-flying-bird:nth-child(1) { --wh-bird-top: 1%; --wh-bird-entry: 6%; --wh-flap-speed: 1500ms; }
+  .wh-flying-bird:nth-child(2) { --wh-bird-top: 3%; --wh-bird-entry: 28%; --wh-flap-speed: 1800ms; --wh-flap-delay: -700ms; }
+  .wh-flying-bird,
+  .wh-home.wh-ready .wh-flying-bird { opacity: 0.32; transform: none; animation: none; }
 
   /* Every hero animation is applied through `.wh-home.wh-ready X`, so these
      cancellations have to match that specificity or they lose. They didn't,
