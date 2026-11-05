@@ -146,7 +146,14 @@ export function RsvpForm({
   useEffect(() => {
     if (justSubmitted && !stampStarted.current) {
       stampStarted.current = true;
+      setMode("readonly");
       setStamping(true);
+      // The redirect's #rsvp hash isn't reliably honoured on a same-page
+      // navigation, which left the guest at the old submit button -- and once
+      // the long form collapsed to the stamp, that spot was the photos below.
+      requestAnimationFrame(() =>
+        document.getElementById("rsvp")?.scrollIntoView({ block: "start", behavior: "instant" })
+      );
     }
   }, [justSubmitted]);
 
