@@ -109,6 +109,10 @@
 .sc-section.sc-in-view .sc-reveal { opacity: 1; transform: translateY(0); }
 
 @media (max-width: 720px) {
+  /* The desktop 72/84px padding stacks to a ~160px empty band between
+     sections on a phone. The RSVP band keeps its own: its padding sits
+     inside the maroon background rather than reading as blank space. */
+  .sc-section:not(.rv-section) { padding: 40px 0 44px; }
   .sc-container { width: min(560px, calc(100% - 32px)); }
   .sc-rail { display: none; }
   /* At the fixed 2.3rem/1.1 line-height above, this heading font wraps to
