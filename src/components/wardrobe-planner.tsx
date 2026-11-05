@@ -3,6 +3,7 @@
 import { useId, useRef, useState, type CSSProperties, type KeyboardEvent } from "react";
 import { formatEventDayPart, formatEventTime, formatEventWeekday } from "@/lib/format";
 import { designAssets } from "@/lib/design-assets";
+import { eventKind } from "@/lib/event-kind";
 import "./wardrobe-planner.css";
 
 export type WardrobeContent = {
@@ -20,8 +21,7 @@ type Event = {
   extra_content: { wardrobe?: WardrobeContent } | Record<string, unknown>;
 };
 
-// Cycled by position, same reasoning as EventFlipCards' accents --
-// generalizes regardless of what the admin actually calls each event.
+// In event-kind order (Haldi, Sangeet, ceremony, Reception) -- see eventKind.
 const accentColors = [
   "var(--color-event-haldi)",
   "var(--color-event-sangeet)",
@@ -33,8 +33,7 @@ const accentColors = [
 const accentInks = ["var(--foreground)", "#fffaf0", "var(--foreground)", "#fffaf0"];
 
 // The designer's pencil-illustration PNGs (one per garment pairing:
-// Haldi/Sangeet/Ceremony/Reception), cycled by position rather than tied
-// to a specific event name for the same reason as accentColors above --
+// Haldi/Sangeet/Ceremony/Reception), in event-kind order like accentColors --
 // generic decorative art, not per-couple content, so not admin-editable.
 const garmentSketches = [
   { src: designAssets.wardrobeHaldi, alt: "Pencil fashion illustration of a sharara and kurta for the Haldi" },
@@ -111,6 +110,7 @@ export function WardrobePlanner({ events }: { events: Event[] }) {
   const [activeIndex, setActiveIndex] = useState(0);
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const active = events[activeIndex];
+  const activeKind = active ? eventKind(active.name, activeIndex) : 0;
 
   if (!active) return null;
 
@@ -153,8 +153,8 @@ export function WardrobePlanner({ events }: { events: Event[] }) {
             {
               "--wp-count": events.length,
               "--wp-active": activeIndex,
-              "--wp-active-color": accentColors[activeIndex % accentColors.length],
-              "--wp-active-ink": accentInks[activeIndex % accentInks.length],
+              "--wp-active-color": accentColors[activeKind],
+              "--wp-active-ink": accentInks[activeKind],
             } as CSSProperties
           }
         >
@@ -171,7 +171,7 @@ export function WardrobePlanner({ events }: { events: Event[] }) {
               onClick={() => select(index, false)}
               onKeyDown={(event) => handleTabKeyDown(event, index)}
               className="wp-tab"
-              style={{ "--wp-tab-color": accentColors[index % accentColors.length] } as CSSProperties}
+              style={{ "--wp-tab-color": accentColors[eventKind(event.name, index)] } as CSSProperties}
             >
               <span className="wp-tab-head">
                 <span className="wp-tab-daypart">{formatEventDayPart(event.event_date, event.start_time)}</span>
@@ -188,7 +188,7 @@ export function WardrobePlanner({ events }: { events: Event[] }) {
       <div className="wp-detail" key={active.id}>
         <div className="wp-panel-inner">
           <div className="wp-copy">
-            <p className="gh-eyebrow" style={{ color: accentColors[activeIndex % accentColors.length] } as CSSProperties}>
+            <p className="gh-eyebrow" style={{ color: accentColors[activeKind] } as CSSProperties}>
               {active.name}
             </p>
             <h3 className="font-heading">{wardrobe?.title || "Dress code coming soon"}</h3>
@@ -204,12 +204,12 @@ export function WardrobePlanner({ events }: { events: Event[] }) {
 
           <div
             className="wp-visual"
-            style={{ "--wp-wash": accentColors[activeIndex % accentColors.length] } as CSSProperties}
+            style={{ "--wp-wash": accentColors[activeKind] } as CSSProperties}
           >
             <WatercolorSketch
-              src={garmentSketches[activeIndex % garmentSketches.length].src}
-              alt={garmentSketches[activeIndex % garmentSketches.length].alt}
-              index={activeIndex}
+              src={garmentSketches[activeKind].src}
+              alt={garmentSketches[activeKind].alt}
+              index={activeKind}
             />
             {wardrobe?.palette && wardrobe.palette.length > 0 ? (
               <div className="wp-palette">
