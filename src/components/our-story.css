@@ -122,7 +122,10 @@
 }
 
 @media (max-width: 700px) {
-  .os-viewport { aspect-ratio: 4 / 5; }
+  /* Landscape on phones too: the photos are landscape, and a tall 4:5 box
+     cropped their sides (cutting people out of frame). 3:2 is the camera's
+     own shape, so they show nearly whole. */
+  .os-viewport { aspect-ratio: 3 / 2; }
   .os-slide-label { padding: 28px 20px 14px; font-size: 1.25rem; }
   .os-slide::after { inset: 12px; }
   .os-controls { grid-template-columns: 48px minmax(0, 1fr) 48px; gap: 8px; padding: 12px; }
