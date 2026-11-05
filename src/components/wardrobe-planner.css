@@ -68,6 +68,7 @@
 .wp-tab:hover { background: rgba(255, 250, 240, 0.52); padding-left: 29px; color: var(--accent-foreground); }
 .wp-tab[aria-selected="true"] { background: var(--background); padding-left: 32px; color: var(--accent-foreground); }
 .wp-tab[aria-selected="true"]::before { opacity: 1; transform: scaleY(1); }
+.wp-tab-sub { display: none; }
 .wp-tab:focus-visible { outline: 2px solid color-mix(in srgb, var(--wp-tab-color) 64%, transparent); outline-offset: -6px; }
 
 .wp-detail {
@@ -208,26 +209,59 @@
      just duplicates it once the tabs move to the top on mobile. */
   .wp-rail-heading { display: none; }
 
-  /* Flatten the 2x2 grid of boxed tab cells (900px tier) into a lighter
-     pill/tab-bar look: drop the filled-box active state and the left/top
-     accent bar, mark the active tab with an underline instead, and drop
-     the script "Look 0N" label -- day-part + event name is enough at
-     this size. */
-  .wp-tab {
+  /* A sliding switch: every event's name in one rounded track, with a pill
+     in the chosen event's colour gliding under it. Equal columns, so three
+     or four events both fill the track. */
+  .wp-rail { padding: 14px 10px 12px; }
+  .wp-tabs {
+    position: relative;
+    grid-template-columns: repeat(var(--wp-count, 4), minmax(0, 1fr));
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: var(--background);
+    padding: 4px;
+  }
+  .wp-tabs::before {
+    content: "";
+    position: absolute;
+    top: 4px;
+    bottom: 4px;
+    left: 4px;
+    width: calc((100% - 8px) / var(--wp-count, 4));
+    border-radius: 9px;
+    background: var(--wp-active-color);
+    transform: translateX(calc(var(--wp-active, 0) * 100%));
+    transition: transform 320ms cubic-bezier(0.2, 0.7, 0.2, 1), background 320ms ease;
+  }
+  .wp-tab,
+  .wp-tab:nth-child(2n),
+  .wp-tab:last-child {
+    z-index: 1;
     min-height: 0;
-    gap: 2px;
-    border-bottom: 2px solid transparent;
-    padding: 12px 14px;
-  }
-  .wp-tab:last-child { border-bottom: 2px solid transparent; }
-  .wp-tab::before { display: none; }
-  .wp-tab:hover { padding-left: 14px; background: transparent; }
-  .wp-tab[aria-selected="true"] {
-    padding-left: 14px;
+    place-content: center;
+    border: 0;
     background: transparent;
-    border-bottom-color: var(--wp-tab-color);
+    padding: 9px 2px;
+    text-align: center;
   }
-  .wp-tab-head { justify-content: flex-start; }
-  .wp-tab-daypart { font-size: 0.62rem; }
-  .wp-tab strong { font-size: 0.95rem; }
+  .wp-tab::before,
+  .wp-tab-head { display: none; }
+  .wp-tab:hover,
+  .wp-tab[aria-selected="true"] { padding-left: 2px; background: transparent; }
+  .wp-tab strong { font-size: 0.9rem; line-height: 1.1; text-wrap: balance; transition: color 200ms ease; }
+  .wp-tab[aria-selected="true"] strong { color: var(--wp-active-ink, #fffaf0); }
+  .wp-tab-sub {
+    display: block;
+    margin-top: 10px;
+    color: var(--muted-foreground);
+    font-size: 0.66rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-align: center;
+    text-transform: uppercase;
+  }
+}
+
+@media (max-width: 700px) and (prefers-reduced-motion: reduce) {
+  .wp-tabs::before { transition: none; }
 }
