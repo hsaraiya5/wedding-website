@@ -10,8 +10,8 @@ import "./site-header.css";
 const links = [
   { href: "#welcome", label: "Welcome" },
   { href: "#events", label: "Events" },
-  { href: "#travel", label: "Travel & Stay" },
   { href: "#wardrobe", label: "Wardrobe Planner" },
+  { href: "#travel", label: "Travel & Stay" },
   { href: "#guest-guide", label: "Guest Guide" },
   { href: "#faq", label: "Questions" },
   { href: "#rsvp", label: "RSVP" },
