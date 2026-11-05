@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useEffect, useRef, useState, type CSSProperties, type KeyboardEvent, type MouseEvent } from "react";
 import { formatEventDayFull, formatEventTime, formatIcsDateTime } from "@/lib/format";
 import { designAssets } from "@/lib/design-assets";
+import { eventKind } from "@/lib/event-kind";
 import { rowMatchedHeight, type FlipMeasure } from "@/lib/flip-heights";
 import "./event-flip-cards.css";
 
@@ -29,9 +30,8 @@ type Event = {
 
 // Ported from the design handoff's paper "event-flip" cards: a front face
 // (overview) that peels its corner then turns in place to reveal the back
-// (tradition details + calendar download). Cycled by position, same
-// reasoning as the old EventsTimeline's accentColors -- generalizes
-// regardless of what the admin actually calls each event.
+// (tradition details + calendar download). Accents are in event-kind order
+// (Haldi, Sangeet, ceremony, Reception) -- see eventKind.
 const accents = [
   { color: "#b88420", wash: "#f4e3b9" },
   { color: "#7b3546", wash: "#eadbd8" },
@@ -211,7 +211,7 @@ export function EventFlipCards({ events, startIndex = 0 }: { events: Event[]; st
     <div className="ef-grid" style={floralStyle}>
       {events.map((event, index) => {
         const position = startIndex + index;
-        const accent = accents[position % accents.length];
+        const accent = accents[eventKind(event.name, position)];
         const icon = eventIcons.find((entry) => entry.match.test(event.name));
         const itinerary = (event.extra_content as { itinerary?: ItineraryContent })?.itinerary;
         const isOpen = openIds.has(event.id);
