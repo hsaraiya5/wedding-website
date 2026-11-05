@@ -115,6 +115,17 @@ export default async function HomePage({
         )}
       </Section>
 
+      {events.length > 0 ? (
+        <Section id="wardrobe">
+          <SectionHeading
+            eyebrow="Wardrobe planner"
+            title="Plan each look, one celebration at a time."
+            intro="Choose an event to explore Indian outfit ideas, a considered color palette, and the practical details that make getting dressed easy."
+          />
+          <WardrobePlanner events={events} />
+        </Section>
+      ) : null}
+
       {travel_options.length > 0 || household.hotel_covered_by_host ? (
         <Section id="travel">
           <TravelSection
@@ -125,17 +136,6 @@ export default async function HomePage({
             noticeTitle={site_settings?.travel_notice_title}
             noticeBody={site_settings?.travel_notice_body}
           />
-        </Section>
-      ) : null}
-
-      {events.length > 0 ? (
-        <Section id="wardrobe">
-          <SectionHeading
-            eyebrow="Wardrobe planner"
-            title="Plan each look, one celebration at a time."
-            intro="Choose an event to explore Indian outfit ideas, a considered color palette, and the practical details that make getting dressed easy."
-          />
-          <WardrobePlanner events={events} />
         </Section>
       ) : null}
 
