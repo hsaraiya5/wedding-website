@@ -13,10 +13,6 @@
   position: relative;
   width: 100%;
   min-width: 0;
-  /* 61px = the mobile site-header's 60px height + its 1px border, so this
-     section sits flush under it instead of leaving the next section's top
-     peeking in as a sliver. */
-  min-height: calc(100svh - 61px);
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   overflow: hidden;
@@ -118,7 +114,10 @@
   place-items: center;
   min-width: 0;
   order: 1;
-  padding: 52px 22px 64px;
+  /* Phones size the hero to its content rather than the full screen: centred
+     in a full-height box it floated in a band of empty space top and bottom.
+     The bottom padding leaves room for the scroll cue under the buttons. */
+  padding: 28px 22px 84px;
 }
 .wh-panel::after {
   content: "";
