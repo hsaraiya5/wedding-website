@@ -115,9 +115,8 @@
   min-width: 0;
   order: 1;
   /* Phones size the hero to its content rather than the full screen: centred
-     in a full-height box it floated in a band of empty space top and bottom.
-     The bottom padding leaves room for the scroll cue under the buttons. */
-  padding: 28px 22px 84px;
+     in a full-height box it floated in a band of empty space top and bottom. */
+  padding: 28px 22px 48px;
 }
 .wh-panel::after {
   content: "";
@@ -365,6 +364,11 @@
   opacity: 0;
 }
 .wh-scroll-cue svg { width: 18px; height: 18px; }
+/* Not needed on phones, where the hero fits its content and Events follows
+   straight on. */
+@media (max-width: 700px) {
+  .wh-scroll-cue { display: none; }
+}
 .wh-home.wh-ready .wh-scroll-cue {
   animation: wh-cue-in 520ms ease 1300ms both, wh-cue-bounce 1800ms ease-in-out 1820ms infinite;
 }
