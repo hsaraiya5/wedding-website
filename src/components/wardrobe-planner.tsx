@@ -28,6 +28,9 @@ const accentColors = [
   "var(--color-event-ceremony)",
   "var(--color-event-reception)",
 ];
+// Text on the phone switch's sliding pill: white reads too faintly on the
+// light marigold and pink pills, so those take ink instead.
+const accentInks = ["var(--foreground)", "#fffaf0", "var(--foreground)", "#fffaf0"];
 
 // The designer's pencil-illustration PNGs (one per garment pairing:
 // Haldi/Sangeet/Ceremony/Reception), cycled by position rather than tied
@@ -146,7 +149,14 @@ export function WardrobePlanner({ events }: { events: Event[] }) {
           className="wp-tabs"
           role="tablist"
           aria-label="Wardrobe by event"
-          style={{ "--wp-count": events.length } as CSSProperties}
+          style={
+            {
+              "--wp-count": events.length,
+              "--wp-active": activeIndex,
+              "--wp-active-color": accentColors[activeIndex % accentColors.length],
+              "--wp-active-ink": accentInks[activeIndex % accentInks.length],
+            } as CSSProperties
+          }
         >
           {events.map((event, index) => (
             <button
@@ -170,6 +180,9 @@ export function WardrobePlanner({ events }: { events: Event[] }) {
             </button>
           ))}
         </div>
+        {/* Phone only (see wardrobe-planner.css): the switch shows names alone,
+            so the chosen event's day and time of day sit under it. */}
+        <p className="wp-tab-sub">{formatEventDayPart(active.event_date, active.start_time)}</p>
       </aside>
 
       <div className="wp-detail" key={active.id}>
