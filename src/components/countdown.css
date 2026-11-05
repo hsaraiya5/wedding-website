@@ -202,21 +202,9 @@
   .cd-label-short { display: inline; }
 }
 
-/* Home page's main countdown reveals with the rest of WelcomeHome's
-   content, staggered per unit -- matches the handoff's
-   ".welcome-home.ready .main-countdown .flip-unit:nth-child(n)". */
-.wh-home .cd-root.cd-main .cd-unit { opacity: 0; transform: translateY(10px) scale(0.98); }
-.wh-home.wh-ready .cd-root.cd-main .cd-unit { animation: cd-unit-in 620ms ease both; }
-.wh-home.wh-ready .cd-root.cd-main .cd-unit:nth-child(1) { animation-delay: 720ms; }
-.wh-home.wh-ready .cd-root.cd-main .cd-unit:nth-child(2) { animation-delay: 820ms; }
-.wh-home.wh-ready .cd-root.cd-main .cd-unit:nth-child(3) { animation-delay: 920ms; }
-.wh-home.wh-ready .cd-root.cd-main .cd-unit:nth-child(4) { animation-delay: 1020ms; }
-.wh-home.wh-ready .cd-root.cd-main .cd-unit:nth-child(5) { animation-delay: 1120ms; }
-.wh-home.wh-ready .cd-root.cd-main .cd-unit:nth-child(6) { animation-delay: 1220ms; }
-@keyframes cd-unit-in {
-  from { opacity: 0; transform: translateY(10px) scale(0.98); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
-}
+/* Home page's main countdown arrives in one piece with the rest of
+   WelcomeHome's content (.wh-content > .cd-root fades in welcome-home.css).
+   Revealing the boxes one by one read as the page loading in stages. */
 
 /* The nav menu overlay's countdown flips each digit box up into place on
    open, staggered -- matches the handoff's ".menu-overlay.open
@@ -237,16 +225,6 @@
   0% { opacity: 0; transform: perspective(360px) rotateX(-88deg); }
   65% { opacity: 1; transform: perspective(360px) rotateX(8deg); }
   100% { opacity: 1; transform: perspective(360px) rotateX(0); }
-}
-
-/* On phones the home countdown is one strip, so it fades in as one piece:
-   staggering each cell left the strip's empty border on screen while its
-   numbers were still invisible. */
-@media (max-width: 480px) {
-  .wh-home .cd-root.cd-main .cd-unit,
-  .wh-home.wh-ready .cd-root.cd-main .cd-unit { opacity: 1; transform: none; animation: none; }
-  .wh-home .cd-root.cd-main .cd-units { opacity: 0; transform: translateY(10px); }
-  .wh-home.wh-ready .cd-root.cd-main .cd-units { animation: cd-unit-in 620ms ease 720ms both; }
 }
 
 /* Must match the specificity of the .wh-ready / .sh-open rules that start
