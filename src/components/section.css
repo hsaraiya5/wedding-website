@@ -23,10 +23,7 @@
   background-size: 100% auto;
   background-repeat: repeat-y;
   opacity: 0;
-  clip-path: inset(100% 0 0 0);
-  transform: translateY(18px) scale(0.985);
-  transform-origin: bottom;
-  transition: clip-path 1400ms cubic-bezier(0.18, 0.72, 0.2, 1), opacity 700ms ease, transform 1400ms cubic-bezier(0.18, 0.72, 0.2, 1);
+  transform: translateY(18px);
   filter: drop-shadow(0 12px 16px rgba(67, 57, 43, 0.08));
   pointer-events: none;
 }
@@ -47,15 +44,13 @@
 }
 .sc-section.sc-in-view .sc-rail {
   opacity: var(--sc-rail-opacity);
-  clip-path: inset(0 0 0 0);
-  transform: translateY(0) scale(1);
-  animation: sc-botanical-grow 1650ms cubic-bezier(0.18, 0.78, 0.2, 1) both;
+  transform: translateY(0);
+  animation: sc-botanical-grow 1100ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
 }
 .sc-section.sc-in-view .sc-rail-right { animation-delay: 120ms; }
 @keyframes sc-botanical-grow {
-  0% { opacity: 0; clip-path: inset(100% 0 0); transform: translateY(28px) scale(0.94); }
-  72% { opacity: var(--sc-rail-opacity); clip-path: inset(0); transform: translateY(-3px) scale(1.012); }
-  100% { opacity: var(--sc-rail-opacity); clip-path: inset(0); transform: translateY(0) scale(1); }
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: var(--sc-rail-opacity); transform: translateY(0); }
 }
 
 .sc-container {

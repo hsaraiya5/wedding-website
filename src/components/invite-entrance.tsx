@@ -37,9 +37,11 @@ const OPEN_BEATS: [Stage, number][] = [
   ["launching", 2750],
   ["done", 3200],
 ];
-// The card's fade completes around 3170ms. Handing off right after it lands
-// rather than half a second later -- that gap was a dead, blank screen.
-const HANDOFF_MS = 3300;
+// Starts loading /home as the card begins to fade ("launching") rather than
+// once it has gone: the browser keeps this page painted, fade still playing,
+// until /home's first paint, so the load overlaps the fade instead of
+// following it as a blank wait.
+const HANDOFF_MS = 2750;
 
 const initialState: RedeemCodeState = { error: null, householdName: null };
 

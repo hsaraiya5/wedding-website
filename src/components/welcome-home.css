@@ -50,8 +50,7 @@
   inset: 0;
   background: var(--wh-hero-art) left center / cover no-repeat;
   opacity: 0;
-  clip-path: inset(100% 0 0);
-  transform: translateY(26px) scale(0.965);
+  transform: translateY(16px);
   transform-origin: bottom left;
 }
 .wh-home.wh-ready .wh-art::before {
@@ -134,7 +133,6 @@
   height: 180px;
   background: var(--wh-floral-art) right bottom / auto 180px no-repeat;
   opacity: 0;
-  clip-path: inset(100% 0 0);
   pointer-events: none;
 }
 .wh-home.wh-ready .wh-panel::after {
@@ -379,13 +377,12 @@
   50% { transform: translateY(6px); }
 }
 @keyframes wh-botanical-grow {
-  0% { opacity: 0; clip-path: inset(100% 0 0); transform: translateY(24px) scale(0.96); }
-  76% { opacity: 1; clip-path: inset(0); transform: translateY(-3px) scale(1.01); }
-  100% { opacity: 1; clip-path: inset(0); transform: translateY(0) scale(1); }
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 @keyframes wh-corner-grow {
-  from { opacity: 0; clip-path: inset(100% 0 0); transform: translateY(20px); }
-  to { opacity: 0.1; clip-path: inset(0); transform: translateY(0); }
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 0.1; transform: translateY(0); }
 }
 @keyframes wh-script-write { to { clip-path: inset(0); } }
 
